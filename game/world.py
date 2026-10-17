@@ -61,8 +61,11 @@ EURO_SLOTS = [
 ]
 LIB_SLOTS = {"BRA": 7, "ARG": 6, "COL": 3, "ECU": 3, "PAR": 3, "CHI": 2, "PER": 2, "URU": 2, "BOL": 2, "VEN": 2}
 SUD_SLOTS = {"BRA": 6, "ARG": 6, "COL": 3, "CHI": 3, "PER": 3, "ECU": 3, "URU": 3, "PAR": 2, "BOL": 2, "VEN": 1}
-ACLE_SLOTS = {"KSA": 4, "KOR": 3, "CHN": 3, "AUS": 2, "IND": 1}
-CONT_ORDER = ["UCL", "UEL", "UECL", "USC", "LIB", "SUD", "ACLE"]
+# ЛЧ АФК (Элит): по реальной раскладке мест между ассоциациями (запад - Саудовская Аравия, ОАЭ, Катар; восток - Япония, Корея, Китай, Таиланд, Австралия)
+ACLE_SLOTS = {"KSA": 4, "JPN": 3, "KOR": 3, "UAE": 3, "QAT": 3, "CHN": 2, "THA": 2, "AUS": 2, "IND": 1}
+# Кубок чемпионов КОНКАКАФ: только клубы Мексики и MLS (лиг Центральной Америки и Карибов в базе нет)
+CCC_SLOTS = {"MEX": 6, "USA": 6}
+CONT_ORDER = ["UCL", "UEL", "UECL", "USC", "LIB", "SUD", "ACLE", "CCC"]
 PEN_SCORES = [(5, 4), (4, 3), (4, 2), (3, 2), (5, 3), (3, 1), (6, 5), (7, 6), (4, 1), (8, 7), (2, 1)]
 PEN_W = [22, 20, 12, 12, 10, 6, 8, 4, 3, 2, 1]
 
@@ -375,6 +378,10 @@ class World:
         r = self._cont_comp(acl)
         if r:
             res["cont"]["ACLE"] = r
+        ccc, _ = self._region_fields(res, CCC_SLOTS)
+        r = self._cont_comp(ccc)
+        if r:
+            res["cont"]["CCC"] = r
 
     def _cont_comp(self, teams, groups=False):
         rng, n = self.rng, len(teams)

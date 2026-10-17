@@ -28,7 +28,7 @@ _SHORT = {"league": ("Чемпион", "Champion"), "title2": ("Победа в 
           "supercup": ("Суперкубок", "Super Cup"), "UCL": ("ЛЧ", "UCL"), "UEL": ("ЛЕ", "UEL"), "UECL": ("ЛК", "UECL"), "USC": ("Суперкубок УЕФА", "UEFA Super Cup"),
           "WC": ("ЧМ", "World Cup"), "EURO": ("ЧЕ", "EURO"), "CA": ("Копа Америка", "Copa América"), "AFCON": ("Кубок Африки", "AFCON"),
           "ASIAN": ("Кубок Азии", "Asian Cup"), "GOLD": ("Золотой кубок", "Gold Cup"), "OFCNC": ("Кубок ОФК", "OFC Cup"), "youth_league": ("Мол. лига", "Youth League"),
-          "LIB": ("Либертадорес", "Libertadores"), "SUD": ("Судамерикана", "Sudamericana"), "ACLE": ("ЛЧ АФК", "AFC CL"), "UNL": ("Лига наций", "Nations League")}
+          "LIB": ("Либертадорес", "Libertadores"), "SUD": ("Судамерикана", "Sudamericana"), "ACLE": ("ЛЧ АФК", "AFC CL"), "CCC": ("Кубок КОНКАКАФ", "CONCACAF CC"), "UNL": ("Лига наций", "Nations League")}
 
 def award_name(code, rank=None):
     """Название личной награды; для места в топ-30 Золотого мяча - с номером места."""

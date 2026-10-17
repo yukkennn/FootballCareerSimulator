@@ -9,7 +9,7 @@ from . import stars as stars_mod
 START_YEAR = 2026
 RETIRE_AGE = 40
 SAVE_VERSION = 2
-CONT_CODES = ("UCL", "UEL", "UECL", "USC", "LIB", "SUD", "ACLE")
+CONT_CODES = ("UCL", "UEL", "UECL", "USC", "LIB", "SUD", "ACLE", "CCC")
 
 def season_label(year):
     return f"{year}/{str(year + 1)[2:]}"

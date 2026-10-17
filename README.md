@@ -64,25 +64,29 @@ The league Team of the Season, Player of the Season and the Golden Boot depend o
 ## What's inside
 - `main.py`, `game/`: the application (`world.py` leagues, cups, continental competitions, national teams; `career.py` the career; `stats.py` goals and ratings;
   `stars.py` world stars; `player.py` development and decline; `ui/` desktop screens; `web/` web screens).
-- `data/football.db`, `assets/logos/`: club database and crests (1134 clubs, 78 leagues, 211 countries; team ratings from EA FC 27, smaller UEFA leagues rated by hand from the UEFA coefficient).
+- `data/football.db`, `assets/logos/`: club database and crests (1214 clubs, 83 leagues, 211 countries; team ratings from EA FC 27, smaller UEFA leagues rated by hand from the UEFA coefficient).
 - `database/`, `tools/`, `data/`, `docs/DATA_SOURCES.md`: building the database, importing FC 27, Elo and EA FC ratings, downloading missing crests.
 - `tests/`: `balance.py` (mass career runs), `test_ui_flow.py` (headless desktop interface), `test_web_flow.py` (headless web interface), importer tests.
 
 ## Known limitations
-- **Clubs exist for 73 countries**: all 55 UEFA members, 10 CONMEBOL countries (Argentina, Brazil, Colombia, Chile, Peru, Ecuador, Uruguay, Paraguay, Bolivia,
-  Venezuela), MLS (USA plus 3 Canadian clubs), Saudi Arabia, South Korea, China, India and Australia (plus 2 New Zealand clubs).
-  70 countries have their own league; clubs from Canada, New Zealand and Liechtenstein play in their neighbours' leagues, and a few Welsh and Andorran
-  clubs (Cardiff, Swansea, Wrexham, Newport, FC Andorra) play in the English and Spanish leagues. For the other 138 countries the academy is taken
+- **Clubs exist for 78 countries**: all 55 UEFA members, 10 CONMEBOL countries (Argentina, Brazil, Colombia, Chile, Peru, Ecuador, Uruguay, Paraguay, Bolivia,
+  Venezuela), Mexico, MLS (USA plus 3 Canadian clubs), Japan, Saudi Arabia, South Korea, China, the UAE, Qatar, Thailand, India and Australia (plus 2 New Zealand clubs).
+  75 countries have their own league; clubs from Canada, New Zealand and Liechtenstein play in their neighbours' leagues, and a few Welsh and Andorran
+  clubs (Cardiff, Swansea, Wrexham, Newport, FC Andorra) play in the English and Spanish leagues. For the other 133 countries the academy is taken
   from a fallback country (`data/academy_fallback.csv`).
 - **Many clubs are rated by hand**: EA FC 27 has only some of them. Colombia, Chile, Peru, Ecuador, Uruguay, Paraguay, Bolivia and Venezuela have
   only 4-7 FC 27 clubs each, so well-known clubs with hand-made ratings were added; those leagues are shorter than the real ones (8-12 clubs), but extra rounds
   give a realistic number of games (32-44). 6 of the 20 Brazilian clubs were added by hand. 24 small UEFA leagues (Albania, Armenia, the Baltics, Ireland,
   Wales and others) are rated entirely by hand from the UEFA coefficient, and Hungary, Cyprus, Azerbaijan and Finland have only 1-2 FC 27 clubs each.
   The actual 2027 line-up of these leagues may differ.
-- **No clubs from Mexico, Japan, the UAE, Thailand, Qatar or Africa**, so, for example, Al Ain and Buriram from FC 27 are not included.
-  The CONCACAF Champions Cup, the AFC Champions League Two, the African and Oceanian club competitions and the Club World Cup are listed in the database
+- **Mexico, Japan, the UAE, Qatar and Thailand** (added in October 2026): line-ups for 2026/27 from the English Wikipedia (for Qatar there is no
+  2026/27 page yet, so the line-up was derived from 2025/26 with promotion and relegation). EA FC 27 has only Al Ain (71) and Buriram (68);
+  the other clubs are rated by hand against the leagues already in the game (`tools/asia_mexico_leagues.py`). Mexico's cup is called Copa MX in the game,
+  although the real Copa MX has not been held since 2020.
+- **No clubs from Africa** and from many other countries (Central America, Iran, Egypt and others). The CONCACAF Champions Cup is played only by
+  Mexican and MLS clubs. The AFC Champions League Two, the African and Oceanian club competitions and the Club World Cup are listed in the database
   but are not played in the game.
-- **7 clubs have no crest**: reserve and youth teams (Real Sociedad B, VfB Stuttgart II and others), United Tigers and Juvenes/Dogana. A circle with initials is drawn instead.
+- **8 clubs have no crest**: reserve and youth teams (Real Sociedad B, VfB Stuttgart II and others), United Tigers, Juvenes/Dogana and Khor Fakkan. A circle with initials is drawn instead.
   To download missing crests: `python tools/fetch_logos.py data/football.db`.
 - **Star players' clubs at the start** (574 real players in `data/real_players.csv`) are based on data up to summer 2026 and have not been re-checked: some may have moved.
 - **Testing**: the web version is checked automatically by `tests/test_web_flow.py` before every deployment (a full playing and coaching career, Russian and English)
@@ -172,25 +176,27 @@ macOS / Linux: `./run.sh`.
 ## Что внутри
 - `main.py`, `game/`: приложение (`world.py` лиги, кубки, континентальные турниры, сборные; `career.py` карьера; `stats.py` голы и оценки;
   `stars.py` звёзды мира; `player.py` рост и спад; `ui/` экраны для компьютера; `web/` экраны сайта).
-- `data/football.db`, `assets/logos/`: база клубов и эмблемы (1134 клуба, 78 лиг, 211 стран; рейтинги команд из EA FC 27, у небольших лиг УЕФА ручная оценка по коэффициенту УЕФА).
+- `data/football.db`, `assets/logos/`: база клубов и эмблемы (1214 клубов, 83 лиги, 211 стран; рейтинги команд из EA FC 27, у небольших лиг УЕФА ручная оценка по коэффициенту УЕФА).
 - `database/`, `tools/`, `data/`, `docs/DATA_SOURCES.md`: сборка базы, импорт FC 27, Elo, рейтингов EA FC, докачка эмблем.
 - `tests/`: `balance.py` (массовый прогон карьер), `test_ui_flow.py` (десктопный интерфейс без экрана), `test_web_flow.py` (веб-интерфейс без браузера), тесты импортёров.
 
 ## Честно об ограничениях
-- **Клубы есть у 73 стран**: все 55 стран УЕФА, 10 стран КОНМЕБОЛ (Аргентина, Бразилия, Колумбия, Чили, Перу, Эквадор, Уругвай, Парагвай, Боливия,
-  Венесуэла), MLS (США и 3 клуба Канады), Саудовская Аравия, Южная Корея, Китай, Индия и Австралия (с 2 клубами Новой Зеландии).
-  Своя лига есть у 70 стран: клубы Канады, Новой Зеландии и Лихтенштейна играют в лигах соседей, а несколько клубов Уэльса и Андорры
-  (Кардифф, Суонси, Рексем, Ньюпорт, «Андорра») - в английских и испанской лигах. Для остальных 138 стран академия берётся из запасной страны
+- **Клубы есть у 78 стран**: все 55 стран УЕФА, 10 стран КОНМЕБОЛ (Аргентина, Бразилия, Колумбия, Чили, Перу, Эквадор, Уругвай, Парагвай, Боливия,
+  Венесуэла), Мексика, MLS (США и 3 клуба Канады), Япония, Саудовская Аравия, Южная Корея, Китай, ОАЭ, Катар, Таиланд, Индия и Австралия (с 2 клубами Новой Зеландии).
+  Своя лига есть у 75 стран: клубы Канады, Новой Зеландии и Лихтенштейна играют в лигах соседей, а несколько клубов Уэльса и Андорры
+  (Кардифф, Суонси, Рексем, Ньюпорт, «Андорра») - в английских и испанской лигах. Для остальных 133 стран академия берётся из запасной страны
   (`data/academy_fallback.csv`).
 - **Многие клубы оценены вручную**: в EA FC 27 есть только часть из них. Из Колумбии, Чили, Перу, Эквадора, Уругвая, Парагвая, Боливии и Венесуэлы в FC 27
   только по 4-7 клубов, поэтому к ним добавлены известные клубы с ручной оценкой; лиги там короче настоящих (8-12 клубов), но за счёт лишних кругов
   число матчей близко к реальному (32-44). В Бразилии 6 клубов из 20 добавлены вручную. 24 небольшие лиги УЕФА (Албания, Армения, Прибалтика, Ирландия,
   Уэльс и другие) целиком оценены вручную по коэффициенту УЕФА, а в Венгрии, на Кипре, в Азербайджане и Финляндии из FC 27 только по 1-2 клуба.
   Составы этих лиг на сезон 2027 могли отличаться.
-- **Нет клубов Мексики, Японии, ОАЭ, Таиланда, Катара и Африки**, поэтому, например, Аль-Айн и Бурирам из FC 27 не добавлены.
-  Кубок чемпионов КОНКАКАФ, Лига чемпионов АФК 2, клубные турниры Африки и Океании и клубный чемпионат мира есть в справочнике турниров,
-  но в игре не разыгрываются.
-- **Эмблем нет у 7 клубов**: резервные и молодёжные команды (Real Sociedad B, VfB Stuttgart II и др.), United Tigers и Juvenes/Dogana. Вместо них рисуется круг с инициалами.
+- **Мексика, Япония, ОАЭ, Катар и Таиланд** (добавлены в октябре 2026): составы на 2026/27 из английской Википедии (для Катара страницы 2026/27 ещё нет:
+  состав выведен из 2025/26 с учётом вылета и повышения). Из EA FC 27 есть только Аль-Айн (71) и Бурирам (68), остальные клубы оценены вручную
+  по лигам, которые уже есть в игре (`tools/asia_mexico_leagues.py`). Кубок Мексики в игре называется Copa MX, хотя настоящий Copa MX не проводится с 2020 года.
+- **Нет клубов Африки** и многих других стран (Центральная Америка, Иран, Египет и другие). Кубок чемпионов КОНКАКАФ разыгрывают только клубы
+  Мексики и MLS. Лига чемпионов АФК 2, клубные турниры Африки и Океании и клубный чемпионат мира есть в справочнике турниров, но в игре не разыгрываются.
+- **Эмблем нет у 8 клубов**: резервные и молодёжные команды (Real Sociedad B, VfB Stuttgart II и др.), United Tigers, Juvenes/Dogana и Khor Fakkan. Вместо них рисуется круг с инициалами.
   Докачать: `python tools/fetch_logos.py data/football.db`.
 - **Клубы звёзд на старте** (574 реальных игрока в `data/real_players.csv`) взяты по данным до лета 2026 года и с тех пор не перепроверялись: кто-то мог перейти в другой клуб.
 - **Проверка**: веб-версию перед каждой публикацией автоматически проверяет `tests/test_web_flow.py` (полная карьера игрока и тренера, русский и английский);

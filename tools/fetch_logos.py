@@ -28,7 +28,8 @@ UA = {"User-Agent": "football-career-sim/1.0 (personal project; club logo fetche
 # как страны называются на TheSportsDB, если не так, как name_en в базе
 TSDB_ALIASES = {"USA": {"united states", "usa"}, "IRL": {"ireland", "republic of ireland"}, "KOR": {"south korea", "korea republic", "korea"},
                 "CZE": {"czech republic", "czechia"}, "TUR": {"turkey", "türkiye", "turkiye"}, "BIH": {"bosnia-herzegovina", "bosnia and herzegovina"},
-                "MKD": {"north macedonia", "macedonia", "fyr macedonia"}, "CHN": {"china", "china pr"}, "KSA": {"saudi arabia"},
+                "MKD": {"north macedonia", "macedonia", "fyr macedonia"}, "CHN": {"china", "china pr"}, "KSA": {"saudi arabia"}, "UAE": {"united arab emirates", "uae"}, "MEX": {"mexico"},
+                "JPN": {"japan"}, "QAT": {"qatar"}, "THA": {"thailand"},
                 "NED": {"netherlands", "holland"}, "CIV": {"ivory coast", "côte d'ivoire"}, "RUS": {"russia"}, "MDA": {"moldova"},
                 "FRO": {"faroe islands"}, "NIR": {"northern ireland"}, "KOS": {"kosovo"}, "ENG": {"england"}, "WAL": {"wales"},
                 "SCO": {"scotland"}, "AUS": {"australia"}, "NZL": {"new zealand"}, "CAN": {"canada"}, "GEO": {"georgia"}}
@@ -39,6 +40,7 @@ JUNK = {"women", "womens", "ladies", "femenino", "feminino", "feminin", "feminin
 EXCLUDE = {("arg-central-cordoba", "Central Córdoba de Rosario")}
 # клубы, которые автоматический поиск не находит (короткие или неоднозначные названия): статья английской Википедии задана явно
 MANUAL_WIKI = {
+    "mex-guadalajara": "C.D. Guadalajara",
     "aze-neftci": "Neftçi PFK", "aze-qabala": "Gabala FC", "chi-colo-colo": "Colo-Colo", "chi-o-higgins": "O'Higgins F.C.",
     "fro-hb": "Havnar Bóltfelag", "fro-ki": "KÍ Klaksvík", "gib-st-joseph-s": "St Joseph's F.C.",
     "irl-st-patrick-s-athletic": "St Patrick's Athletic F.C.", "isl-fh": "Fimleikafélag Hafnarfjarðar",

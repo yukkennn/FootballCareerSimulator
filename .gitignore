@@ -7,3 +7,4 @@ site/
 *.spec
 error.log
 .claude/
+tools/.logo_cache/
