@@ -1,0 +1,573 @@
+league_id,name,club_country,is_reserve,fc_name,est_ovr
+ger-3-liga,Fortuna Düsseldorf,,0,Fortuna Düsseldorf,
+ger-3-liga,Hansa Rostock,,0,Hansa Rostock,
+ger-3-liga,MSV Duisburg,,0,MSV Duisburg,
+ger-3-liga,Preußen Münster,,0,Preußen Münster,
+ger-3-liga,SV Wehen Wiesbaden,,0,SV Wehen Wiesbaden,
+ger-3-liga,Rot-Weiß Essen,,0,Rot-Weiß Essen,
+ger-3-liga,Alemannia Aachen,,0,Alemannia Aachen,
+ger-3-liga,SV Waldhof Mannheim,,0,SV Waldhof Mannheim,
+ger-3-liga,Jahn Regensburg,,0,Jahn Regensburg,
+ger-3-liga,Viktoria Köln,,0,Viktoria Köln,
+ger-3-liga,FC Ingolstadt 04,,0,FC Ingolstadt 04,
+ger-3-liga,1. FC Saarbrücken,,0,1. FC Saarbrücken,
+ger-3-liga,TSV Havelse,,0,TSV Havelse,
+ger-3-liga,Fortuna Köln,,0,Fortuna Köln,
+ger-3-liga,Würzburger Kickers,,0,Würzburger Kickers,
+ger-3-liga,SC Verl,,0,SC Verl,
+ger-3-liga,SV Meppen,,0,SV Meppen,
+ger-3-liga,SG Sonnenhof Großaspach,,0,SG Sonnenhof Großaspach,
+ger-3-liga,VfB Stuttgart II,,1,VfB Stuttgart II,
+ger-3-liga,TSG 1899 Hoffenheim II,,1,TSG 1899 Hoffenheim II,
+usa-mls,Inter Miami,,0,Inter Miami,
+usa-mls,Los Angeles FC,,0,Los Angeles FC,
+usa-mls,New York City FC,,0,New York City FC,
+usa-mls,Chicago Fire FC,,0,Chicago Fire FC,
+usa-mls,Vancouver Whitecaps,CAN,0,Vancouver Whitecaps,
+usa-mls,Seattle Sounders,,0,Seattle Sounders,
+usa-mls,Toronto FC,CAN,0,Toronto FC,
+usa-mls,Nashville SC,,0,Nashville SC,
+usa-mls,Orlando City SC,,0,Orlando City SC,
+usa-mls,Charlotte FC,,0,Charlotte FC,
+usa-mls,FC Cincinnati,,0,FC Cincinnati,
+usa-mls,Houston Dynamo,,0,Houston Dynamo,
+usa-mls,LA Galaxy,,0,Los Angeles Galaxy,
+usa-mls,New England Revolution,,0,New England Revolution,
+usa-mls,Columbus Crew,,0,Columbus Crew,
+usa-mls,San Diego FC,,0,San Diego FC,
+usa-mls,Real Salt Lake,,0,Real Salt Lake,
+usa-mls,San Jose Earthquakes,,0,San Jose Earthquakes,
+usa-mls,Minnesota United FC,,0,Minnesota United FC,
+usa-mls,Portland Timbers,,0,Portland Timbers,
+usa-mls,Atlanta United FC,,0,Atlanta United FC,
+usa-mls,St. Louis City SC,,0,St. Louis City SC,
+usa-mls,D.C. United,,0,D.C. United,
+usa-mls,FC Dallas,,0,FC Dallas,
+usa-mls,Philadelphia Union,,0,Philadelphia Union,
+usa-mls,Austin FC,,0,Austin FC,
+usa-mls,Colorado Rapids,,0,Colorado Rapids,
+usa-mls,CF Montréal,CAN,0,CF Montréal,
+usa-mls,New York Red Bulls,,0,Red Bull New York,
+usa-mls,Sporting Kansas City,,0,Sporting KC,
+ksa-saudi-pro-league,Al Hilal,,0,Al Hilal,
+ksa-saudi-pro-league,Al Nassr,,0,Al Nassr,
+ksa-saudi-pro-league,Al Ahli,,0,Al Ahli,
+ksa-saudi-pro-league,Al Qadsiah,,0,Al Qadsiah,
+ksa-saudi-pro-league,Al Ittihad,,0,Al Ittihad,
+ksa-saudi-pro-league,Diriyah Club,,0,Diriyah Club,
+ksa-saudi-pro-league,Al Shabab,,0,Al Shabab,
+ksa-saudi-pro-league,NEOM SC,,0,NEOM SC,
+ksa-saudi-pro-league,Al Khaleej,,0,Al Khaleej,
+ksa-saudi-pro-league,Al Ettifaq,,0,Al Ettifaq,
+ksa-saudi-pro-league,Al Taawoun,,0,Al Taawoun,
+ksa-saudi-pro-league,Al Fateh,,0,Al Fateh,
+ksa-saudi-pro-league,Al Faisaly,,0,Al Faisaly,
+ksa-saudi-pro-league,Al Fayha,,0,Al Fayha,
+ksa-saudi-pro-league,Abha Club,,0,Abha Club,
+ksa-saudi-pro-league,Al Hazem,,0,Al Hazem,
+ksa-saudi-pro-league,Al Kholood,,0,Al Kholood,
+ksa-saudi-pro-league,Al Riyadh,,0,Al Riyadh,
+arg-liga-profesional,River Plate,,0,River Plate,
+arg-liga-profesional,Boca Juniors,,0,Boca Juniors,
+arg-liga-profesional,Estudiantes de La Plata,,0,Estudiantes de La Plata,
+arg-liga-profesional,Rosario Central,,0,Rosario Central,
+arg-liga-profesional,Racing Club,,0,Racing Club de Avellaneda,
+arg-liga-profesional,Vélez Sarsfield,,0,Vélez Sarsfield,
+arg-liga-profesional,Lanús,,0,Lanús,
+arg-liga-profesional,Belgrano,,0,Belgrano de Córdoba,
+arg-liga-profesional,Independiente,,0,Independiente,
+arg-liga-profesional,Independiente Rivadavia,,0,Independiente Rivadavia,
+arg-liga-profesional,Platense,,0,Platense,
+arg-liga-profesional,Defensa y Justicia,,0,Defensa y Justicia,
+arg-liga-profesional,San Lorenzo,,0,San Lorenzo de Almagro,
+arg-liga-profesional,Argentinos Juniors,,0,Argentinos Juniors,
+arg-liga-profesional,Huracán,,0,Huracán,
+arg-liga-profesional,Talleres,,0,Talleres de Córdoba,
+arg-liga-profesional,Atlético Tucumán,,0,Atlético Tucumán,
+arg-liga-profesional,Tigre,,0,Tigre,
+arg-liga-profesional,Unión de Santa Fe,,0,Unión de Santa Fe,
+arg-liga-profesional,Barracas Central,,0,Barracas Central,
+arg-liga-profesional,Gimnasia y Esgrima La Plata,,0,Gimnasia y Esgrima La Plata,
+arg-liga-profesional,Instituto,,0,Instituto de Córdoba,
+arg-liga-profesional,Newell's Old Boys,,0,Newell's Old Boys,
+arg-liga-profesional,Aldosivi,,0,Aldosivi,
+arg-liga-profesional,Central Córdoba,,0,Central Córdoba,
+arg-liga-profesional,Sarmiento,,0,Sarmiento,
+arg-liga-profesional,Gimnasia y Esgrima de Mendoza,,0,Gimnasia y Esgrima de Mendoza,
+arg-liga-profesional,Banfield,,0,Banfield,
+arg-liga-profesional,Estudiantes de Río Cuarto,,0,Estudiantes de Río Cuarto,
+arg-liga-profesional,Deportivo Riestra,,0,Deportivo Riestra,
+bra-serie-a,Flamengo,,0,Flamengo,
+bra-serie-a,Palmeiras,,0,Palmeiras,
+bra-serie-a,Atlético Mineiro,,0,Atlético Mineiro,
+bra-serie-a,Santos,,0,Santos,
+bra-serie-a,RB Bragantino,,0,RB Bragantino,
+bra-serie-a,Botafogo,,0,Botafogo,
+bra-serie-a,São Paulo,,0,São Paulo,
+bra-serie-a,Corinthians,,0,Corinthians,
+bra-serie-a,Bahia,,0,Bahia,
+bra-serie-a,Fluminense,,0,Fluminense,
+bra-serie-a,Cruzeiro,,0,Cruzeiro,
+bra-serie-a,Grêmio,,0,Grêmio,
+bra-serie-a,Vasco da Gama,,0,Vasco da Gama,
+bra-serie-a,Mirassol,,0,Mirassol,
+bra-serie-a,Internacional,,0,,72
+bra-serie-a,Athletico Paranaense,,0,,69
+bra-serie-a,Vitória,,0,,68
+bra-serie-a,Coritiba,,0,,67
+bra-serie-a,Chapecoense,,0,,66
+bra-serie-a,Remo,,0,,66
+kor-k-league-1,Jeonbuk Hyundai Motors,,0,Jeonbuk Hyundai Motors,
+kor-k-league-1,FC Seoul,,0,FC Seoul,
+kor-k-league-1,Ulsan HD,,0,Ulsan HD FC,
+kor-k-league-1,Daejeon Hana Citizen,,0,Daejeon Hana Citizen,
+kor-k-league-1,Gangwon FC,,0,Gangwon FC,
+kor-k-league-1,Incheon United,,0,Incheon United,
+kor-k-league-1,FC Anyang,,0,FC Anyang,
+kor-k-league-1,Pohang Steelers,,0,Pohang Steelers,
+kor-k-league-1,Jeju SK,,0,Jeju SK FC,
+kor-k-league-1,Gimcheon Sangmu,,0,Gimcheon Sangmu,
+kor-k-league-1,Bucheon FC 1995,,0,Bucheon FC 1995,
+kor-k-league-1,Gwangju FC,,0,Gwangju FC,
+chn-super-league,Shanghai Shenhua,,0,Shanghai Shenhua,
+chn-super-league,Beijing Guoan,,0,Beijing Guoan,
+chn-super-league,Shandong Taishan,,0,Shandong Taishan,
+chn-super-league,Shanghai Port,,0,Shanghai Port,
+chn-super-league,Chengdu Rongcheng,,0,Chengdu Rongcheng F.C.,
+chn-super-league,Zhejiang Professional,,0,Zhejiang Professional FC,
+chn-super-league,Wuhan Three Towns,,0,Wuhan Three Towns,
+chn-super-league,Yunnan Yukun,,0,Yunnan Yukun,
+chn-super-league,Henan FC,,0,Henan FC,
+chn-super-league,Shenzhen Peng City,,0,Shenzhen Peng City,
+chn-super-league,Dalian Yingbo,,0,Dalian Yingbo FC,
+chn-super-league,Tianjin Jinmen Tiger,,0,Tianjin Jinmen Tiger,
+chn-super-league,Qingdao West Coast,,0,Qingdao West Coast FC,
+chn-super-league,Liaoning Tieren,,0,Liaoning Tieren,
+chn-super-league,Qingdao Hainiu,,0,Qingdao Hainiu FC,
+chn-super-league,Chongqing Tonglianglong,,0,Chongqing Tonglianglong F.C.,
+aus-a-league,Auckland FC,NZL,0,Auckland FC,
+aus-a-league,Western Sydney Wanderers,,0,Western Sydney Wanderers,
+aus-a-league,Melbourne Victory,,0,Melbourne Victory,
+aus-a-league,Melbourne City,,0,Melbourne City,
+aus-a-league,Sydney FC,,0,Sydney FC,
+aus-a-league,Newcastle Jets,,0,Newcastle Jets,
+aus-a-league,Adelaide United,,0,Adelaide United,
+aus-a-league,Macarthur FC,,0,Macarthur FC,
+aus-a-league,Perth Glory,,0,Perth Glory,
+aus-a-league,Brisbane Roar,,0,Brisbane Roar,
+aus-a-league,Wellington Phoenix,NZL,0,Wellington Phoenix,
+aus-a-league,Central Coast Mariners,,0,Central Coast Mariners,
+ind-super-league,Mohun Bagan Super Giant,,0,Mohun Bagan Super Giant,
+ind-super-league,Bengaluru FC,,0,Bengaluru FC,
+ind-super-league,Jamshedpur FC,,0,Jamshedpur FC,
+ind-super-league,Odisha FC,,0,Odisha FC,
+ind-super-league,NorthEast United,,0,NorthEast United,
+ind-super-league,United Tigers SC,,0,United Tigers SC,
+ind-super-league,FC Goa,,0,FC Goa,
+ind-super-league,Mumbai City FC,,0,Mumbai City FC,
+ind-super-league,Chennaiyin FC,,0,Chennaiyin FC,
+ind-super-league,Punjab FC,,0,Punjab FC,
+ind-super-league,SC Delhi,,0,SC Delhi,
+ind-super-league,Kerala Blasters FC,,0,Kerala Blasters FC,
+ind-super-league,Inter Kashi,,0,Inter Kashi,
+col-primera-a,Atlético Nacional,,0,Atlético Nacional,
+col-primera-a,Junior,,0,Junior de Barranquilla,
+col-primera-a,Independiente Santa Fe,,0,Independiente Santa Fe,
+col-primera-a,Millonarios,,0,Millonarios,
+col-primera-a,Deportes Tolima,,0,Deportes Tolima,
+col-primera-a,América de Cali,,0,América de Cali,
+col-primera-a,Independiente Medellín,,0,Independiente Medellín,
+col-primera-a,Deportivo Cali,,0,,66
+col-primera-a,Once Caldas,,0,,66
+col-primera-a,Atlético Bucaramanga,,0,,66
+col-primera-a,Deportivo Pereira,,0,,64
+col-primera-a,Águilas Doradas,,0,,63
+chi-primera,Universidad Católica,,0,Universidad Católica,
+chi-primera,Coquimbo Unido,,0,Coquimbo Unido,
+chi-primera,Audax Italiano,,0,Audax Italiano,
+chi-primera,Palestino,,0,Palestino,
+chi-primera,O'Higgins,,0,O'Higgins,
+chi-primera,Colo-Colo,,0,,68
+chi-primera,Universidad de Chile,,0,,68
+chi-primera,Huachipato,,0,,64
+chi-primera,Everton de Viña del Mar,,0,,63
+chi-primera,Cobresal,,0,,63
+chi-primera,Ñublense,,0,,62
+chi-primera,Unión La Calera,,0,,62
+per-liga-1,Universitario,,0,Universitario de Deportes,
+per-liga-1,Sporting Cristal,,0,Sporting Cristal,
+per-liga-1,Cienciano,,0,Cienciano,
+per-liga-1,Cusco FC,,0,Cusco FC,
+per-liga-1,Alianza Atlético,,0,Alianza Atlético de Sullana,
+per-liga-1,Alianza Lima,,0,,68
+per-liga-1,FBC Melgar,,0,,65
+per-liga-1,Sport Huancayo,,0,,62
+per-liga-1,ADT Tarma,,0,,62
+per-liga-1,Atlético Grau,,0,,61
+ecu-ligapro,LDU Quito,,0,LDU Quito,
+ecu-ligapro,Independiente del Valle,,0,Independiente del Valle,
+ecu-ligapro,Barcelona SC,,0,Barcelona SC Guayaquil,
+ecu-ligapro,Deportivo Cuenca,,0,Deportivo Cuenca,
+ecu-ligapro,Macará,,0,Macará,
+ecu-ligapro,Emelec,,0,,65
+ecu-ligapro,Universidad Católica del Ecuador,,0,,64
+ecu-ligapro,Aucas,,0,,63
+ecu-ligapro,Orense,,0,,63
+ecu-ligapro,Mushuc Runa,,0,,62
+uru-primera,Peñarol,,0,Peñarol,
+uru-primera,Nacional Montevideo,,0,Nacional,
+uru-primera,Montevideo City Torque,,0,Montevideo City Torque,
+uru-primera,Juventud de Las Piedras,,0,Juventud de Las Piedras,
+uru-primera,Boston River,,0,Boston River,
+uru-primera,Defensor Sporting,,0,,66
+uru-primera,Liverpool Montevideo,,0,,65
+uru-primera,Danubio,,0,,64
+uru-primera,Montevideo Wanderers,,0,,63
+uru-primera,Racing Club de Montevideo,,0,,62
+par-primera,Olimpia,,0,Olimpia Asunción,
+par-primera,Cerro Porteño,,0,Cerro Porteño,
+par-primera,Libertad,,0,Libertad,
+par-primera,Recoleta FC,,0,Recoleta FC,
+par-primera,Guaraní,,0,,65
+par-primera,Nacional Asunción,,0,,64
+par-primera,Sportivo Trinidense,,0,,62
+par-primera,Sportivo Luqueño,,0,,62
+bol-primera,Bolívar,,0,Bolívar,
+bol-primera,Always Ready,,0,Always Ready,
+bol-primera,Blooming,,0,Blooming,
+bol-primera,Independiente Petrolero,,0,Independiente Petrolero,
+bol-primera,The Strongest,,0,,66
+bol-primera,Oriente Petrolero,,0,,62
+bol-primera,Aurora,,0,,61
+bol-primera,Nacional Potosí,,0,,61
+bol-primera,Real Tomayapo,,0,,60
+ven-primera,Carabobo FC,,0,Carabobo FC,
+ven-primera,Academia Puerto Cabello,,0,Academia Puerto Cabello,
+ven-primera,Universidad Central de Venezuela,,0,Universidad Central de Venezuela,
+ven-primera,Caracas FC,,0,Caracas FC,
+ven-primera,Deportivo La Guaira,,0,Deportivo La Guaira,
+ven-primera,Deportivo Táchira,,0,,65
+ven-primera,Monagas SC,,0,,63
+ven-primera,Metropolitanos FC,,0,,62
+cyp-first-division,APOEL,,0,APOEL Nicosia FC,
+cyp-first-division,Omonia Nicosia,,0,Omonia Nicosia FC,
+cyp-first-division,Pafos FC,,0,,71
+cyp-first-division,AEK Larnaca,,0,,69
+cyp-first-division,Aris Limassol,,0,,67
+cyp-first-division,Apollon Limassol,,0,,66
+cyp-first-division,Anorthosis Famagusta,,0,,65
+cyp-first-division,AEL Limassol,,0,,64
+cyp-first-division,Omonia Aradippou,,0,,61
+cyp-first-division,Olympiakos Nicosia,,0,,61
+cyp-first-division,Nea Salamis Famagusta,,0,,60
+cyp-first-division,Krasava E.N.Y.,,0,,60
+cyp-first-division,Karmiotissa,,0,,59
+cyp-first-division,Omonia 29M,,0,,59
+hun-nb-i,Ferencváros,,0,Ferencvárosi TC,
+hun-nb-i,Puskás Akadémia,,0,,67
+hun-nb-i,Paks,,0,,66
+hun-nb-i,Debrecen,,0,,65
+hun-nb-i,ETO Győr,,0,,65
+hun-nb-i,Újpest,,0,,64
+hun-nb-i,MTK Budapest,,0,,63
+hun-nb-i,Zalaegerszeg,,0,,63
+hun-nb-i,Kisvárda,,0,,62
+hun-nb-i,Nyíregyháza,,0,,61
+hun-nb-i,Vasas,,0,,61
+hun-nb-i,Kispest-Honvéd,,0,,61
+aze-premier-league,Qarabağ,,0,Qarabağ FK,
+aze-premier-league,Sabah,,0,,66
+aze-premier-league,Zira,,0,,65
+aze-premier-league,Neftçi,,0,,64
+aze-premier-league,Turan Tovuz,,0,,63
+aze-premier-league,Araz-Naxçıvan,,0,,63
+aze-premier-league,Sumgayit,,0,,61
+aze-premier-league,Kapaz,,0,,60
+aze-premier-league,Qabala,,0,,60
+aze-premier-league,Shamakhi,,0,,59
+aze-premier-league,Imishli,,0,,57
+aze-premier-league,Shafa,,0,,57
+svn-prvaliga,Celje,,0,,67
+svn-prvaliga,Olimpija Ljubljana,,0,,67
+svn-prvaliga,Maribor,,0,,66
+svn-prvaliga,Koper,,0,,64
+svn-prvaliga,Bravo,,0,,62
+svn-prvaliga,Mura,,0,,62
+svn-prvaliga,Radomlje,,0,,60
+svn-prvaliga,Aluminij,,0,,60
+svn-prvaliga,Nafta 1903,,0,,59
+svn-prvaliga,Brinje Grosuplje,,0,,58
+svk-nike-liga,Slovan Bratislava,,0,,68
+svk-nike-liga,DAC Dunajská Streda,,0,,65
+svk-nike-liga,Spartak Trnava,,0,,65
+svk-nike-liga,Žilina,,0,,64
+svk-nike-liga,Podbrezová,,0,,62
+svk-nike-liga,Zemplín Michalovce,,0,,61
+svk-nike-liga,Trenčín,,0,,61
+svk-nike-liga,Ružomberok,,0,,61
+svk-nike-liga,Košice,,0,,61
+svk-nike-liga,Skalica,,0,,59
+svk-nike-liga,Komárno,,0,,59
+svk-nike-liga,Dukla Banská Bystrica,,0,,59
+isl-besta-deild,Víkingur Reykjavík,,0,,63
+isl-besta-deild,Breiðablik,,0,,63
+isl-besta-deild,Valur,,0,,62
+isl-besta-deild,Stjarnan,,0,,61
+isl-besta-deild,FH,,0,,60
+isl-besta-deild,KR,,0,,60
+isl-besta-deild,ÍA,,0,,59
+isl-besta-deild,Fram,,0,,59
+isl-besta-deild,KA,,0,,59
+isl-besta-deild,ÍBV,,0,,58
+isl-besta-deild,Keflavík,,0,,57
+isl-besta-deild,Þór Akureyri,,0,,57
+irl-premier-division,Shamrock Rovers,,0,,64
+irl-premier-division,Shelbourne,,0,,62
+irl-premier-division,Derry City,NIR,0,,61
+irl-premier-division,St Patrick's Athletic,,0,,61
+irl-premier-division,Bohemians,,0,,60
+irl-premier-division,Sligo Rovers,,0,,58
+irl-premier-division,Galway United,,0,,58
+irl-premier-division,Drogheda United,,0,,58
+irl-premier-division,Waterford,,0,,58
+irl-premier-division,Dundalk,,0,,58
+arm-premier-league,Noah,,0,,65
+arm-premier-league,Ararat-Armenia,,0,,63
+arm-premier-league,Pyunik,,0,,63
+arm-premier-league,Urartu,,0,,61
+arm-premier-league,Alashkert,,0,,61
+arm-premier-league,Ararat Yerevan,,0,,58
+arm-premier-league,Shirak,,0,,58
+arm-premier-league,Van,,0,,58
+arm-premier-league,BKMA Yerevan,,0,,57
+arm-premier-league,Syunik,,0,,57
+arm-premier-league,Gandzasar Kapan,,0,,56
+arm-premier-league,Sardarapat,,0,,55
+kos-superliga,Ballkani,,0,,63
+kos-superliga,Drita,,0,,62
+kos-superliga,Prishtina,,0,,60
+kos-superliga,Gjilani,,0,,59
+kos-superliga,Llapi,,0,,59
+kos-superliga,Malisheva,,0,,58
+kos-superliga,Dukagjini,,0,,57
+kos-superliga,Feronikeli,,0,,57
+kos-superliga,Drenica,,0,,56
+kos-superliga,Vushtrria,,0,,56
+bih-premijer-liga,Zrinjski Mostar,,0,,64
+bih-premijer-liga,Borac Banja Luka,,0,,64
+bih-premijer-liga,Sarajevo,,0,,62
+bih-premijer-liga,Željezničar,,0,,61
+bih-premijer-liga,Velež Mostar,,0,,60
+bih-premijer-liga,Široki Brijeg,,0,,59
+bih-premijer-liga,Sloga Doboj,,0,,57
+bih-premijer-liga,Radnik Bijeljina,,0,,57
+bih-premijer-liga,Čelik Zenica,,0,,56
+bih-premijer-liga,BSK Banja Luka,,0,,55
+lva-virsliga,RFS,,0,,65
+lva-virsliga,Riga FC,,0,,63
+lva-virsliga,Auda,,0,,60
+lva-virsliga,Liepāja,,0,,58
+lva-virsliga,BFC Daugavpils,,0,,57
+lva-virsliga,FS Jelgava,,0,,57
+lva-virsliga,Super Nova,,0,,56
+lva-virsliga,Grobiņa,,0,,55
+lva-virsliga,Tukums 2000,,0,,55
+lva-virsliga,Ogre United,,0,,54
+fin-veikkausliiga,HJK,,0,HJK Helsinki,
+fin-veikkausliiga,KuPS,,0,,63
+fin-veikkausliiga,Ilves,,0,,61
+fin-veikkausliiga,SJK,,0,,61
+fin-veikkausliiga,Inter Turku,,0,,60
+fin-veikkausliiga,VPS,,0,,59
+fin-veikkausliiga,Gnistan,,0,,58
+fin-veikkausliiga,AC Oulu,,0,,58
+fin-veikkausliiga,Lahti,,0,,57
+fin-veikkausliiga,IFK Mariehamn,,0,,57
+fin-veikkausliiga,TPS,,0,,57
+fin-veikkausliiga,Jaro,,0,,56
+mda-liga,Sheriff Tiraspol,,0,,63
+mda-liga,Petrocub Hîncești,,0,,58
+mda-liga,Milsami Orhei,,0,,57
+mda-liga,Zimbru Chișinău,,0,,57
+mda-liga,Bălți,,0,,55
+mda-liga,Dacia Buiucani,,0,,53
+mda-liga,Real Sireți,,0,,52
+mda-liga,Politehnica UTM,,0,,52
+fro-premier-league,KÍ,,0,,55
+fro-premier-league,Víkingur Gøta,,0,,52
+fro-premier-league,HB,,0,,52
+fro-premier-league,B36 Tórshavn,,0,,51
+fro-premier-league,NSÍ Runavík,,0,,51
+fro-premier-league,07 Vestur,,0,,49
+fro-premier-league,EB/Streymur,,0,,48
+fro-premier-league,B68 Toftir,,0,,48
+fro-premier-league,Skála,,0,,47
+fro-premier-league,AB Argir,,0,,47
+alb-kategoria-superiore,Egnatia,,0,,57
+alb-kategoria-superiore,Partizani,,0,,56
+alb-kategoria-superiore,Vllaznia,,0,,56
+alb-kategoria-superiore,Tirana,,0,,55
+alb-kategoria-superiore,Dinamo City,,0,,55
+alb-kategoria-superiore,Teuta,,0,,54
+alb-kategoria-superiore,Elbasani,,0,,53
+alb-kategoria-superiore,Laçi,,0,,53
+alb-kategoria-superiore,Skënderbeu,,0,,53
+alb-kategoria-superiore,Vora,,0,,51
+mkd-first-league,Shkëndija,,0,,57
+mkd-first-league,Vardar,,0,,55
+mkd-first-league,Struga,,0,,55
+mkd-first-league,Sileks,,0,,53
+mkd-first-league,Arsimi,,0,,53
+mkd-first-league,Shkëndija 77,,0,,52
+mkd-first-league,Bashkimi,,0,,52
+mkd-first-league,Tikvesh,,0,,52
+mkd-first-league,Bregalnica Štip,,0,,51
+mkd-first-league,Skopje,,0,,50
+blr-premier-league,Dinamo Minsk,,0,,58
+blr-premier-league,BATE Borisov,,0,,56
+blr-premier-league,Neman Grodno,,0,,55
+blr-premier-league,Torpedo-BelAZ,,0,,55
+blr-premier-league,Isloch,,0,,54
+blr-premier-league,Dinamo Brest,,0,,54
+blr-premier-league,Slavia Mozyr,,0,,53
+blr-premier-league,Gomel,,0,,53
+blr-premier-league,FC Minsk,,0,,53
+blr-premier-league,Maxline Vitebsk,,0,,53
+blr-premier-league,Arsenal Dzerzhinsk,,0,,52
+blr-premier-league,Vitebsk,,0,,52
+blr-premier-league,Naftan Novopolotsk,,0,,51
+blr-premier-league,Dnepr Mogilev,,0,,51
+blr-premier-league,Belshina Bobruisk,,0,,51
+blr-premier-league,Baranovichi,,0,,50
+ltu-toplyga,Žalgiris Vilnius,,0,,57
+ltu-toplyga,Kauno Žalgiris,,0,,56
+ltu-toplyga,Hegelmann,,0,,55
+ltu-toplyga,Sūduva,,0,,54
+ltu-toplyga,Panevėžys,,0,,54
+ltu-toplyga,FA Šiauliai,,0,,52
+ltu-toplyga,Banga Gargždai,,0,,52
+ltu-toplyga,Džiugas,,0,,51
+ltu-toplyga,TransINVEST,,0,,50
+and-primera-divisio,Inter Club d'Escaldes,,0,,50
+and-primera-divisio,FC Santa Coloma,,0,,47
+and-primera-divisio,Atlètic Club d'Escaldes,,0,,46
+and-primera-divisio,Rànger's,,0,,46
+and-primera-divisio,Penya Encarnada,,0,,44
+and-primera-divisio,Ordino,,0,,43
+and-primera-divisio,Carroi,,0,,42
+and-primera-divisio,Casa de Portugal,,0,,42
+and-primera-divisio,Esperança d'Andorra,,0,,41
+and-primera-divisio,Sporting Club d'Escaldes,,0,,41
+mlt-premier-league,Ħamrun Spartans,,0,,54
+mlt-premier-league,Hibernians,,0,,51
+mlt-premier-league,Floriana,,0,,50
+mlt-premier-league,Birkirkara,,0,,50
+mlt-premier-league,Sliema Wanderers,,0,,49
+mlt-premier-league,Valletta,,0,,49
+mlt-premier-league,Gżira United,,0,,48
+mlt-premier-league,Marsaxlokk,,0,,47
+mlt-premier-league,Mosta,,0,,47
+mlt-premier-league,Balzan,,0,,46
+mlt-premier-league,Żabbar St. Patrick,,0,,45
+mlt-premier-league,Birżebbuġa St. Peter's,,0,,44
+gib-football-league,Lincoln Red Imps,,0,,50
+gib-football-league,St Joseph's,,0,,46
+gib-football-league,Europa,,0,,45
+gib-football-league,FC Magpies,,0,,44
+gib-football-league,Lions Gibraltar,,0,,43
+gib-football-league,Glacis United,,0,,42
+gib-football-league,Mons Calpe,,0,,42
+gib-football-league,College 1975,,0,,41
+gib-football-league,Lynx,,0,,41
+gib-football-league,Hound Dogs,,0,,40
+gib-football-league,Europa Point,,0,,40
+est-meistriliiga,Flora Tallinn,,0,,54
+est-meistriliiga,FCI Levadia,,0,,54
+est-meistriliiga,Paide Linnameeskond,,0,,51
+est-meistriliiga,Nõmme Kalju,,0,,51
+est-meistriliiga,Narva Trans,,0,,48
+est-meistriliiga,Tammeka,,0,,47
+est-meistriliiga,Harju,,0,,47
+est-meistriliiga,Nõmme United,,0,,47
+est-meistriliiga,Kuressaare,,0,,46
+est-meistriliiga,Vaprus,,0,,46
+nir-premiership,Linfield,,0,,54
+nir-premiership,Larne,,0,,53
+nir-premiership,Glentoran,,0,,52
+nir-premiership,Cliftonville,,0,,52
+nir-premiership,Coleraine,,0,,52
+nir-premiership,Crusaders,,0,,51
+nir-premiership,Dungannon Swifts,,0,,50
+nir-premiership,Portadown,,0,,49
+nir-premiership,Ballymena United,,0,,49
+nir-premiership,Carrick Rangers,,0,,48
+nir-premiership,Bangor,,0,,47
+nir-premiership,Limavady United,,0,,46
+geo-erovnuli-liga,Dinamo Tbilisi,,0,,56
+geo-erovnuli-liga,Dinamo Batumi,,0,,56
+geo-erovnuli-liga,Iberia 1999,,0,,55
+geo-erovnuli-liga,Torpedo Kutaisi,,0,,55
+geo-erovnuli-liga,Dila Gori,,0,,54
+geo-erovnuli-liga,Samgurali Tsqaltubo,,0,,52
+geo-erovnuli-liga,Spaeri,,0,,52
+geo-erovnuli-liga,Gagra,,0,,52
+geo-erovnuli-liga,Rustavi,,0,,50
+geo-erovnuli-liga,Meshakhte,,0,,50
+lux-national-division,Differdange 03,,0,,51
+lux-national-division,Progrès Niederkorn,,0,,50
+lux-national-division,F91 Dudelange,,0,,50
+lux-national-division,Swift Hesperange,,0,,50
+lux-national-division,Racing Union,,0,,49
+lux-national-division,UNA Strassen,,0,,49
+lux-national-division,Victoria Rosport,,0,,47
+lux-national-division,Jeunesse Esch,,0,,47
+lux-national-division,Käerjeng 97,,0,,46
+lux-national-division,Hostert,,0,,45
+lux-national-division,Mondorf-les-Bains,,0,,45
+lux-national-division,Etzella Ettelbruck,,0,,45
+lux-national-division,Wiltz 71,,0,,44
+lux-national-division,US Rumelange,,0,,44
+lux-national-division,Atert Bissen,,0,,43
+lux-national-division,Résidence Walferdange,,0,,43
+mne-first-league,Budućnost Podgorica,,0,,54
+mne-first-league,Sutjeska Nikšić,,0,,54
+mne-first-league,Dečić,,0,,52
+mne-first-league,Mornar Bar,,0,,51
+mne-first-league,Petrovac,,0,,50
+mne-first-league,Mladost Donja Gorica,,0,,50
+mne-first-league,Arsenal Tivat,,0,,49
+mne-first-league,Jezero,,0,,48
+mne-first-league,Bokelj,,0,,48
+mne-first-league,Otrant,,0,,46
+wal-cymru-premier,The New Saints,,0,,54
+wal-cymru-premier,Connah's Quay Nomads,,0,,49
+wal-cymru-premier,Penybont,,0,,48
+wal-cymru-premier,Caernarfon Town,,0,,47
+wal-cymru-premier,Barry Town United,,0,,46
+wal-cymru-premier,Haverfordwest County,,0,,46
+wal-cymru-premier,Colwyn Bay,,0,,45
+wal-cymru-premier,Cardiff Met,,0,,44
+wal-cymru-premier,Flint Town United,,0,,44
+wal-cymru-premier,Briton Ferry Llansawel,,0,,43
+wal-cymru-premier,Airbus UK Broughton,,0,,43
+wal-cymru-premier,Llandudno,,0,,43
+wal-cymru-premier,Ammanford,,0,,42
+wal-cymru-premier,Holywell Town,,0,,42
+wal-cymru-premier,Cambrian United,,0,,41
+wal-cymru-premier,Trefelin BGC,,0,,41
+smr-campionato-sammarinese,Tre Fiori,,0,,44
+smr-campionato-sammarinese,Virtus,,0,,43
+smr-campionato-sammarinese,La Fiorita,,0,,43
+smr-campionato-sammarinese,Tre Penne,,0,,43
+smr-campionato-sammarinese,Folgore,,0,,41
+smr-campionato-sammarinese,Domagnano,,0,,41
+smr-campionato-sammarinese,Fiorentino,,0,,40
+smr-campionato-sammarinese,Cosmos,,0,,40
+smr-campionato-sammarinese,Juvenes/Dogana,,0,,39
+smr-campionato-sammarinese,Libertas,,0,,39
+smr-campionato-sammarinese,Pennarossa,,0,,38
+smr-campionato-sammarinese,San Giovanni,,0,,38
+smr-campionato-sammarinese,Faetano,,0,,37
+smr-campionato-sammarinese,San Marino Academy U22,,1,,37
+smr-campionato-sammarinese,Cailungo,,0,,36
+smr-campionato-sammarinese,Murata,,0,,36

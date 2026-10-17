@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10141a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Football Career">
+<title>Football Career Sim</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="style.css?v=__BUILD__">
+</head>
+<body>
+<div id="app">
+  <div class="splash">
+    <img src="icon-192.png" alt="" width="96" height="96">
+    <div class="h2">Football Career Sim</div>
+    <div class="spinner"></div>
+    <div class="muted small" id="splash-text">Загрузка игры… / Loading…</div>
+  </div>
+</div>
+<div id="busy" hidden><div class="spinner"></div></div>
+<div id="toast" hidden></div>
+<script>window.BUILD = "__BUILD__"; window.PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/";</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
+<script src="app.js?v=__BUILD__"></script>
+</body>
+</html>

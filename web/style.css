@@ -1,0 +1,212 @@
+/* Football Career Sim: телефонная вёрстка (цвета как в десктопной версии, game/ui/theme.py) */
+:root {
+  --bg: #10141a; --panel: #1a212b; --panel2: #232c39; --line: #2a3442; --line2: #334053;
+  --text: #e8ecf1; --muted: #8d98a8; --accent: #2ecc71; --gold: #f5c542; --red: #e55353;
+  --award: #7de3ff; --award-bg: #15303b; --nat: #ffa25c; --me: #3a3218;
+  --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body { font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif; overscroll-behavior-y: none; }
+#app { max-width: 640px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
+[hidden] { display: none !important; }
+
+/* --- каркас экрана */
+.topbar { position: sticky; top: 0; z-index: 5; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px;
+  padding: calc(8px + var(--safe-t)) 12px 8px; background: rgba(16, 20, 26, .94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.topbar h1 { margin: 0; font-size: 18px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tb-l:empty, .tb-r:empty { display: none; }
+.content { flex: 1; padding: 12px 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+.actions { position: sticky; bottom: 0; z-index: 5; display: flex; gap: 10px; padding: 10px 16px calc(10px + var(--safe-b));
+  background: rgba(16, 20, 26, .96); backdrop-filter: blur(8px); border-top: 1px solid var(--line); }
+.actions .btn { flex: 1; }
+.actions .btn-primary { flex: 2; }
+
+/* --- текст */
+.h2 { font-size: 17px; font-weight: 650; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.b { font-weight: 700; }
+.gold { color: var(--gold); }
+.award { color: var(--award); }
+.nat { color: var(--nat); }
+.ok { color: var(--accent); }
+.bad { color: var(--red); }
+.mt { margin-top: 6px; }
+.pad { padding: 6px 12px; }
+p { margin: 0; }
+.reason { color: var(--accent); font-size: 16px; }
+.hint { margin-top: 6px; font-size: 14px; }
+
+/* --- блоки */
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.row > input { flex: 1; min-width: 0; }
+.kvs { gap: 0; padding: 4px 12px; }
+.kv { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.kv:last-child { border-bottom: 0; }
+.kv b { text-align: right; font-weight: 600; }
+.club-h { flex-direction: row; align-items: center; gap: 12px; }
+.list { gap: 0; padding: 4px 12px; }
+.li { padding: 8px 0; border-bottom: 1px solid var(--line); }
+.li:last-child { border-bottom: 0; }
+.awardbg { background: var(--award-bg); margin: 0 -12px; padding: 8px 12px; }
+.lines > div { padding: 2px 0; }
+.ev { color: #e59b5a; }
+
+/* --- кнопки и поля */
+.btn { appearance: none; font: inherit; color: var(--text); background: var(--panel2); border: 1px solid var(--line2); border-radius: 10px;
+  padding: 11px 14px; min-height: 44px; cursor: pointer; text-align: center; }
+.btn:active { filter: brightness(1.2); }
+.btn-primary, .btn-choose { background: var(--accent); color: #08120c; border: none; font-weight: 750; }
+.btn-choose { width: 100%; font-size: 16px; }
+.btn-danger { background: #3a2226; border-color: #6b3037; }
+.btn-ghost { background: none; border: none; font-size: 22px; padding: 4px 10px; min-height: 40px; }
+.btn.icon { font-size: 20px; padding: 8px 12px; }
+.btn.file { display: block; }
+input:not([type]), input[type=search] { font: inherit; font-size: 16px; color: var(--text); background: var(--panel2); border: 1px solid var(--line2);
+  border-radius: 10px; padding: 10px 12px; min-height: 44px; width: 100%; outline: none; }
+input:focus { border-color: var(--accent); }
+input[type=range] { width: 100%; accent-color: var(--accent); height: 32px; }
+.chip { font: inherit; font-size: 13px; color: var(--muted); background: var(--panel2); border: 1px solid var(--line2); border-radius: 999px;
+  padding: 7px 12px; cursor: pointer; white-space: nowrap; }
+.chip.on { background: var(--accent); color: #08120c; border-color: var(--accent); font-weight: 700; }
+.langs { display: flex; gap: 4px; }
+.tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+
+/* выбор страны */
+.optlist { max-height: 42dvh; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; }
+.opt { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt:has(input:checked) { background: var(--accent); color: #08120c; }
+.opt:has(input:checked) .muted, .opt:has(input:checked) .gold { color: #08120c; }
+/* позиции и нога */
+.posrow { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; }
+.pos input, .chip-r input { position: absolute; opacity: 0; pointer-events: none; }
+.pos span { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 58px; padding: 4px; border-radius: 10px;
+  background: var(--panel2); border: 1px solid var(--line2); text-align: center; cursor: pointer; }
+.pos small { font-size: 11px; color: var(--muted); line-height: 1.15; }
+.pos input:checked + span { background: var(--accent); border-color: var(--accent); color: #08120c; }
+.pos input:checked + span small { color: #08120c; }
+.chip-r span { display: inline-block; padding: 9px 16px; border-radius: 999px; background: var(--panel2); border: 1px solid var(--line2); cursor: pointer; }
+.chip-r input:checked + span { background: var(--accent); color: #08120c; border-color: var(--accent); font-weight: 700; }
+.pos input:focus-visible + span, .chip-r input:focus-visible + span { outline: 2px solid var(--award); }
+
+/* --- эмблема: круг с инициалами, сверху картинка (если загрузилась) */
+.logo { position: relative; flex: none; width: var(--s); height: var(--s); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  background: hsl(var(--h) 45% 45%); color: #fff; font-weight: 700; font-size: calc(var(--s) * .36); }
+.logo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: var(--panel); border-radius: 0; }
+
+/* --- карточка игрока */
+.pcard { border: 2.5px solid var(--tc); border-radius: 18px; padding: 14px 16px; background: linear-gradient(135deg, #2d3748, #161b24); }
+.pc-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.pc-ovr { font-size: 48px; font-weight: 800; color: var(--tc); line-height: 1; }
+.pc-pos { font-size: 18px; font-weight: 700; }
+.pc-sub { text-align: right; color: var(--muted); font-size: 14px; }
+.pc-sub span { font-size: 12px; }
+.pc-name { text-align: center; font-size: 19px; font-weight: 700; margin: 8px 0; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,.15); }
+.attr { display: grid; grid-template-columns: 44px 1fr 30px; gap: 8px; align-items: center; padding: 3px 0; }
+.attr .an { color: var(--muted); font-weight: 700; font-size: 14px; }
+.attr b { text-align: right; }
+.bar { height: 10px; border-radius: 5px; background: rgba(255,255,255,.1); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 5px; }
+
+/* --- график */
+.chart svg { width: 100%; height: auto; }
+.chart text { fill: var(--muted); font-size: 11px; }
+.chart .grid { stroke: rgba(255,255,255,.09); }
+.chart .line { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; }
+.chart .dot { fill: var(--accent); }
+.chart .best { fill: var(--gold); }
+.chart .bestt { fill: var(--gold); font-weight: 700; }
+
+/* --- карточка клуба */
+.ccard { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.cc-head { display: flex; gap: 12px; align-items: center; }
+.cc-main { flex: 1; min-width: 0; }
+.cc-lines { font-size: 14px; display: grid; gap: 2px; }
+.cc-lines:empty { display: none; }
+.tag { font-size: 12px; color: var(--gold); }
+.tag.home { color: var(--accent); }
+.ccard .row .btn { flex: 1; }
+
+/* --- сезоны */
+.srows { display: flex; flex-direction: column; gap: 6px; }
+.srh { text-align: right; padding-right: 12px; }
+.srow { appearance: none; font: inherit; color: inherit; text-align: left; display: flex; gap: 10px; align-items: center; width: 100%;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; }
+.srow:active { border-color: var(--accent); }
+.sr-main { flex: 1; min-width: 0; }
+.sr-num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* --- отчёт */
+.season { display: flex; flex-direction: column; gap: 10px; }
+.season + .season { margin-top: 18px; }
+.season-h { background: var(--panel2); border-radius: 10px; padding: 10px 12px; }
+.blk { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.bh { font-weight: 700; padding: 10px 12px 4px; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tbl th { color: var(--muted); font-weight: 600; font-size: 12px; text-align: center; padding: 6px 6px; border-bottom: 1px solid var(--line2); }
+.tbl td { padding: 6px 6px; text-align: center; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl th:first-child, .tbl td:first-child { text-align: left; padding-left: 12px; }
+.tbl.comps td:first-child { width: 100%; }
+.tbl.league td:nth-child(2), .tbl.league th:nth-child(2), .tbl.path td, .tbl.path th, .tbl.bdo td:nth-child(2) { text-align: left; }
+.tbl tr.me td { background: var(--me); color: var(--gold); font-weight: 700; }
+.tbl tr.first td:first-child { color: var(--gold); }
+.tbl tr.total td { border-bottom: 0; }
+.tbl tr.z-top td { background: #173322; }
+.tbl tr.z-po td { background: #1e2a38; }
+.tbl tr.z-out td { color: var(--muted); }
+.res { font-size: 12.5px; }
+.cap { color: var(--muted); font-size: 12.5px; padding: 6px 12px; }
+details.sub { border-top: 1px solid var(--line); }
+details.sub summary { padding: 10px 12px; cursor: pointer; font-weight: 600; font-size: 14px; }
+details.sub[open] summary { border-bottom: 1px solid var(--line); }
+.ballon { background: #2a2516; border: 1px solid #6b5a24; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.ballon .tbl td, .ballon .tbl th { border-color: #4a3f1f; }
+.ballon .tbl th:first-child, .ballon .tbl td:first-child { padding-left: 4px; }
+
+/* --- тренерская карьера */
+.meter { position: relative; height: 22px; border-radius: 6px; background: var(--panel2); border: 1px solid var(--line2); overflow: hidden; }
+.meter i { display: block; height: 100%; }
+.meter span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0,0,0,.8); }
+.sel { display: flex; flex-direction: column; gap: 4px; }
+select { font: inherit; font-size: 15px; color: var(--text); background: var(--panel2); border: 1px solid var(--line2); border-radius: 10px;
+  padding: 9px 10px; min-height: 44px; width: 100%; }
+.check { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+.check input { width: 22px; height: 22px; accent-color: var(--accent); }
+.slot { display: grid; grid-template-columns: 44px 1fr; gap: 8px; align-items: center; }
+.slot select { font-size: 13px; min-height: 40px; padding: 6px 8px; }
+.pl { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-top: 1px solid var(--line); }
+.blk > .pl:first-of-type, .bh + .pl { border-top-color: var(--line2); }
+.pl.xi { background: rgba(46, 204, 113, .06); }
+.ppos { width: 38px; flex: none; font-size: 13px; color: var(--muted); padding-top: 2px; }
+.pl-m { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.pl-m .row { margin-top: 6px; }
+.pl-m > .btn { margin-top: 6px; align-self: flex-start; }
+.povr { font-size: 20px; font-variant-numeric: tabular-nums; }
+.btn-sm { min-height: 36px; padding: 6px 12px; font-size: 13px; }
+.btn.gold { color: var(--gold); border-color: var(--gold); }
+.btn:disabled { opacity: .45; cursor: default; }
+.mk { display: flex; flex-direction: column; gap: 8px; padding-top: 10px; }
+.mk > .muted, .mk > .tabs, .mk > .sel, .mk > .h2 { margin: 0 12px; }
+details.panel > summary { cursor: pointer; padding: 2px 0; }
+details.panel[open] > .panel { border: 0; padding: 8px 0 0; }
+.mbtns.col { flex-direction: column; }
+
+/* --- окна, загрузка, уведомления */
+.modal-bg { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.6); display: flex; align-items: flex-end; justify-content: center; }
+.modal { width: 100%; max-width: 640px; background: var(--panel); border-radius: 16px 16px 0 0; padding: 18px 16px calc(16px + var(--safe-b));
+  display: flex; flex-direction: column; gap: 12px; }
+.mbtns { display: flex; gap: 10px; }
+.mbtns .btn { flex: 1; }
+.splash { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px; text-align: center; }
+.splash img { border-radius: 22px; }
+.spinner { width: 36px; height: 36px; border-radius: 50%; border: 4px solid var(--panel2); border-top-color: var(--accent); animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#busy { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; }
+#toast { position: fixed; z-index: 40; left: 50%; transform: translateX(-50%); bottom: calc(84px + var(--safe-b)); width: calc(100% - 32px); max-width: 600px;
+  background: #2c3747; border: 1px solid var(--line2); border-radius: 12px; padding: 12px 14px; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }

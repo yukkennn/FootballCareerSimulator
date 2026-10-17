@@ -1,0 +1,212 @@
+fifa_code,name_en,iso2,confederation
+AFG,Afghanistan,AF,AFC
+ALB,Albania,AL,UEFA
+ALG,Algeria,DZ,CAF
+ASA,American Samoa,AS,OFC
+AND,Andorra,AD,UEFA
+ANG,Angola,AO,CAF
+AIA,Anguilla,AI,CONCACAF
+ATG,Antigua and Barbuda,AG,CONCACAF
+ARG,Argentina,AR,CONMEBOL
+ARM,Armenia,AM,UEFA
+ARU,Aruba,AW,CONCACAF
+AUS,Australia,AU,AFC
+AUT,Austria,AT,UEFA
+AZE,Azerbaijan,AZ,UEFA
+BAH,Bahamas,BS,CONCACAF
+BHR,Bahrain,BH,AFC
+BAN,Bangladesh,BD,AFC
+BRB,Barbados,BB,CONCACAF
+BLR,Belarus,BY,UEFA
+BEL,Belgium,BE,UEFA
+BLZ,Belize,BZ,CONCACAF
+BEN,Benin,BJ,CAF
+BER,Bermuda,BM,CONCACAF
+BHU,Bhutan,BT,AFC
+BOL,Bolivia,BO,CONMEBOL
+BIH,Bosnia and Herzegovina,BA,UEFA
+BOT,Botswana,BW,CAF
+BRA,Brazil,BR,CONMEBOL
+VGB,British Virgin Islands,VG,CONCACAF
+BRU,Brunei,BN,AFC
+BUL,Bulgaria,BG,UEFA
+BFA,Burkina Faso,BF,CAF
+BDI,Burundi,BI,CAF
+CAM,Cambodia,KH,AFC
+CMR,Cameroon,CM,CAF
+CAN,Canada,CA,CONCACAF
+CPV,Cape Verde,CV,CAF
+CAY,Cayman Islands,KY,CONCACAF
+CTA,Central African Republic,CF,CAF
+CHA,Chad,TD,CAF
+CHI,Chile,CL,CONMEBOL
+CHN,China,CN,AFC
+TPE,Chinese Taipei,TW,AFC
+COL,Colombia,CO,CONMEBOL
+COM,Comoros,KM,CAF
+CGO,Congo,CG,CAF
+COK,Cook Islands,CK,OFC
+CRC,Costa Rica,CR,CONCACAF
+CRO,Croatia,HR,UEFA
+CUB,Cuba,CU,CONCACAF
+CUW,Curaçao,CW,CONCACAF
+CYP,Cyprus,CY,UEFA
+CZE,Czech Republic,CZ,UEFA
+COD,DR Congo,CD,CAF
+DEN,Denmark,DK,UEFA
+DJI,Djibouti,DJ,CAF
+DMA,Dominica,DM,CONCACAF
+DOM,Dominican Republic,DO,CONCACAF
+ECU,Ecuador,EC,CONMEBOL
+EGY,Egypt,EG,CAF
+SLV,El Salvador,SV,CONCACAF
+ENG,England,GB-ENG,UEFA
+EQG,Equatorial Guinea,GQ,CAF
+ERI,Eritrea,ER,CAF
+EST,Estonia,EE,UEFA
+SWZ,Eswatini,SZ,CAF
+ETH,Ethiopia,ET,CAF
+FRO,Faroe Islands,FO,UEFA
+FIJ,Fiji,FJ,OFC
+FIN,Finland,FI,UEFA
+FRA,France,FR,UEFA
+GAB,Gabon,GA,CAF
+GAM,Gambia,GM,CAF
+GEO,Georgia,GE,UEFA
+GER,Germany,DE,UEFA
+GHA,Ghana,GH,CAF
+GIB,Gibraltar,GI,UEFA
+GRE,Greece,GR,UEFA
+GRN,Grenada,GD,CONCACAF
+GUM,Guam,GU,AFC
+GUA,Guatemala,GT,CONCACAF
+GUI,Guinea,GN,CAF
+GNB,Guinea-Bissau,GW,CAF
+GUY,Guyana,GY,CONCACAF
+HAI,Haiti,HT,CONCACAF
+HON,Honduras,HN,CONCACAF
+HKG,Hong Kong,HK,AFC
+HUN,Hungary,HU,UEFA
+ISL,Iceland,IS,UEFA
+IND,India,IN,AFC
+IDN,Indonesia,ID,AFC
+IRN,Iran,IR,AFC
+IRQ,Iraq,IQ,AFC
+ISR,Israel,IL,UEFA
+ITA,Italy,IT,UEFA
+CIV,Ivory Coast,CI,CAF
+JAM,Jamaica,JM,CONCACAF
+JPN,Japan,JP,AFC
+JOR,Jordan,JO,AFC
+KAZ,Kazakhstan,KZ,UEFA
+KEN,Kenya,KE,CAF
+KOS,Kosovo,XK,UEFA
+KUW,Kuwait,KW,AFC
+KGZ,Kyrgyzstan,KG,AFC
+LAO,Laos,LA,AFC
+LVA,Latvia,LV,UEFA
+LBN,Lebanon,LB,AFC
+LES,Lesotho,LS,CAF
+LBR,Liberia,LR,CAF
+LBY,Libya,LY,CAF
+LIE,Liechtenstein,LI,UEFA
+LTU,Lithuania,LT,UEFA
+LUX,Luxembourg,LU,UEFA
+MAC,Macau,MO,AFC
+MAD,Madagascar,MG,CAF
+MWI,Malawi,MW,CAF
+MAS,Malaysia,MY,AFC
+MDV,Maldives,MV,AFC
+MLI,Mali,ML,CAF
+MLT,Malta,MT,UEFA
+MTN,Mauritania,MR,CAF
+MRI,Mauritius,MU,CAF
+MEX,Mexico,MX,CONCACAF
+MDA,Moldova,MD,UEFA
+MNG,Mongolia,MN,AFC
+MNE,Montenegro,ME,UEFA
+MSR,Montserrat,MS,CONCACAF
+MAR,Morocco,MA,CAF
+MOZ,Mozambique,MZ,CAF
+MYA,Myanmar,MM,AFC
+NAM,Namibia,NA,CAF
+NEP,Nepal,NP,AFC
+NED,Netherlands,NL,UEFA
+NCL,New Caledonia,NC,OFC
+NZL,New Zealand,NZ,OFC
+NCA,Nicaragua,NI,CONCACAF
+NIG,Niger,NE,CAF
+NGA,Nigeria,NG,CAF
+PRK,North Korea,KP,AFC
+MKD,North Macedonia,MK,UEFA
+NIR,Northern Ireland,GB-NIR,UEFA
+NOR,Norway,NO,UEFA
+OMA,Oman,OM,AFC
+PAK,Pakistan,PK,AFC
+PLE,Palestine,PS,AFC
+PAN,Panama,PA,CONCACAF
+PNG,Papua New Guinea,PG,OFC
+PAR,Paraguay,PY,CONMEBOL
+PER,Peru,PE,CONMEBOL
+PHI,Philippines,PH,AFC
+POL,Poland,PL,UEFA
+POR,Portugal,PT,UEFA
+PUR,Puerto Rico,PR,CONCACAF
+QAT,Qatar,QA,AFC
+IRL,Republic of Ireland,IE,UEFA
+ROU,Romania,RO,UEFA
+RUS,Russia,RU,UEFA
+RWA,Rwanda,RW,CAF
+SKN,Saint Kitts and Nevis,KN,CONCACAF
+LCA,Saint Lucia,LC,CONCACAF
+VIN,Saint Vincent and the Grenadines,VC,CONCACAF
+SAM,Samoa,WS,OFC
+SMR,San Marino,SM,UEFA
+KSA,Saudi Arabia,SA,AFC
+SCO,Scotland,GB-SCT,UEFA
+SEN,Senegal,SN,CAF
+SRB,Serbia,RS,UEFA
+SEY,Seychelles,SC,CAF
+SLE,Sierra Leone,SL,CAF
+SGP,Singapore,SG,AFC
+SVK,Slovakia,SK,UEFA
+SVN,Slovenia,SI,UEFA
+SOL,Solomon Islands,SB,OFC
+SOM,Somalia,SO,CAF
+RSA,South Africa,ZA,CAF
+KOR,South Korea,KR,AFC
+SSD,South Sudan,SS,CAF
+ESP,Spain,ES,UEFA
+SRI,Sri Lanka,LK,AFC
+SDN,Sudan,SD,CAF
+SUR,Suriname,SR,CONCACAF
+SWE,Sweden,SE,UEFA
+SUI,Switzerland,CH,UEFA
+SYR,Syria,SY,AFC
+STP,São Tomé and Príncipe,ST,CAF
+TAH,Tahiti,PF,OFC
+TJK,Tajikistan,TJ,AFC
+TAN,Tanzania,TZ,CAF
+THA,Thailand,TH,AFC
+TLS,Timor-Leste,TL,AFC
+TOG,Togo,TG,CAF
+TGA,Tonga,TO,OFC
+TRI,Trinidad and Tobago,TT,CONCACAF
+TUN,Tunisia,TN,CAF
+TUR,Turkey,TR,UEFA
+TKM,Turkmenistan,TM,AFC
+TCA,Turks and Caicos Islands,TC,CONCACAF
+VIR,U.S. Virgin Islands,VI,CONCACAF
+UGA,Uganda,UG,CAF
+UKR,Ukraine,UA,UEFA
+UAE,United Arab Emirates,AE,AFC
+USA,United States,US,CONCACAF
+URU,Uruguay,UY,CONMEBOL
+UZB,Uzbekistan,UZ,AFC
+VAN,Vanuatu,VU,OFC
+VEN,Venezuela,VE,CONMEBOL
+VIE,Vietnam,VN,AFC
+WAL,Wales,GB-WLS,UEFA
+YEM,Yemen,YE,AFC
+ZAM,Zambia,ZM,CAF
+ZIM,Zimbabwe,ZW,CAF

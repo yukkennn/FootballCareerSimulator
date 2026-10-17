@@ -1,0 +1,22 @@
+code,name_en,name_ru,kind,confederation,tier,cycle_years,next_edition_year,note
+UCL,UEFA Champions League,Лига чемпионов УЕФА,club,UEFA,1,1,2027,ежегодно
+UEL,UEFA Europa League,Лига Европы УЕФА,club,UEFA,2,1,2027,ежегодно
+UECL,UEFA Conference League,Лига конференций УЕФА,club,UEFA,3,1,2027,ежегодно
+USC,UEFA Super Cup,Суперкубок УЕФА,club,UEFA,1,1,2027,победитель ЛЧ против победителя ЛЕ
+LIB,Copa Libertadores,Кубок Либертадорес,club,CONMEBOL,1,1,2027,ежегодно
+SUD,Copa Sudamericana,Копа Судамерикана,club,CONMEBOL,2,1,2027,ежегодно
+CAFCL,CAF Champions League,Лига чемпионов КАФ,club,CAF,1,1,2027,ежегодно
+CAFCC,CAF Confederation Cup,Кубок Конфедерации КАФ,club,CAF,2,1,2027,ежегодно
+ACLE,AFC Champions League Elite,Лига чемпионов АФК (Элит),club,AFC,1,1,2027,ежегодно
+ACL2,AFC Champions League Two,Лига чемпионов АФК 2,club,AFC,2,1,2027,ежегодно
+CCC,CONCACAF Champions Cup,Кубок чемпионов КОНКАКАФ,club,CONCACAF,1,1,2027,ежегодно
+OCL,OFC Champions League,Лига чемпионов ОФК,club,OFC,1,1,2027,ежегодно
+CWC,FIFA Club World Cup,Клубный чемпионат мира,club,,0,4,2029,раз в 4 года (формат 2025)
+WC,FIFA World Cup,Чемпионат мира,national,,0,4,2030,2026 уже прошёл
+EURO,UEFA European Championship,Чемпионат Европы,national,UEFA,1,4,2028,
+CA,Copa América,Копа Америка,national,CONMEBOL,1,4,2028,в симуляторе гостей КОНКАКАФ можно включать
+AFCON,Africa Cup of Nations,Кубок африканских наций,national,CAF,1,2,2027,цикл КАФ менялся; в v1 берём 2 года до 2027 и далее 4 года
+ASIAN,AFC Asian Cup,Кубок Азии,national,AFC,1,4,2027,
+GOLD,CONCACAF Gold Cup,Золотой кубок КОНКАКАФ,national,CONCACAF,1,2,2027,
+OFCNC,OFC Nations Cup,Кубок наций ОФК,national,OFC,1,4,2028,
+UNL,UEFA Nations League,Лига наций УЕФА,national,UEFA,2,2,2027,опционально

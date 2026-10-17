@@ -1,0 +1,167 @@
+league_id,name,club_country,is_reserve
+eng-championship,Birmingham City,,0
+eng-championship,Blackburn Rovers,,0
+eng-championship,Bolton Wanderers,,0
+eng-championship,Bristol City,,0
+eng-championship,Burnley,,0
+eng-championship,Cardiff City,WAL,0
+eng-championship,Charlton Athletic,,0
+eng-championship,Derby County,,0
+eng-championship,Lincoln City,,0
+eng-championship,Middlesbrough,,0
+eng-championship,Millwall,,0
+eng-championship,Norwich City,,0
+eng-championship,Portsmouth,,0
+eng-championship,Preston North End,,0
+eng-championship,Queens Park Rangers,,0
+eng-championship,Sheffield United,,0
+eng-championship,Southampton,,0
+eng-championship,Stoke City,,0
+eng-championship,Swansea City,WAL,0
+eng-championship,Watford,,0
+eng-championship,West Bromwich Albion,,0
+eng-championship,West Ham United,,0
+eng-championship,Wolverhampton Wanderers,,0
+eng-championship,Wrexham,WAL,0
+eng-league-one,AFC Wimbledon,,0
+eng-league-one,Barnsley,,0
+eng-league-one,Blackpool,,0
+eng-league-one,Bradford City,,0
+eng-league-one,Bromley,,0
+eng-league-one,Burton Albion,,0
+eng-league-one,Cambridge United,,0
+eng-league-one,Doncaster Rovers,,0
+eng-league-one,Huddersfield Town,,0
+eng-league-one,Leicester City,,0
+eng-league-one,Leyton Orient,,0
+eng-league-one,Luton Town,,0
+eng-league-one,Mansfield Town,,0
+eng-league-one,Milton Keynes Dons,,0
+eng-league-one,Notts County,,0
+eng-league-one,Oxford United,,0
+eng-league-one,Peterborough United,,0
+eng-league-one,Plymouth Argyle,,0
+eng-league-one,Reading,,0
+eng-league-one,Sheffield Wednesday,,0
+eng-league-one,Stevenage,,0
+eng-league-one,Stockport County,,0
+eng-league-one,Wigan Athletic,,0
+eng-league-one,Wycombe Wanderers,,0
+eng-league-two,Accrington Stanley,,0
+eng-league-two,Barnet,,0
+eng-league-two,Bristol Rovers,,0
+eng-league-two,Cheltenham Town,,0
+eng-league-two,Chesterfield,,0
+eng-league-two,Colchester United,,0
+eng-league-two,Crawley Town,,0
+eng-league-two,Crewe Alexandra,,0
+eng-league-two,Exeter City,,0
+eng-league-two,Fleetwood Town,,0
+eng-league-two,Gillingham,,0
+eng-league-two,Grimsby Town,,0
+eng-league-two,Newport County,WAL,0
+eng-league-two,Northampton Town,,0
+eng-league-two,Oldham Athletic,,0
+eng-league-two,Port Vale,,0
+eng-league-two,Rochdale,,0
+eng-league-two,Rotherham United,,0
+eng-league-two,Salford City,,0
+eng-league-two,Shrewsbury Town,,0
+eng-league-two,Swindon Town,,0
+eng-league-two,Tranmere Rovers,,0
+eng-league-two,Walsall,,0
+eng-league-two,York City,,0
+esp-segunda-division,AD Ceuta,,0
+esp-segunda-division,Albacete Balompié,,0
+esp-segunda-division,Burgos CF,,0
+esp-segunda-division,Cádiz CF,,0
+esp-segunda-division,CD Castellón,,0
+esp-segunda-division,CD Eldense,,0
+esp-segunda-division,CD Leganés,,0
+esp-segunda-division,CD Tenerife,,0
+esp-segunda-division,CE Sabadell,,0
+esp-segunda-division,Córdoba CF,,0
+esp-segunda-division,FC Andorra,AND,0
+esp-segunda-division,Girona FC,,0
+esp-segunda-division,Granada CF,,0
+esp-segunda-division,Celta de Vigo B,,1
+esp-segunda-division,RCD Mallorca,,0
+esp-segunda-division,Real Oviedo,,0
+esp-segunda-division,Real Sociedad B,,1
+esp-segunda-division,Real Valladolid,,0
+esp-segunda-division,SD Eibar,,0
+esp-segunda-division,Sporting Gijón,,0
+esp-segunda-division,UD Almería,,0
+esp-segunda-division,UD Las Palmas,,0
+ger-2-bundesliga,VfL Wolfsburg,,0
+ger-2-bundesliga,1. FC Heidenheim,,0
+ger-2-bundesliga,FC St. Pauli,,0
+ger-2-bundesliga,Hannover 96,,0
+ger-2-bundesliga,SV Darmstadt 98,,0
+ger-2-bundesliga,1. FC Kaiserslautern,,0
+ger-2-bundesliga,Hertha BSC,,0
+ger-2-bundesliga,1. FC Nürnberg,,0
+ger-2-bundesliga,VfL Bochum,,0
+ger-2-bundesliga,Karlsruher SC,,0
+ger-2-bundesliga,Dynamo Dresden,,0
+ger-2-bundesliga,Holstein Kiel,,0
+ger-2-bundesliga,Arminia Bielefeld,,0
+ger-2-bundesliga,1. FC Magdeburg,,0
+ger-2-bundesliga,Eintracht Braunschweig,,0
+ger-2-bundesliga,SpVgg Greuther Fürth,,0
+ger-2-bundesliga,Energie Cottbus,,0
+ger-2-bundesliga,VfL Osnabrück,,0
+ita-serie-b,Arezzo,,0
+ita-serie-b,Ascoli,,0
+ita-serie-b,Avellino,,0
+ita-serie-b,Benevento,,0
+ita-serie-b,Carrarese,,0
+ita-serie-b,Catanzaro,,0
+ita-serie-b,Cesena,,0
+ita-serie-b,Cremonese,,0
+ita-serie-b,Empoli,,0
+ita-serie-b,Hellas Verona,,0
+ita-serie-b,Juve Stabia,,0
+ita-serie-b,Mantova,,0
+ita-serie-b,Modena,,0
+ita-serie-b,Padova,,0
+ita-serie-b,Palermo,,0
+ita-serie-b,Pisa,,0
+ita-serie-b,Sampdoria,,0
+ita-serie-b,Südtirol,,0
+ita-serie-b,Vicenza,,0
+ita-serie-b,Virtus Entella,,0
+fra-ligue-2,Annecy,,0
+fra-ligue-2,US Boulogne,,0
+fra-ligue-2,Clermont Foot,,0
+fra-ligue-2,USL Dunkerque,,0
+fra-ligue-2,Grenoble Foot 38,,0
+fra-ligue-2,Guingamp,,0
+fra-ligue-2,Stade Lavallois,,0
+fra-ligue-2,Montpellier,,0
+fra-ligue-2,AS Nancy Lorraine,,0
+fra-ligue-2,Pau FC,,0
+fra-ligue-2,Red Star,,0
+fra-ligue-2,Stade de Reims,,0
+fra-ligue-2,Rodez,,0
+fra-ligue-2,AS Saint-Étienne,,0
+fra-ligue-2,FC Nantes,,0
+fra-ligue-2,FC Metz,,0
+fra-ligue-2,Dijon FCO,,0
+fra-ligue-2,FC Sochaux-Montbéliard,,0
+kaz-premier-league,Aktobe,,0
+kaz-premier-league,Tobol,,0
+kaz-premier-league,Altay,,0
+kaz-premier-league,Kairat Almaty,,0
+kaz-premier-league,Astana,,0
+kaz-premier-league,Zhetysu,,0
+kaz-premier-league,Atyrau,,0
+kaz-premier-league,Ulytau,,0
+kaz-premier-league,Kaisar,,0
+kaz-premier-league,Zhenis,,0
+kaz-premier-league,Kyzylzhar,,0
+kaz-premier-league,Kaspiy,,0
+kaz-premier-league,Okzhetpes,,0
+kaz-premier-league,Elimai,,0
+kaz-premier-league,Ordabasy,,0
+kaz-premier-league,Irtysh,,0

@@ -1,0 +1,575 @@
+tier,name,nat,pos,age,ovr,pot_lo,pot_hi,club
+star,Kylian Mbappé,FRA,ST,27,91,92,92,esp-real-madrid
+star,Erling Haaland,NOR,ST,26,91,92,92,eng-manchester-city
+star,Lamine Yamal,ESP,RW,19,89,95,95,esp-fc-barcelona
+star,Ousmane Dembélé,FRA,RW,29,89,89,89,fra-paris-saint-germain
+star,Vinícius Júnior,BRA,LW,26,89,90,90,esp-real-madrid
+star,Jude Bellingham,ENG,CAM,23,88,91,91,esp-real-madrid
+star,Harry Kane,ENG,ST,33,89,89,89,ger-bayern-munich
+star,Mohamed Salah,EGY,RW,34,87,87,87,eng-liverpool-fc
+star,Raphinha,BRA,LW,29,88,88,88,esp-fc-barcelona
+star,Pedri,ESP,CM,23,88,91,91,esp-fc-barcelona
+star,Vitinha,POR,CM,26,88,89,89,fra-paris-saint-germain
+star,Achraf Hakimi,MAR,RB,27,88,88,88,fra-paris-saint-germain
+star,Rodri,ESP,CDM,30,88,88,88,eng-manchester-city
+star,Virgil van Dijk,NED,CB,35,86,86,86,eng-liverpool-fc
+star,Florian Wirtz,GER,CAM,23,87,91,91,eng-liverpool-fc
+star,Jamal Musiala,GER,CAM,23,87,91,91,ger-bayern-munich
+star,Michael Olise,FRA,RW,24,87,90,90,ger-bayern-munich
+star,Bukayo Saka,ENG,RW,25,87,89,89,eng-arsenal-fc
+star,Declan Rice,ENG,CM,27,87,88,88,eng-arsenal-fc
+star,Cole Palmer,ENG,CAM,24,86,89,89,eng-chelsea-fc
+star,Lautaro Martínez,ARG,ST,29,88,88,88,ita-inter-milan
+star,Julián Álvarez,ARG,ST,26,87,89,89,esp-atletico-de-madrid
+star,Khvicha Kvaratskhelia,GEO,LW,25,87,89,89,fra-paris-saint-germain
+star,Nuno Mendes,POR,LB,24,87,89,89,fra-paris-saint-germain
+star,Federico Valverde,URU,CM,28,88,88,88,esp-real-madrid
+star,Alexander Isak,SWE,ST,27,87,88,88,eng-liverpool-fc
+star,Viktor Gyökeres,SWE,ST,28,86,86,86,eng-arsenal-fc
+star,Gianluigi Donnarumma,ITA,GK,27,88,89,89,eng-manchester-city
+star,Thibaut Courtois,BEL,GK,34,88,88,88,esp-real-madrid
+star,Alisson,BRA,GK,33,87,87,87,eng-liverpool-fc
+star,William Saliba,FRA,CB,25,87,89,89,eng-arsenal-fc
+star,Joshua Kimmich,GER,CDM,31,87,87,87,ger-bayern-munich
+star,Pau Cubarsí,ESP,CB,19,84,91,91,esp-fc-barcelona
+star,João Neves,POR,CM,21,86,91,91,fra-paris-saint-germain
+star,Désiré Doué,FRA,RW,21,85,91,91,fra-paris-saint-germain
+star,Alexis Mac Allister,ARG,CM,27,87,87,87,eng-liverpool-fc
+star,Bruno Fernandes,POR,CAM,32,86,86,86,eng-manchester-united
+star,Martin Ødegaard,NOR,CAM,27,87,88,88,eng-arsenal-fc
+star,Victor Osimhen,NGA,ST,27,86,87,87,tur-galatasaray
+star,Rúben Dias,POR,CB,29,87,87,87,eng-manchester-city
+star,Nico Williams,ESP,LW,24,86,88,88,esp-athletic-bilbao
+star,Rafael Leão,POR,LW,27,85,86,86,ita-ac-milan
+star,Jan Oblak,SVN,GK,33,87,87,87,esp-atletico-de-madrid
+star,Gabriel Magalhães,BRA,CB,28,87,87,87,eng-arsenal-fc
+star,Alessandro Bastoni,ITA,CB,27,86,87,87,ita-inter-milan
+star,Moisés Caicedo,ECU,CDM,24,86,88,88,eng-chelsea-fc
+star,Luis Díaz,COL,LW,29,86,86,86,ger-bayern-munich
+star,Kenan Yıldız,TUR,LW,21,84,90,90,ita-juventus-fc
+star,Arda Güler,TUR,CAM,21,84,90,90,esp-real-madrid
+star,Mike Maignan,FRA,GK,31,87,87,87,ita-ac-milan
+star,Jules Koundé,FRA,RB,27,86,87,87,esp-fc-barcelona
+star,Nicolò Barella,ITA,CM,29,86,86,86,ita-inter-milan
+star,Hugo Ekitiké,FRA,ST,24,85,88,88,eng-liverpool-fc
+star,Estêvão,BRA,RW,19,82,91,91,eng-chelsea-fc
+star,Warren Zaïre-Emery,FRA,CM,20,82,89,89,fra-paris-saint-germain
+star,Dean Huijsen,ESP,CB,21,83,89,89,esp-real-madrid
+star,Scott McTominay,SCO,CM,29,85,85,85,ita-ssc-napoli
+star,Franco Mastantuono,ARG,RW,19,80,90,90,esp-real-madrid
+star,Joško Gvardiol,CRO,CB,24,86,88,88,eng-manchester-city
+star,Trent Alexander-Arnold,ENG,RB,27,86,86,86,esp-real-madrid
+star,Enzo Fernández,ARG,CM,25,86,87,87,eng-chelsea-fc
+star,Frenkie de Jong,NED,CM,29,86,86,86,esp-fc-barcelona
+star,Aurélien Tchouaméni,FRA,CDM,26,86,87,87,esp-real-madrid
+star,Eduardo Camavinga,FRA,CM,23,85,88,88,esp-real-madrid
+star,Rodrygo,BRA,RW,25,85,86,86,esp-real-madrid
+star,Gavi,ESP,CM,22,84,88,88,esp-fc-barcelona
+star,Fermín López,ESP,CAM,23,84,87,87,esp-fc-barcelona
+star,Alejandro Balde,ESP,LB,22,84,87,87,esp-fc-barcelona
+star,Dani Olmo,ESP,CAM,28,85,85,85,esp-fc-barcelona
+star,Martín Zubimendi,ESP,CDM,27,86,87,87,eng-arsenal-fc
+star,Eberechi Eze,ENG,CAM,28,84,84,84,eng-arsenal-fc
+star,David Raya,ESP,GK,30,86,86,86,eng-arsenal-fc
+star,Ryan Gravenberch,NED,CM,24,86,88,88,eng-liverpool-fc
+star,Dominik Szoboszlai,HUN,CM,25,86,87,87,eng-liverpool-fc
+star,Jeremie Frimpong,NED,RB,25,84,85,85,eng-liverpool-fc
+star,Ibrahima Konaté,FRA,CB,27,85,85,85,eng-liverpool-fc
+star,Phil Foden,ENG,CAM,26,85,86,86,eng-manchester-city
+star,Rayan Cherki,FRA,CAM,23,85,88,88,eng-manchester-city
+star,Jérémy Doku,BEL,LW,24,84,86,86,eng-manchester-city
+star,Omar Marmoush,EGY,ST,27,84,84,84,eng-manchester-city
+star,Bryan Mbeumo,CMR,RW,27,85,85,85,eng-manchester-united
+star,Benjamin Šeško,SVN,ST,23,83,87,87,eng-manchester-united
+star,João Pedro,BRA,ST,24,84,86,86,eng-chelsea-fc
+star,Bruno Guimarães,BRA,CM,28,86,86,86,eng-newcastle-united
+star,Sandro Tonali,ITA,CM,26,85,86,86,eng-newcastle-united
+star,Morgan Rogers,ENG,CAM,24,84,87,87,eng-aston-villa
+star,Xavi Simons,NED,CAM,23,84,87,87,eng-tottenham-hotspur
+star,Micky van de Ven,NED,CB,25,85,86,86,eng-tottenham-hotspur
+star,Mohammed Kudus,GHA,RW,26,84,85,85,eng-tottenham-hotspur
+star,Gregor Kobel,SUI,GK,28,86,86,86,ger-borussia-dortmund
+star,Serhou Guirassy,GUI,ST,30,85,85,85,ger-borussia-dortmund
+star,Aleksandar Pavlović,GER,CDM,22,84,88,88,ger-bayern-munich
+star,Dayot Upamecano,FRA,CB,27,85,85,85,ger-bayern-munich
+star,Jonathan Tah,GER,CB,30,85,85,85,ger-bayern-munich
+star,Alejandro Grimaldo,ESP,LB,30,84,84,84,ger-bayer-04-leverkusen
+star,Marquinhos,BRA,CB,32,85,85,85,fra-paris-saint-germain
+star,Willian Pacho,ECU,CB,24,85,87,87,fra-paris-saint-germain
+star,Bradley Barcola,FRA,LW,24,84,87,87,fra-paris-saint-germain
+star,Lucas Chevalier,FRA,GK,24,84,87,87,fra-paris-saint-germain
+star,Marcus Thuram,FRA,ST,29,85,85,85,ita-inter-milan
+star,Federico Dimarco,ITA,LB,28,85,85,85,ita-inter-milan
+star,Hakan Çalhanoğlu,TUR,CDM,32,85,85,85,ita-inter-milan
+star,Christian Pulisic,USA,RW,27,85,85,85,ita-ac-milan
+star,Kevin De Bruyne,BEL,CAM,35,85,85,85,ita-ssc-napoli
+star,Nico Paz,ARG,CAM,21,83,88,88,ita-como-1907
+star,Diogo Costa,POR,GK,26,85,86,86,por-fc-porto
+star,Takefusa Kubo,JPN,RW,25,83,84,84,esp-real-sociedad
+star,Lionel Messi,ARG,CF,39,85,85,85,usa-inter-miami
+star,Cristiano Ronaldo,POR,ST,41,83,83,83,ksa-al-nassr
+prospect,Lennart Karl,GER,CAM,18,76,82,93,ger-bayern-munich
+prospect,Max Dowman,ENG,RW,16,70,78,94,eng-arsenal-fc
+prospect,Ethan Nwaneri,ENG,CAM,19,79,82,91,eng-arsenal-fc
+prospect,Myles Lewis-Skelly,ENG,LB,19,79,81,89,eng-arsenal-fc
+prospect,Rio Ngumoha,ENG,LW,18,72,77,90,eng-liverpool-fc
+prospect,Giovanni Leoni,ITA,CB,19,74,78,88,eng-liverpool-fc
+prospect,Kobbie Mainoo,ENG,CM,21,79,81,89,eng-manchester-united
+prospect,Leny Yoro,FRA,CB,20,79,82,90,eng-manchester-united
+prospect,Diego León,PAR,LB,19,70,75,85,eng-manchester-united
+prospect,Jorrel Hato,NED,LB,20,79,81,89,eng-chelsea-fc
+prospect,Kendry Páez,ECU,CAM,19,74,78,89,eng-chelsea-fc
+prospect,Geovany Quenda,POR,RW,19,78,80,90,eng-chelsea-fc
+prospect,Mamadou Sarr,FRA,CB,21,75,78,86,eng-chelsea-fc
+prospect,Lucas Bergvall,SWE,CM,20,79,81,88,eng-tottenham-hotspur
+prospect,Archie Gray,ENG,CM,20,77,79,87,eng-tottenham-hotspur
+prospect,Mathys Tel,FRA,ST,21,78,80,88,eng-tottenham-hotspur
+prospect,Claudio Echeverri,ARG,CAM,20,75,78,88,eng-manchester-city
+prospect,Sverre Nypan,NOR,CM,19,73,77,87,eng-manchester-city
+prospect,Eli Junior Kroupi,FRA,ST,20,77,79,87,eng-afc-bournemouth
+prospect,Rayan,BRA,RW,20,75,78,88,eng-afc-bournemouth
+prospect,Chemsdine Talbi,MAR,RW,21,75,77,85,eng-sunderland-afc
+prospect,Jobe Bellingham,ENG,CM,20,78,80,87,ger-borussia-dortmund
+prospect,Assan Ouédraogo,GER,CAM,20,76,78,88,ger-rb-leipzig
+prospect,Yan Diomande,CIV,LW,19,79,81,90,ger-rb-leipzig
+prospect,Said El Mala,GER,LW,20,77,79,88,ger-1-fc-koln
+prospect,Can Uzun,TUR,CAM,20,78,80,88,ger-eintracht-frankfurt
+prospect,Eliesse Ben Seghir,MAR,CAM,21,79,80,87,ger-bayer-04-leverkusen
+prospect,Paul Wanner,GER,CAM,20,76,78,87,ned-psv-eindhoven
+prospect,Marc Bernal,ESP,CDM,19,76,79,88,esp-fc-barcelona
+prospect,Dro Fernández,ESP,CM,18,71,76,89,esp-fc-barcelona
+prospect,Endrick,BRA,ST,20,78,81,91,esp-real-madrid
+prospect,Rodrigo Mora,POR,CAM,19,78,80,90,por-fc-porto
+prospect,Samu Aghehowa,ESP,ST,22,79,81,87,por-fc-porto
+prospect,Victor Froholdt,DEN,CM,20,76,78,86,por-fc-porto
+prospect,Ayyoub Bouaddi,FRA,CM,18,77,79,89,fra-losc-lille
+prospect,Senny Mayulu,FRA,CM,20,77,79,87,fra-paris-saint-germain
+prospect,Ibrahim Mbaye,FRA,LW,18,73,77,89,fra-paris-saint-germain
+prospect,Malick Fofana,BEL,LW,21,79,80,87,fra-olympique-lyon
+prospect,Francesco Camarda,ITA,ST,18,72,76,88,ita-ac-milan
+prospect,Pio Esposito,ITA,ST,21,77,79,87,ita-inter-milan
+prospect,Mika Godts,BEL,LW,20,78,79,87,ned-ajax-amsterdam
+prospect,Konstantinos Karetsas,GRE,CAM,18,74,78,90,bel-krc-genk
+prospect,Christos Mouzakitis,GRE,CM,19,74,77,87,gre-olympiacos-piraeus
+prospect,Vitor Roque,BRA,ST,21,78,79,87,bra-palmeiras
+prospect,Nico O'Reilly,ENG,LB,21,78,80,87,eng-manchester-city
+prospect,Gonzalo García,ESP,ST,22,77,79,86,esp-real-madrid
+prospect,Tom Bischof,GER,CM,21,77,79,86,ger-bayern-munich
+prospect,Ibrahim Maza,ALG,CAM,20,77,79,88,ger-bayer-04-leverkusen
+prospect,Jesús Rodríguez,ESP,LW,20,75,78,87,ita-como-1907
+prospect,Assane Diao,SEN,RW,21,76,78,86,ita-como-1907
+prospect,Givairo Read,NED,RB,20,75,77,85,ned-feyenoord-rotterdam
+prospect,William Gomes,BRA,RW,20,75,77,86,por-fc-porto
+prospect,Ângelo,BRA,RW,21,75,77,85,ksa-al-nassr
+prospect,Santiago Castro,ARG,ST,22,77,79,85,ita-bologna-fc-1909
+prospect,Lucas Beraldo,BRA,CB,22,78,80,86,fra-paris-saint-germain
+prospect,Harry Amass,ENG,LB,19,72,76,86,eng-manchester-united
+prospect,Chido Obi,DEN,ST,18,70,75,88,eng-manchester-united
+prospect,Kees Smit,NED,CM,20,76,79,88,ned-az-alkmaar
+prospect,Cher Ndour,ITA,CM,21,74,77,85,ita-acf-fiorentina
+prospect,Wisdom Mike,GER,RW,18,70,75,87,ger-bayern-munich
+prospect,Antonio Nusa,NOR,LW,21,78,80,87,ger-rb-leipzig
+prospect,Nestory Irankunda,AUS,RW,20,72,75,84,eng-watford
+prospect,Pau Prim,ESP,CDM,19,70,74,84,esp-fc-barcelona
+prospect,Toni Fernández,ESP,LW,18,70,75,87,esp-fc-barcelona
+prospect,Franco Carboni,ARG,LB,22,74,76,83,arg-river-plate
+notable,Ben White,ENG,RB,28,82,82,82,eng-arsenal-fc
+notable,Riccardo Calafiori,ITA,LB,24,82,82,83,eng-arsenal-fc
+notable,Leandro Trossard,BEL,LW,31,81,81,81,eng-arsenal-fc
+notable,Kai Havertz,GER,ST,27,83,83,83,eng-arsenal-fc
+notable,Gabriel Martinelli,BRA,LW,25,82,82,83,eng-arsenal-fc
+notable,Mikel Merino,ESP,CM,30,83,83,83,eng-arsenal-fc
+notable,Jurriën Timber,NED,RB,25,83,83,84,eng-arsenal-fc
+notable,Noni Madueke,ENG,RW,24,80,80,81,eng-arsenal-fc
+notable,Christian Nørgaard,DEN,CDM,32,80,80,80,eng-arsenal-fc
+notable,Piero Hincapié,ECU,CB,24,82,82,83,eng-arsenal-fc
+notable,Bernardo Silva,POR,CAM,32,84,84,84,eng-manchester-city
+notable,Mateo Kovačić,CRO,CM,32,82,82,82,eng-manchester-city
+notable,Tijjani Reijnders,NED,CM,28,84,84,84,eng-manchester-city
+notable,Abdukodir Khusanov,UZB,CB,22,79,79,82,eng-manchester-city
+notable,Savinho,BRA,RW,22,81,81,84,eng-manchester-city
+notable,John Stones,ENG,CB,32,81,81,81,eng-manchester-city
+notable,Nathan Aké,NED,CB,31,80,80,80,eng-manchester-city
+notable,Matheus Nunes,POR,CM,28,80,80,80,eng-manchester-city
+notable,Antoine Semenyo,GHA,RW,26,83,83,84,eng-manchester-city
+notable,Marc Guéhi,ENG,CB,26,84,84,85,eng-manchester-city
+notable,Cody Gakpo,NED,LW,27,83,83,83,eng-liverpool-fc
+notable,Federico Chiesa,ITA,RW,28,79,79,79,eng-liverpool-fc
+notable,Curtis Jones,ENG,CM,25,80,80,81,eng-liverpool-fc
+notable,Andrew Robertson,SCO,LB,32,81,81,81,eng-liverpool-fc
+notable,Conor Bradley,NIR,RB,23,79,79,82,eng-liverpool-fc
+notable,Milos Kerkez,HUN,LB,22,81,81,84,eng-liverpool-fc
+notable,Giorgi Mamardashvili,GEO,GK,25,83,83,84,eng-liverpool-fc
+notable,Wataru Endo,JPN,CDM,33,77,77,77,eng-liverpool-fc
+notable,Matheus Cunha,BRA,ST,27,83,83,83,eng-manchester-united
+notable,Mason Mount,ENG,CAM,27,79,79,79,eng-manchester-united
+notable,Amad Diallo,CIV,RW,24,81,81,82,eng-manchester-united
+notable,Lisandro Martínez,ARG,CB,28,82,82,82,eng-manchester-united
+notable,Manuel Ugarte,URU,CDM,25,80,80,81,eng-manchester-united
+notable,Senne Lammens,BEL,GK,24,79,79,80,eng-manchester-united
+notable,Patrick Dorgu,DEN,LB,22,77,77,80,eng-manchester-united
+notable,Matthijs de Ligt,NED,CB,27,82,82,82,eng-manchester-united
+notable,Diogo Dalot,POR,RB,27,80,80,80,eng-manchester-united
+notable,Reece James,ENG,RB,26,83,83,84,eng-chelsea-fc
+notable,Levi Colwill,ENG,CB,23,82,82,85,eng-chelsea-fc
+notable,Marc Cucurella,ESP,LB,28,83,83,83,eng-chelsea-fc
+notable,Robert Sánchez,ESP,GK,28,80,80,80,eng-chelsea-fc
+notable,Pedro Neto,POR,RW,26,82,82,83,eng-chelsea-fc
+notable,Romeo Lavia,BEL,CDM,22,80,80,83,eng-chelsea-fc
+notable,Liam Delap,ENG,ST,23,79,79,82,eng-chelsea-fc
+notable,Alejandro Garnacho,ARG,LW,22,81,81,84,eng-chelsea-fc
+notable,Jamie Gittens,ENG,LW,22,80,80,83,eng-chelsea-fc
+notable,Wesley Fofana,FRA,CB,25,80,80,81,eng-chelsea-fc
+notable,Malo Gusto,FRA,RB,23,81,81,84,eng-chelsea-fc
+notable,Guglielmo Vicario,ITA,GK,30,82,82,82,eng-tottenham-hotspur
+notable,Cristian Romero,ARG,CB,28,84,84,84,eng-tottenham-hotspur
+notable,Pedro Porro,ESP,RB,27,82,82,82,eng-tottenham-hotspur
+notable,Dominic Solanke,ENG,ST,29,80,80,80,eng-tottenham-hotspur
+notable,Richarlison,BRA,ST,29,78,78,78,eng-tottenham-hotspur
+notable,Destiny Udogie,ITA,LB,23,80,80,83,eng-tottenham-hotspur
+notable,Pape Matar Sarr,SEN,CM,24,80,80,81,eng-tottenham-hotspur
+notable,Rodrigo Bentancur,URU,CM,29,80,80,80,eng-tottenham-hotspur
+notable,João Palhinha,POR,CDM,31,82,82,82,eng-tottenham-hotspur
+notable,James Maddison,ENG,CAM,29,81,81,81,eng-tottenham-hotspur
+notable,Emiliano Martínez,ARG,GK,34,84,84,84,eng-aston-villa
+notable,Ollie Watkins,ENG,ST,30,82,82,82,eng-aston-villa
+notable,Youri Tielemans,BEL,CM,29,82,82,82,eng-aston-villa
+notable,John McGinn,SCO,CM,32,80,80,80,eng-aston-villa
+notable,Boubacar Kamara,FRA,CDM,27,82,82,82,eng-aston-villa
+notable,Ezri Konsa,ENG,CB,28,81,81,81,eng-aston-villa
+notable,Pau Torres,ESP,CB,29,81,81,81,eng-aston-villa
+notable,Amadou Onana,BEL,CDM,25,81,81,82,eng-aston-villa
+notable,Matty Cash,POL,RB,29,79,79,79,eng-aston-villa
+notable,Jean-Philippe Mateta,FRA,ST,29,80,80,80,eng-crystal-palace
+notable,Adam Wharton,ENG,CM,22,80,80,83,eng-crystal-palace
+notable,Dean Henderson,ENG,GK,29,81,81,81,eng-crystal-palace
+notable,Daniel Muñoz,COL,RB,30,81,81,81,eng-crystal-palace
+notable,Ismaïla Sarr,SEN,RW,28,80,80,80,eng-crystal-palace
+notable,Yeremy Pino,ESP,RW,23,79,79,82,eng-crystal-palace
+notable,Nick Woltemade,GER,ST,24,81,81,82,eng-newcastle-united
+notable,Anthony Gordon,ENG,LW,25,82,82,83,eng-newcastle-united
+notable,Nick Pope,ENG,GK,34,81,81,81,eng-newcastle-united
+notable,Joelinton,BRA,CM,30,81,81,81,eng-newcastle-united
+notable,Sven Botman,NED,CB,26,80,80,81,eng-newcastle-united
+notable,Tino Livramento,ENG,RB,23,80,80,83,eng-newcastle-united
+notable,Malick Thiaw,GER,CB,25,80,80,81,eng-newcastle-united
+notable,Yoane Wissa,COD,ST,29,80,80,80,eng-newcastle-united
+notable,Morgan Gibbs-White,ENG,CAM,26,82,82,83,eng-nottingham-forest
+notable,Murillo,BRA,CB,24,82,82,83,eng-nottingham-forest
+notable,Elliot Anderson,ENG,CM,23,82,82,85,eng-nottingham-forest
+notable,Chris Wood,NZL,ST,34,79,79,79,eng-nottingham-forest
+notable,Matz Sels,BEL,GK,34,80,80,80,eng-nottingham-forest
+notable,Nikola Milenković,SRB,CB,28,81,81,81,eng-nottingham-forest
+notable,Kaoru Mitoma,JPN,LW,29,81,81,81,eng-brighton-hove-albion
+notable,Carlos Baleba,CMR,CDM,22,81,81,84,eng-brighton-hove-albion
+notable,Jan Paul van Hecke,NED,CB,26,80,80,81,eng-brighton-hove-albion
+notable,Bart Verbruggen,NED,GK,24,81,81,82,eng-brighton-hove-albion
+notable,Georginio Rutter,FRA,CAM,24,78,78,79,eng-brighton-hove-albion
+notable,Yankuba Minteh,GAM,RW,22,78,78,81,eng-brighton-hove-albion
+notable,Kevin Schade,GER,LW,24,78,78,79,eng-brentford-fc
+notable,Igor Thiago,BRA,ST,25,79,79,80,eng-brentford-fc
+notable,Mikkel Damsgaard,DEN,CAM,26,78,78,79,eng-brentford-fc
+notable,Nathan Collins,IRL,CB,25,79,79,80,eng-brentford-fc
+notable,Evanilson,BRA,ST,26,79,79,80,eng-afc-bournemouth
+notable,Tyler Adams,USA,CDM,27,79,79,79,eng-afc-bournemouth
+notable,Marcos Senesi,ARG,CB,29,79,79,79,eng-afc-bournemouth
+notable,Alex Scott,ENG,CM,23,78,78,81,eng-afc-bournemouth
+notable,Jordan Pickford,ENG,GK,32,83,83,83,eng-everton-fc
+notable,James Tarkowski,ENG,CB,33,79,79,79,eng-everton-fc
+notable,Iliman Ndiaye,SEN,LW,26,80,80,81,eng-everton-fc
+notable,Kiernan Dewsbury-Hall,ENG,CM,27,78,78,78,eng-everton-fc
+notable,Thierno Barry,FRA,ST,23,78,78,81,eng-everton-fc
+notable,Bernd Leno,GER,GK,34,80,80,80,eng-fulham-fc
+notable,Antonee Robinson,USA,LB,28,80,80,80,eng-fulham-fc
+notable,Alex Iwobi,NGA,CAM,30,79,79,79,eng-fulham-fc
+notable,Emile Smith Rowe,ENG,CAM,26,78,78,79,eng-fulham-fc
+notable,Granit Xhaka,SUI,CDM,33,81,81,81,eng-sunderland-afc
+notable,Noah Sadiki,COD,CM,22,77,77,80,eng-sunderland-afc
+notable,Habib Diarra,SEN,CM,22,77,77,80,eng-sunderland-afc
+notable,Robin Roefs,NED,GK,23,78,78,81,eng-sunderland-afc
+notable,Ethan Ampadu,WAL,CDM,26,77,77,78,eng-leeds-united
+notable,Dominic Calvert-Lewin,ENG,ST,29,77,77,77,eng-leeds-united
+notable,Lucas Perri,BRA,GK,28,79,79,79,eng-leeds-united
+notable,Jarrod Bowen,ENG,RW,29,82,82,82,eng-west-ham-united
+notable,Alphonse Areola,FRA,GK,33,78,78,78,eng-west-ham-united
+notable,José Sá,POR,GK,33,78,78,78,eng-wolverhampton-wanderers
+notable,Dani Carvajal,ESP,RB,34,81,81,81,esp-real-madrid
+notable,Antonio Rüdiger,GER,CB,33,82,82,82,esp-real-madrid
+notable,Éder Militão,BRA,CB,28,83,83,83,esp-real-madrid
+notable,Álvaro Carreras,ESP,LB,23,81,81,84,esp-real-madrid
+notable,Ferland Mendy,FRA,LB,31,80,80,80,esp-real-madrid
+notable,David Alaba,AUT,CB,34,79,79,79,esp-real-madrid
+notable,Brahim Díaz,MAR,CAM,27,81,81,81,esp-real-madrid
+notable,Dani Ceballos,ESP,CM,30,79,79,79,esp-real-madrid
+notable,Andriy Lunin,UKR,GK,27,79,79,79,esp-real-madrid
+notable,Robert Lewandowski,POL,ST,38,84,84,84,esp-fc-barcelona
+notable,Ronald Araújo,URU,CB,27,82,82,82,esp-fc-barcelona
+notable,Eric García,ESP,CB,25,80,80,81,esp-fc-barcelona
+notable,Joan García,ESP,GK,25,84,84,85,esp-fc-barcelona
+notable,Ferran Torres,ESP,ST,26,81,81,82,esp-fc-barcelona
+notable,Marc Casadó,ESP,CDM,23,79,79,82,esp-fc-barcelona
+notable,Andreas Christensen,DEN,CB,30,80,80,80,esp-fc-barcelona
+notable,Antoine Griezmann,FRA,ST,35,83,83,83,esp-atletico-de-madrid
+notable,Koke,ESP,CM,34,80,80,80,esp-atletico-de-madrid
+notable,Alexander Sørloth,NOR,ST,30,81,81,81,esp-atletico-de-madrid
+notable,Giuliano Simeone,ARG,RW,23,80,80,83,esp-atletico-de-madrid
+notable,Pablo Barrios,ESP,CM,23,81,81,84,esp-atletico-de-madrid
+notable,Marcos Llorente,ESP,RB,31,81,81,81,esp-atletico-de-madrid
+notable,José María Giménez,URU,CB,31,80,80,80,esp-atletico-de-madrid
+notable,David Hancko,SVK,CB,28,81,81,81,esp-atletico-de-madrid
+notable,Robin Le Normand,ESP,CB,29,81,81,81,esp-atletico-de-madrid
+notable,Álex Baena,ESP,CAM,25,83,83,84,esp-atletico-de-madrid
+notable,Conor Gallagher,ENG,CM,26,81,81,82,esp-atletico-de-madrid
+notable,Johnny Cardoso,USA,CDM,24,80,80,81,esp-atletico-de-madrid
+notable,Thiago Almada,ARG,CAM,25,80,80,81,esp-atletico-de-madrid
+notable,Oihan Sancet,ESP,CAM,26,82,82,83,esp-athletic-bilbao
+notable,Unai Simón,ESP,GK,29,84,84,84,esp-athletic-bilbao
+notable,Iñaki Williams,GHA,RW,32,79,79,79,esp-athletic-bilbao
+notable,Dani Vivian,ESP,CB,27,81,81,81,esp-athletic-bilbao
+notable,Isco,ESP,CAM,34,81,81,81,esp-real-betis-balompie
+notable,Cucho Hernández,COL,ST,27,79,79,79,esp-real-betis-balompie
+notable,Antony,BRA,RW,26,79,79,80,esp-real-betis-balompie
+notable,Giovani Lo Celso,ARG,CAM,30,80,80,80,esp-real-betis-balompie
+notable,Gerard Moreno,ESP,ST,34,80,80,80,esp-villarreal-cf
+notable,Georges Mikautadze,GEO,ST,26,80,80,81,esp-villarreal-cf
+notable,Nicolas Pépé,CIV,RW,31,79,79,79,esp-villarreal-cf
+notable,Luiz Júnior,BRA,GK,25,80,80,81,esp-villarreal-cf
+notable,Mikel Oyarzabal,ESP,ST,29,83,83,83,esp-real-sociedad
+notable,Álex Remiro,ESP,GK,31,82,82,82,esp-real-sociedad
+notable,Brais Méndez,ESP,CAM,29,79,79,79,esp-real-sociedad
+notable,Igor Zubeldia,ESP,CB,29,79,79,79,esp-real-sociedad
+notable,José Gayà,ESP,LB,31,79,79,79,esp-valencia-cf
+notable,Ante Budimir,CRO,ST,35,79,79,79,esp-ca-osasuna
+notable,Isi Palazón,ESP,RW,31,78,78,78,esp-rayo-vallecano
+notable,Borja Iglesias,ESP,ST,33,77,77,77,esp-celta-de-vigo
+notable,Manuel Neuer,GER,GK,40,84,84,84,ger-bayern-munich
+notable,Serge Gnabry,GER,RW,31,81,81,81,ger-bayern-munich
+notable,Leon Goretzka,GER,CM,31,81,81,81,ger-bayern-munich
+notable,Konrad Laimer,AUT,RB,29,81,81,81,ger-bayern-munich
+notable,Alphonso Davies,CAN,LB,25,83,83,84,ger-bayern-munich
+notable,Kim Min-jae,KOR,CB,29,82,82,82,ger-bayern-munich
+notable,Hiroki Ito,JPN,CB,27,79,79,79,ger-bayern-munich
+notable,Josip Stanišić,CRO,RB,26,80,80,81,ger-bayern-munich
+notable,Julian Brandt,GER,CAM,30,81,81,81,ger-borussia-dortmund
+notable,Nico Schlotterbeck,GER,CB,26,84,84,85,ger-borussia-dortmund
+notable,Karim Adeyemi,GER,RW,24,81,81,82,ger-borussia-dortmund
+notable,Emre Can,GER,CDM,32,79,79,79,ger-borussia-dortmund
+notable,Marcel Sabitzer,AUT,CM,32,80,80,80,ger-borussia-dortmund
+notable,Felix Nmecha,GER,CM,25,80,80,81,ger-borussia-dortmund
+notable,Maximilian Beier,GER,ST,23,79,79,82,ger-borussia-dortmund
+notable,Waldemar Anton,GER,CB,29,80,80,80,ger-borussia-dortmund
+notable,Patrik Schick,CZE,ST,30,81,81,81,ger-bayer-04-leverkusen
+notable,Exequiel Palacios,ARG,CM,27,82,82,82,ger-bayer-04-leverkusen
+notable,Malik Tillman,USA,CAM,24,80,80,81,ger-bayer-04-leverkusen
+notable,Mark Flekken,NED,GK,33,79,79,79,ger-bayer-04-leverkusen
+notable,David Raum,GER,LB,28,81,81,81,ger-rb-leipzig
+notable,Christoph Baumgartner,AUT,CAM,27,80,80,80,ger-rb-leipzig
+notable,Johan Bakayoko,BEL,RW,23,79,79,82,ger-rb-leipzig
+notable,Willi Orbán,HUN,CB,33,79,79,79,ger-rb-leipzig
+notable,Deniz Undav,GER,ST,30,81,81,81,ger-vfb-stuttgart
+notable,Angelo Stiller,GER,CM,25,82,82,83,ger-vfb-stuttgart
+notable,Alexander Nübel,GER,GK,29,81,81,81,ger-vfb-stuttgart
+notable,Ermedin Demirović,BIH,ST,28,79,79,79,ger-vfb-stuttgart
+notable,Maximilian Mittelstädt,GER,LB,29,79,79,79,ger-vfb-stuttgart
+notable,Robin Koch,GER,CB,30,80,80,80,ger-eintracht-frankfurt
+notable,Jonathan Burkardt,GER,ST,26,79,79,80,ger-eintracht-frankfurt
+notable,Mario Götze,GER,CAM,34,77,77,77,ger-eintracht-frankfurt
+notable,Vincenzo Grifo,ITA,LW,33,79,79,79,ger-sc-freiburg
+notable,Tim Kleindienst,GER,ST,31,78,78,78,ger-borussia-monchengladbach
+notable,Andrej Kramarić,CRO,ST,35,79,79,79,ger-tsg-1899-hoffenheim
+notable,Oliver Baumann,GER,GK,36,80,80,80,ger-tsg-1899-hoffenheim
+notable,Nadiem Amiri,GER,CAM,30,79,79,79,ger-1-fsv-mainz-05
+notable,Romano Schmid,AUT,CAM,26,78,78,79,ger-sv-werder-bremen
+notable,Yann Sommer,SUI,GK,37,82,82,82,ita-inter-milan
+notable,Denzel Dumfries,NED,RB,30,83,83,83,ita-inter-milan
+notable,Davide Frattesi,ITA,CM,26,80,80,81,ita-inter-milan
+notable,Piotr Zieliński,POL,CM,32,81,81,81,ita-inter-milan
+notable,Yann Bisseck,GER,CB,25,80,80,81,ita-inter-milan
+notable,Manuel Akanji,SUI,CB,31,83,83,83,ita-inter-milan
+notable,Henrikh Mkhitaryan,ARM,CM,37,79,79,79,ita-inter-milan
+notable,Ange-Yoan Bonny,FRA,ST,22,78,78,81,ita-inter-milan
+notable,Luka Modrić,CRO,CM,40,82,82,82,ita-ac-milan
+notable,Adrien Rabiot,FRA,CM,31,82,82,82,ita-ac-milan
+notable,Youssouf Fofana,FRA,CDM,27,80,80,80,ita-ac-milan
+notable,Christopher Nkunku,FRA,ST,28,81,81,81,ita-ac-milan
+notable,Santiago Giménez,MEX,ST,25,79,79,80,ita-ac-milan
+notable,Fikayo Tomori,ENG,CB,28,80,80,80,ita-ac-milan
+notable,Strahinja Pavlović,SRB,CB,25,79,79,80,ita-ac-milan
+notable,Samuele Ricci,ITA,CDM,25,79,79,80,ita-ac-milan
+notable,Ardon Jashari,SUI,CM,24,79,79,80,ita-ac-milan
+notable,Alex Meret,ITA,GK,29,80,80,80,ita-ssc-napoli
+notable,Giovanni Di Lorenzo,ITA,RB,33,81,81,81,ita-ssc-napoli
+notable,Stanislav Lobotka,SVK,CDM,31,83,83,83,ita-ssc-napoli
+notable,André-Frank Zambo Anguissa,CMR,CM,30,82,82,82,ita-ssc-napoli
+notable,Rasmus Højlund,DEN,ST,23,81,81,84,ita-ssc-napoli
+notable,Alessandro Buongiorno,ITA,CB,27,82,82,82,ita-ssc-napoli
+notable,Amir Rrahmani,KOS,CB,32,81,81,81,ita-ssc-napoli
+notable,David Neres,BRA,RW,29,80,80,80,ita-ssc-napoli
+notable,Romelu Lukaku,BEL,ST,33,81,81,81,ita-ssc-napoli
+notable,Noa Lang,NED,LW,27,80,80,80,ita-ssc-napoli
+notable,Dušan Vlahović,SRB,ST,26,82,82,83,ita-juventus-fc
+notable,Jonathan David,CAN,ST,26,82,82,83,ita-juventus-fc
+notable,Teun Koopmeiners,NED,CM,28,80,80,80,ita-juventus-fc
+notable,Manuel Locatelli,ITA,CM,28,81,81,81,ita-juventus-fc
+notable,Gleison Bremer,BRA,CB,29,83,83,83,ita-juventus-fc
+notable,Michele Di Gregorio,ITA,GK,29,80,80,80,ita-juventus-fc
+notable,Khéphren Thuram,FRA,CM,25,81,81,82,ita-juventus-fc
+notable,Francisco Conceição,POR,RW,24,80,80,81,ita-juventus-fc
+notable,Andrea Cambiaso,ITA,LB,26,81,81,82,ita-juventus-fc
+notable,Loïs Openda,BEL,ST,26,80,80,81,ita-juventus-fc
+notable,Paulo Dybala,ARG,CF,32,81,81,81,ita-as-roma
+notable,Lorenzo Pellegrini,ITA,CAM,30,78,78,78,ita-as-roma
+notable,Gianluca Mancini,ITA,CB,30,80,80,80,ita-as-roma
+notable,Mile Svilar,BEL,GK,26,84,84,85,ita-as-roma
+notable,Evan Ndicka,CIV,CB,26,81,81,82,ita-as-roma
+notable,Manu Koné,FRA,CM,25,82,82,83,ita-as-roma
+notable,Matías Soulé,ARG,RW,23,80,80,83,ita-as-roma
+notable,Artem Dovbyk,UKR,ST,29,79,79,79,ita-as-roma
+notable,Mattia Zaccagni,ITA,LW,31,80,80,80,ita-ss-lazio
+notable,Ivan Provedel,ITA,GK,32,80,80,80,ita-ss-lazio
+notable,Alessio Romagnoli,ITA,CB,31,80,80,80,ita-ss-lazio
+notable,Nicolò Rovella,ITA,CDM,24,80,80,81,ita-ss-lazio
+notable,Ademola Lookman,NGA,LW,28,82,82,82,ita-atalanta-bc
+notable,Charles De Ketelaere,BEL,CAM,25,82,82,83,ita-atalanta-bc
+notable,Gianluca Scamacca,ITA,ST,27,79,79,79,ita-atalanta-bc
+notable,Éderson,BRA,CM,27,82,82,82,ita-atalanta-bc
+notable,Marten de Roon,NED,CDM,35,79,79,79,ita-atalanta-bc
+notable,Marco Carnesecchi,ITA,GK,26,82,82,83,ita-atalanta-bc
+notable,Isak Hien,SWE,CB,27,80,80,80,ita-atalanta-bc
+notable,Nikola Krstović,MNE,ST,26,79,79,80,ita-atalanta-bc
+notable,Máximo Perrone,ARG,CDM,23,79,79,82,ita-como-1907
+notable,Jean Butez,FRA,GK,31,79,79,79,ita-como-1907
+notable,Moise Kean,ITA,ST,26,82,82,83,ita-acf-fiorentina
+notable,David de Gea,ESP,GK,35,82,82,82,ita-acf-fiorentina
+notable,Albert Guðmundsson,ISL,CF,29,79,79,79,ita-acf-fiorentina
+notable,Riccardo Orsolini,ITA,RW,29,80,80,80,ita-bologna-fc-1909
+notable,Lewis Ferguson,SCO,CM,27,80,80,80,ita-bologna-fc-1909
+notable,Jhon Lucumí,COL,CB,28,80,80,80,ita-bologna-fc-1909
+notable,Duván Zapata,COL,ST,35,76,76,76,ita-torino-fc
+notable,Fabián Ruiz,ESP,CM,30,84,84,84,fra-paris-saint-germain
+notable,Gonçalo Ramos,POR,ST,25,80,80,81,fra-paris-saint-germain
+notable,Lee Kang-in,KOR,CAM,25,80,80,81,fra-paris-saint-germain
+notable,Lucas Hernández,FRA,LB,30,80,80,80,fra-paris-saint-germain
+notable,Ilya Zabarnyi,UKR,CB,23,81,81,84,fra-paris-saint-germain
+notable,Mason Greenwood,ENG,RW,24,82,82,83,fra-olympique-marseille
+notable,Pierre-Emerick Aubameyang,GAB,ST,37,79,79,79,fra-olympique-marseille
+notable,Gerónimo Rulli,ARG,GK,34,82,82,82,fra-olympique-marseille
+notable,Leonardo Balerdi,ARG,CB,27,80,80,80,fra-olympique-marseille
+notable,Pierre-Emile Højbjerg,DEN,CDM,31,81,81,81,fra-olympique-marseille
+notable,Amine Gouiri,ALG,ST,26,79,79,80,fra-olympique-marseille
+notable,Aleksandr Golovin,RUS,CAM,30,79,79,79,fra-as-monaco
+notable,Maghnes Akliouche,FRA,CAM,24,80,80,81,fra-as-monaco
+notable,Lamine Camara,SEN,CM,22,80,80,83,fra-as-monaco
+notable,Folarin Balogun,USA,ST,25,79,79,80,fra-as-monaco
+notable,Paul Pogba,FRA,CM,33,77,77,77,fra-as-monaco
+notable,Denis Zakaria,SUI,CDM,29,81,81,81,fra-as-monaco
+notable,Takumi Minamino,JPN,CAM,31,78,78,78,fra-as-monaco
+notable,Corentin Tolisso,FRA,CM,32,79,79,79,fra-olympique-lyon
+notable,Hákon Arnar Haraldsson,ISL,CAM,23,79,79,82,fra-losc-lille
+notable,Berke Özer,TUR,GK,26,79,79,80,fra-losc-lille
+notable,Florian Thauvin,FRA,RW,33,79,79,79,fra-rc-lens
+notable,Robin Risser,FRA,GK,22,78,78,81,fra-rc-lens
+notable,Terem Moffi,NGA,ST,27,77,77,77,fra-ogc-nice
+notable,Esteban Lepaul,FRA,ST,26,78,78,79,fra-stade-rennais-fc
+notable,Emanuel Emegha,NED,ST,23,78,78,81,fra-rc-strasbourg-alsace
+notable,Valentín Barco,ARG,LB,22,78,78,81,fra-rc-strasbourg-alsace
+notable,Anatoliy Trubin,UKR,GK,25,82,82,83,por-sl-benfica
+notable,Vangelis Pavlidis,GRE,ST,27,81,81,81,por-sl-benfica
+notable,Fredrik Aursnes,NOR,CM,30,81,81,81,por-sl-benfica
+notable,António Silva,POR,CB,22,80,80,83,por-sl-benfica
+notable,Richard Ríos,COL,CM,26,80,80,81,por-sl-benfica
+notable,Alan Varela,ARG,CDM,25,80,80,81,por-fc-porto
+notable,Gabri Veiga,ESP,CM,24,80,80,81,por-fc-porto
+notable,Jan Bednarek,POL,CB,30,78,78,78,por-fc-porto
+notable,Luis Suárez,COL,ST,29,80,80,80,por-sporting-cp
+notable,Pedro Gonçalves,POR,CAM,28,82,82,82,por-sporting-cp
+notable,Francisco Trincão,POR,RW,26,82,82,83,por-sporting-cp
+notable,Morten Hjulmand,DEN,CDM,27,82,82,82,por-sporting-cp
+notable,Gonçalo Inácio,POR,CB,25,82,82,83,por-sporting-cp
+notable,Ousmane Diomande,CIV,CB,22,81,81,84,por-sporting-cp
+notable,Rui Silva,POR,GK,32,79,79,79,por-sporting-cp
+notable,Ricardo Horta,POR,LW,32,79,79,79,por-sc-braga
+notable,Rodrigo Zalazar,URU,CAM,27,79,79,79,por-sc-braga
+notable,Ismael Saibari,MAR,CAM,25,80,80,81,ned-psv-eindhoven
+notable,Guus Til,NED,CM,29,79,79,79,ned-psv-eindhoven
+notable,Joey Veerman,NED,CM,27,79,79,79,ned-psv-eindhoven
+notable,Ivan Perišić,CRO,LW,37,78,78,78,ned-psv-eindhoven
+notable,Ricardo Pepi,USA,ST,23,78,78,81,ned-psv-eindhoven
+notable,Kenneth Taylor,NED,CM,24,79,79,80,ned-ajax-amsterdam
+notable,Josip Šutalo,CRO,CB,26,79,79,80,ned-ajax-amsterdam
+notable,Wout Weghorst,NED,ST,34,76,76,76,ned-ajax-amsterdam
+notable,Anis Hadj Moussa,ALG,RW,24,78,78,79,ned-feyenoord-rotterdam
+notable,Quinten Timber,NED,CM,25,79,79,80,ned-feyenoord-rotterdam
+notable,Hwang In-beom,KOR,CM,30,78,78,78,ned-feyenoord-rotterdam
+notable,Troy Parrott,IRL,ST,24,78,78,79,ned-az-alkmaar
+notable,Hans Vanaken,BEL,CAM,34,79,79,79,bel-club-brugge-kv
+notable,Christos Tzolis,GRE,LW,24,80,80,81,bel-club-brugge-kv
+notable,Raphael Onyedika,NGA,CDM,25,78,78,79,bel-club-brugge-kv
+notable,Callum McGregor,SCO,CM,33,78,78,78,sco-celtic-fc
+notable,Daizen Maeda,JPN,LW,29,79,79,79,sco-celtic-fc
+notable,Reo Hatate,JPN,CM,28,78,78,78,sco-celtic-fc
+notable,Cameron Carter-Vickers,USA,CB,28,78,78,78,sco-celtic-fc
+notable,James Tavernier,ENG,RB,34,76,76,76,sco-rangers-fc
+notable,Leroy Sané,GER,RW,30,81,81,81,tur-galatasaray
+notable,İlkay Gündoğan,GER,CM,35,80,80,80,tur-galatasaray
+notable,Barış Alper Yılmaz,TUR,RW,26,80,80,81,tur-galatasaray
+notable,Lucas Torreira,URU,CDM,30,79,79,79,tur-galatasaray
+notable,Uğurcan Çakır,TUR,GK,30,80,80,80,tur-galatasaray
+notable,Davinson Sánchez,COL,CB,30,80,80,80,tur-galatasaray
+notable,Mauro Icardi,ARG,ST,33,78,78,78,tur-galatasaray
+notable,Gabriel Sara,BRA,CM,27,79,79,79,tur-galatasaray
+notable,Marco Asensio,ESP,RW,30,81,81,81,tur-fenerbahce
+notable,Ederson,BRA,GK,33,83,83,83,tur-fenerbahce
+notable,Milan Škriniar,SVK,CB,31,81,81,81,tur-fenerbahce
+notable,Edson Álvarez,MEX,CDM,28,80,80,80,tur-fenerbahce
+notable,Kerem Aktürkoğlu,TUR,LW,27,80,80,80,tur-fenerbahce
+notable,Sebastian Szymański,POL,CAM,27,79,79,79,tur-fenerbahce
+notable,Talisca,BRA,CAM,32,78,78,78,tur-fenerbahce
+notable,Orkun Kökçü,TUR,CM,25,81,81,82,tur-besiktas-jk
+notable,Rafa Silva,POR,CAM,33,78,78,78,tur-besiktas-jk
+notable,Paul Onuachu,NGA,ST,32,77,77,77,tur-trabzonspor
+notable,Rúben Neves,POR,CDM,29,83,83,83,ksa-al-hilal
+notable,Sergej Milinković-Savić,SRB,CM,31,83,83,83,ksa-al-hilal
+notable,Kalidou Koulibaly,SEN,CB,35,80,80,80,ksa-al-hilal
+notable,Malcom,BRA,RW,29,81,81,81,ksa-al-hilal
+notable,Yassine Bounou,MAR,GK,35,83,83,83,ksa-al-hilal
+notable,Theo Hernández,FRA,LB,28,84,84,84,ksa-al-hilal
+notable,Darwin Núñez,URU,ST,27,81,81,81,ksa-al-hilal
+notable,Salem Al-Dawsari,KSA,LW,34,79,79,79,ksa-al-hilal
+notable,Sadio Mané,SEN,LW,34,80,80,80,ksa-al-nassr
+notable,Marcelo Brozović,CRO,CDM,33,81,81,81,ksa-al-nassr
+notable,Kingsley Coman,FRA,LW,30,81,81,81,ksa-al-nassr
+notable,João Félix,POR,CF,26,80,80,81,ksa-al-nassr
+notable,Íñigo Martínez,ESP,CB,35,80,80,80,ksa-al-nassr
+notable,Bento,BRA,GK,27,79,79,79,ksa-al-nassr
+notable,Karim Benzema,FRA,ST,38,82,82,82,ksa-al-ittihad
+notable,Fabinho,BRA,CDM,32,80,80,80,ksa-al-ittihad
+notable,Moussa Diaby,FRA,RW,27,80,80,80,ksa-al-ittihad
+notable,Houssem Aouar,ALG,CM,28,78,78,78,ksa-al-ittihad
+notable,Youssef En-Nesyri,MAR,ST,29,80,80,80,ksa-al-ittihad
+notable,Riyad Mahrez,ALG,RW,35,81,81,81,ksa-al-ahli
+notable,Ivan Toney,ENG,ST,30,82,82,82,ksa-al-ahli
+notable,Franck Kessié,CIV,CM,29,81,81,81,ksa-al-ahli
+notable,Édouard Mendy,SEN,GK,34,81,81,81,ksa-al-ahli
+notable,Merih Demiral,TUR,CB,28,80,80,80,ksa-al-ahli
+notable,Galeno,BRA,LW,28,80,80,80,ksa-al-ahli
+notable,Enzo Millot,FRA,CAM,24,79,79,80,ksa-al-ahli
+notable,Mateo Retegui,ITA,ST,27,80,80,80,ksa-al-qadsiah
+notable,Julián Quiñones,MEX,ST,29,78,78,78,ksa-al-qadsiah
+notable,Rodrigo De Paul,ARG,CM,32,81,81,81,usa-inter-miami
+notable,Son Heung-min,KOR,LW,34,82,82,82,usa-los-angeles-fc
+notable,Denis Bouanga,GAB,LW,31,79,79,79,usa-los-angeles-fc
+notable,Riqui Puig,ESP,CM,27,77,77,77,usa-la-galaxy
+notable,Marco Reus,GER,CAM,37,76,76,76,usa-la-galaxy
+notable,Hirving Lozano,MEX,RW,31,77,77,77,usa-san-diego-fc
+notable,Thomas Müller,GER,CAM,37,79,79,79,can-vancouver-whitecaps
+notable,Giorgian de Arrascaeta,URU,CAM,32,82,82,82,bra-flamengo
+notable,Pedro,BRA,ST,29,79,79,79,bra-flamengo
+notable,Jorginho,ITA,CM,34,78,78,78,bra-flamengo
+notable,Samuel Lino,BRA,LW,26,80,80,81,bra-flamengo
+notable,Lucas Paquetá,BRA,CAM,29,81,81,81,bra-flamengo
+notable,Raphael Veiga,BRA,CAM,31,78,78,78,bra-palmeiras
+notable,Gustavo Gómez,PAR,CB,33,79,79,79,bra-palmeiras
+notable,Leandro Paredes,ARG,CDM,32,79,79,79,arg-boca-juniors
+notable,Ángel Di María,ARG,RW,38,79,79,79,arg-rosario-central
+notable,Gonzalo Montiel,ARG,RB,29,77,77,77,arg-river-plate
