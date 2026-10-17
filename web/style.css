@@ -254,10 +254,18 @@ details.panel[open] > .panel { border: 0; padding: 8px 0 0; }
   #toast { bottom: 90px; }
 
   /* старт: слева имя и список стран, справа позиция, нога и рост */
-  .v-start { display: grid; grid-template-columns: minmax(360px, 4fr) 7fr; grid-template-areas: "name pos" "country pos" "country phys" "legal legal";
-    grid-template-rows: auto auto 1fr auto; align-items: start; }
-  .a-name { grid-area: name; } .a-country { grid-area: country; } .a-pos { grid-area: pos; } .a-phys { grid-area: phys; } .v-start .legal { grid-area: legal; }
-  .a-country .optlist { max-height: calc(100dvh - 380px); min-height: 300px; }
+  /* стартовый экран ровно в высоту окна: страница не прокручивается, список стран занимает всё оставшееся место */
+  #app:has(.v-start) { height: 100dvh; min-height: 0; }
+  #app:has(.v-start) .topbar { padding: 12px 32px 6px; }
+  #app:has(.v-start) .topbar h1 { font-size: 24px; }
+  #app:has(.v-start) .actions { padding: 8px 32px 12px; }
+  .v-start { display: grid; grid-template-columns: minmax(360px, 4fr) 7fr; grid-template-areas: "name pos" "country pos" "country phys" "country legal";
+    grid-template-rows: auto auto auto 1fr; align-items: start; gap: 12px; min-height: 0; overflow: auto; padding-bottom: 8px; }
+  .a-name { grid-area: name; } .a-pos { grid-area: pos; } .a-phys { grid-area: phys; } .v-start .legal { grid-area: legal; align-self: end; }
+  .a-country { grid-area: country; align-self: stretch; min-height: 0; }
+  .a-country .optlist { flex: 1; min-height: 160px; max-height: none; }
+  .v-start .panel { padding: 10px 12px; gap: 6px; }
+  .v-start .opt { padding: 7px 12px; }
   .posrow { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
   .pos span { min-height: 54px; }
   .a-pos { gap: 6px; }
