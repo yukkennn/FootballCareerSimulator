@@ -23,6 +23,10 @@ Both the playing career and the coaching career are available (transfer window, 
 Saves are stored in the browser. The "Export" button on the load screen saves a copy to a file, and "Import" brings it back.
 Headless test: `python tests/test_web_flow.py`.
 
+**Playing offline.** Open the site once with an internet connection and wait 10-20 seconds on the start screen: the game and Python (about 10 MB)
+are saved in the browser. After that the game starts from the home-screen icon without internet. Club crests are saved as you see them:
+offline, a crest you have never seen is drawn as a circle with initials. Updates arrive by themselves the next time you open the site online.
+
 ## Running the .exe (Windows)
 Double-click the **Football Career Sim** shortcut in the project folder (or `dist\FootballCareerSim\FootballCareerSim.exe`).
 Python is not required: the whole `dist\FootballCareerSim` folder can be copied to another computer or into an archive.
@@ -82,7 +86,8 @@ The league Team of the Season, Player of the Season and the Golden Boot depend o
   To download missing crests: `python tools/fetch_logos.py data/football.db`.
 - **Star players' clubs at the start** (574 real players in `data/real_players.csv`) are based on data up to summer 2026 and have not been re-checked: some may have moved.
 - **Testing**: the web version is checked automatically by `tests/test_web_flow.py` before every deployment (a full playing and coaching career, Russian and English)
-  and was checked by hand in the browser at phone and desktop widths; offline mode has not yet been confirmed on a real phone.
+  and was checked by hand in the browser at phone and desktop widths. Before deployment the JavaScript syntax is checked too.
+  Offline mode was checked in Microsoft Edge (first visit online, then the network cut off and the game reopened); after that fix it has not yet been re-checked on a real phone.
   The desktop app (.exe) has only an automated headless test (`tests/test_ui_flow.py`): if something looks wrong or crashes, send a screenshot or the error text.
 - Matches are not simulated minute by minute: season results come from a probabilistic model.
 
@@ -125,6 +130,10 @@ More about the sources: [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
    Сайт пересобирается и выкладывается сам при каждом push в `main` (`.github/workflows/pages.yml`).
 Сохранения хранятся в браузере. Кнопка «Экспорт» на экране загрузки сохраняет копию в файл, «Импорт» возвращает её.
 Тест без браузера: `python tests/test_web_flow.py`.
+
+**Игра без интернета.** Один раз откройте сайт с интернетом и подождите 10-20 секунд на стартовом экране: игра и Python (около 10 МБ)
+сохранятся в браузере. После этого игра запускается с иконки на главном экране без интернета. Эмблемы клубов сохраняются по мере просмотра:
+без интернета ещё не виденная эмблема рисуется кругом с инициалами. Обновления приходят сами при следующем открытии сайта с интернетом.
 
 ## Запуск через .exe (Windows)
 Дважды щёлкните ярлык **Football Career Sim** в папке проекта (или `dist\FootballCareerSim\FootballCareerSim.exe`).
@@ -185,7 +194,8 @@ macOS / Linux: `./run.sh`.
   Докачать: `python tools/fetch_logos.py data/football.db`.
 - **Клубы звёзд на старте** (574 реальных игрока в `data/real_players.csv`) взяты по данным до лета 2026 года и с тех пор не перепроверялись: кто-то мог перейти в другой клуб.
 - **Проверка**: веб-версию перед каждой публикацией автоматически проверяет `tests/test_web_flow.py` (полная карьера игрока и тренера, русский и английский);
-  кроме того, она проверена вручную в браузере на ширине телефона и компьютера. Работа без интернета на настоящем телефоне пока не подтверждена.
+  кроме того, она проверена вручную в браузере на ширине телефона и компьютера. Перед публикацией проверяется и синтаксис JavaScript.
+  Работа без интернета проверена в Microsoft Edge (первый заход с интернетом, затем сеть отключена и игра открыта заново); после этого исправления на настоящем телефоне её ещё не перепроверяли.
   У десктопного приложения (.exe) есть только автоматический тест без экрана (`tests/test_ui_flow.py`): если что-то выглядит криво или падает, пришлите скриншот или текст ошибки.
 - Матчи не симулируются по минутам: результаты сезона считаются вероятностной моделью.
 
