@@ -496,6 +496,8 @@ T = {
  "web.sort_pot": ("по потенциалу", "by potential"), "web.sort_effect": ("по пользе для основы", "by effect on the XI"),
  "web.sort_price": ("сначала дешёвые", "cheapest first"), "web.sort_age": ("сначала молодые", "youngest first"),
  "web.new_offers": ("Куда можно перейти", "Where you can go"),
+ "web.license_note": ("Некоммерческая фанатская игра. Рейтинги, эмблемы, названия клубов и имена игроков принадлежат их правообладателям.",
+                      "Non-commercial fan game. Ratings, crests, club names and player names belong to their respective owners."),
  "web.details": ("Таблицы турниров", "Competition tables"),
  "web.delete_q": ("Удалить это сохранение? Отменить будет нельзя.", "Delete this save? This cannot be undone."),}
 

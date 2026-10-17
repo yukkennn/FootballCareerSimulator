@@ -76,6 +76,14 @@ def summary_text(c, d):
                 L.append(f"        {nat_comp_name(e, d):<40} {e['games']:>3}/{e['goals']:>3}/{e['assists']:>3}  {nat_result(e, d)}")
     return "\n".join(L)
 
+REPO_URL = "https://github.com/yukkennn/FootballCareerSimulator"
+LICENSE_URL = "https://creativecommons.org/licenses/by-nc/4.0/"
+
+def copyright_html():
+    """Автор и лицензия внизу стартового экрана."""
+    return (f'<p class="legal">© 2026 <a href="{REPO_URL}" target="_blank" rel="noopener">yukkennn</a> · '
+            f'<a href="{LICENSE_URL}" target="_blank" rel="noopener">CC BY-NC 4.0</a><br>{esc(tr("web.license_note"))}</p>')
+
 def screen(title, body, footer="", left="", right=""):
     """Каркас экрана: верхняя панель, прокручиваемое содержимое, нижняя панель с кнопками."""
     top = f'<header class="topbar"><div class="tb-l">{left}</div><h1>{title}</h1><div class="tb-r">{right}</div></header>'
@@ -176,7 +184,7 @@ class WebApp(CoachScreens):
                 f'<input type="range" name="height" min="{HEIGHT_MIN}" max="{HEIGHT_MAX}" value="{f["height"]}" data-partial="phys" data-live="#hval">'
                 f'<div class="muted small" id="height_typ">{esc(typ)}</div><div class="hint" id="phys_hint">{esc(hint)}</div></div>')
         footer = btn(esc(tr("start.load")), "show_load") + btn(esc(tr("start.next")), "start", kind="primary")
-        return screen(esc(tr("start.heading")), name + country + position + phys, footer, right=right)
+        return screen(esc(tr("start.heading")), name + country + position + phys + copyright_html(), footer, right=right)
 
     def _sel_text(self):
         nat = self.form["nat"]
