@@ -181,10 +181,11 @@ class WebApp(CoachScreens):
         feet = "".join(f'<label class="chip-r"><input type="radio" name="foot" value="{k}" data-partial="phys"{" checked" if f["foot"] == k else ""}>'
                        f'<span>{esc(tr("foot." + k))}</span></label>' for k in ("R", "L", "B"))
         hint, typ = self._phys()
-        phys = (f'<div class="panel a-phys"><div class="h2">{esc(tr("start.foot"))}</div><div class="row">{feet}</div>'
-                f'<div class="h2 mt">{esc(tr("start.height"))}: <span id="hval">{f["height"]}</span> {esc(tr("start.cm"))}</div>'
+        # нога и рост: на широком экране рядом друг с другом (как в десктопной версии), подсказка под ними
+        phys = (f'<div class="panel a-phys"><div class="ph-foot"><div class="h2">{esc(tr("start.foot"))}</div><div class="row">{feet}</div></div>'
+                f'<div class="ph-height"><div class="h2">{esc(tr("start.height"))}: <span id="hval">{f["height"]}</span> {esc(tr("start.cm"))}</div>'
                 f'<input type="range" name="height" min="{HEIGHT_MIN}" max="{HEIGHT_MAX}" value="{f["height"]}" data-partial="phys" data-live="#hval">'
-                f'<div class="muted small" id="height_typ">{esc(typ)}</div><div class="hint" id="phys_hint">{esc(hint)}</div></div>')
+                f'<div class="muted small" id="height_typ">{esc(typ)}</div></div><div class="hint" id="phys_hint">{esc(hint)}</div></div>')
         footer = btn(esc(tr("start.load")), "show_load") + btn(esc(tr("start.next")), "start", kind="primary")
         return screen(esc(tr("start.heading")), name + country + position + phys + copyright_html(), footer, right=right)
 
