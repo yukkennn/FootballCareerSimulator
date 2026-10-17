@@ -87,7 +87,7 @@ The league Team of the Season, Player of the Season and the Golden Boot depend o
 - **Star players' clubs at the start** (574 real players in `data/real_players.csv`) are based on data up to summer 2026 and have not been re-checked: some may have moved.
 - **Testing**: the web version is checked automatically by `tests/test_web_flow.py` before every deployment (a full playing and coaching career, Russian and English)
   and was checked by hand in the browser at phone and desktop widths. Before deployment the JavaScript syntax is checked too.
-  Offline mode was checked in Microsoft Edge (first visit online, then the network cut off and the game reopened); after that fix it has not yet been re-checked on a real phone.
+  Offline mode was checked in Microsoft Edge (first visit online, then the network cut off and the game reopened) and confirmed on a real phone: without internet the game opens.
   The desktop app (.exe) has only an automated headless test (`tests/test_ui_flow.py`): if something looks wrong or crashes, send a screenshot or the error text.
 - Matches are not simulated minute by minute: season results come from a probabilistic model.
 
@@ -195,7 +195,7 @@ macOS / Linux: `./run.sh`.
 - **Клубы звёзд на старте** (574 реальных игрока в `data/real_players.csv`) взяты по данным до лета 2026 года и с тех пор не перепроверялись: кто-то мог перейти в другой клуб.
 - **Проверка**: веб-версию перед каждой публикацией автоматически проверяет `tests/test_web_flow.py` (полная карьера игрока и тренера, русский и английский);
   кроме того, она проверена вручную в браузере на ширине телефона и компьютера. Перед публикацией проверяется и синтаксис JavaScript.
-  Работа без интернета проверена в Microsoft Edge (первый заход с интернетом, затем сеть отключена и игра открыта заново); после этого исправления на настоящем телефоне её ещё не перепроверяли.
+  Работа без интернета проверена в Microsoft Edge (первый заход с интернетом, затем сеть отключена и игра открыта заново) и подтверждена на настоящем телефоне: без интернета игра открывается.
   У десктопного приложения (.exe) есть только автоматический тест без экрана (`tests/test_ui_flow.py`): если что-то выглядит криво или падает, пришлите скриншот или текст ошибки.
 - Матчи не симулируются по минутам: результаты сезона считаются вероятностной моделью.
 
