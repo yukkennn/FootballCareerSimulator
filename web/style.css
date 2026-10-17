@@ -212,3 +212,98 @@ details.panel[open] > .panel { border: 0; padding: 8px 0 0; }
 #toast { position: fixed; z-index: 40; left: 50%; transform: translateX(-50%); bottom: calc(84px + var(--safe-b)); width: calc(100% - 32px); max-width: 600px;
   background: #2c3747; border: 1px solid var(--line2); border-radius: 12px; padding: 12px 14px; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
 @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }
+
+/* --- колонки и таблицы (на телефоне - друг под другом) */
+.s-cols, .s-l, .s-r, .a-left, .a-right, .a-seasons, .a-info, .m-top, .m-bot { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.dt { display: flex; flex-direction: column; }
+.twrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+.tbl.wide td, .tbl.wide th { white-space: nowrap; padding: 7px 8px; }
+.tbl .l, .tbl th.l { text-align: left; }
+.tbl.wide td.l { white-space: normal; min-width: 70px; }          /* лига, трофеи, роль - переносятся, числа - нет */
+.cl { white-space: nowrap; }
+.tbl tbody tr:nth-child(even) td { background: #1e2631; }
+.tbl tr.click { cursor: pointer; }
+.tbl tr.click:hover td { background: #2c3747; }
+.tbl tr.xi td { color: var(--text); }
+.tbl tr.grp td { background: var(--panel2) !important; color: var(--muted); font-weight: 700; }
+.tbl td .row { flex-wrap: nowrap; }
+.cl { display: inline-flex; align-items: center; gap: 8px; }
+@media (max-width: 999px) { .d-only { display: none !important; } }
+
+/* ============ широкий экран (компьютер): раскладка как в десктопной версии (exe) ============ */
+@media (min-width: 1000px) {
+  .m-only { display: none !important; }
+  body { font-size: 14px; }
+  #app { max-width: 1440px; }
+  .topbar { padding: 16px 32px 12px; background: var(--bg); backdrop-filter: none; border-bottom: 0; }
+  .topbar h1 { font-size: 28px; }
+  .content { padding: 4px 32px 20px; gap: 14px; }
+  .actions { justify-content: flex-end; padding: 12px 32px 18px; background: var(--bg); backdrop-filter: none; border-top: 0; }
+  .actions .btn, .actions .btn-primary { flex: none; min-width: 150px; }
+  .actions .btn-danger:first-child { margin-right: auto; }        /* «Завершить карьеру» - слева, как в exe */
+  .btn { padding: 8px 16px; min-height: 38px; }
+  .btn-primary { padding: 10px 22px; }
+  .btn:hover { border-color: var(--accent); background: #2c3747; }
+  .btn-primary:hover { background: #4be08a; }
+  .modal-bg { align-items: center; }
+  .modal { max-width: 520px; border-radius: 14px; border: 1px solid var(--line2); }
+  #toast { bottom: 90px; }
+
+  /* старт: слева имя и список стран, справа позиция, нога и рост */
+  .v-start { display: grid; grid-template-columns: minmax(360px, 4fr) 7fr; grid-template-areas: "name pos" "country pos" "country phys" "legal legal";
+    grid-template-rows: auto auto 1fr auto; align-items: start; }
+  .a-name { grid-area: name; } .a-country { grid-area: country; } .a-pos { grid-area: pos; } .a-phys { grid-area: phys; } .v-start .legal { grid-area: legal; }
+  .a-country .optlist { max-height: calc(100dvh - 380px); min-height: 300px; }
+  .posrow { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .pos span { min-height: 62px; }
+  .opt:hover { background: var(--panel2); }
+
+  /* сводка: слева данные, справа карточка */
+  .v-summary { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+  .a-card { grid-column: 2; grid-row: 1; }
+  .a-info { grid-column: 1; grid-row: 1; }
+  .kv { padding: 10px 0; }
+
+  /* карточки клубов: в строку (эмблема, название, строки справа, кнопка) */
+  .ccard { flex-direction: row; align-items: center; gap: 18px; padding: 12px 16px; }
+  .ccard:hover { border-color: var(--accent); }
+  .ccard .cc-head { flex: 1; }
+  .ccard .cc-lines { text-align: right; }
+  .ccard .btn-choose { width: auto; min-width: 160px; min-height: 46px; }
+  .ccard .row { flex-wrap: nowrap; }
+  .v-academy, .v-offers, .v-coach_offers, .v-load { max-width: 1100px; width: 100%; margin: 0 auto; }
+
+  /* карьера игрока: шапка, слева карточка и график, справа таблица сезонов */
+  .v-career { display: grid; grid-template-columns: 300px 1fr; grid-template-areas: "head head" "left seasons"; align-items: start; }
+  .a-head { grid-area: head; }
+  .v-career .a-left { grid-area: left; }
+  .a-seasons { grid-area: seasons; }
+
+  /* отчёт: две колонки, полные таблицы турниров ниже (лига слева, кубки справа) */
+  .s-cols { display: grid; grid-template-columns: 3fr 2fr; gap: 14px; align-items: start; }
+  .dt { display: grid; grid-template-columns: 55fr 45fr; align-items: start; }
+  .dt-r { border-left: 1px solid var(--line); }
+  .v-report, .v-season, .v-creport { max-width: 1280px; width: 100%; margin: 0 auto; }
+  .tbl.comps td:first-child { width: auto; }
+
+  /* итоги карьеры */
+  .v-end .kvs { max-width: 900px; }
+
+  /* тренер: слева клуб, руководство, схема и тактика; справа вкладки */
+  .v-coach { display: grid; grid-template-columns: 360px 1fr; grid-template-areas: "head head" "left right"; align-items: start; }
+  .v-coach .a-left { grid-area: left; }
+  .v-coach .a-right { grid-area: right; }
+  .mk-tools { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .mk-tools .sel { flex-direction: row; align-items: center; gap: 8px; }
+  .mk-tools select { width: auto; min-height: 36px; padding: 5px 10px; }
+  .mk { padding: 10px 0 0; }
+  .mk .twrap { border: 0; border-radius: 0; border-top: 1px solid var(--line); }
+  .v-transfer .panel:first-child { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px 28px; }
+  .v-transfer .panel:first-child .sel { flex-direction: row; align-items: center; gap: 8px; margin-left: auto; }
+  .v-transfer .panel:first-child select { width: auto; }
+  .tbl .btn-sm { min-height: 28px; padding: 3px 10px; }
+
+  /* середина сезона: сверху итог половины и тактика, снизу таблица и основа */
+  .m-top { display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
+  .m-bot { display: grid; grid-template-columns: 1fr 420px; align-items: start; }
+}

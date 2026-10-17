@@ -186,6 +186,7 @@ def coach_season_html(c, d, r):
     lines += [f'<div class="gold">◆ {esc(trophy_name(t))}</div>' for t in r["trophies"]]
     lines += [f'<div class="award">★ {esc(award_name(a))}</div>' for a in r["awards"]]
     lines += [f'<div class="ev">• {esc(tr("event." + e["t"]))}</div>' for e in r.get("events", [])]
+    h.append('<div class="s-cols"><div class="s-l">')            # широкий экран: итоги слева, руководство справа
     h.append(f'<div class="blk"><div class="pad lines">{"".join(lines)}</div></div>')
     # --- руководство
     a, b = r["anger_before"], r["anger_after"]
@@ -205,7 +206,7 @@ def coach_season_html(c, d, r):
     msg = tr("creport.fired_mid") if v == "fired_mid" else tr("creport." + v) if v else tr("creport.continue_warn" if b >= 60 else "creport.continue_ok")
     mc = theme.RED if (v or "").startswith("fired") or (not v and b >= 60) else theme.ACCENT if not v else theme.GOLD
     bl.append(f'<div class="b" style="color:{mc}">{esc(msg)}</div>')
-    h.append(f'<div class="panel">{"".join(bl)}</div>')
+    board = f'<div class="panel">{"".join(bl)}</div>'
     fin = r.get("fin")
     money_lines = []
     if fin:
@@ -217,6 +218,7 @@ def coach_season_html(c, d, r):
     if sq:
         h.append(f'<div class="blk"><div class="bh">{esc(tr("sqev.title"))}</div><div class="pad lines">{sq}</div></div>')
     h.append(best_coach_html(r, d))
+    h.append(f'</div><div class="s-r">{board}</div></div>')
     h.append(details_html(d, r))
     return '<section class="season">' + "".join(h) + "</section>"
 
@@ -237,6 +239,7 @@ class CoachScreens:
         lc = squad_mod.line_counts(players)
         out = [f'<div class="muted small">{esc(tr("sq.xi", o=f"{squad_mod.team_rating(c, f):.1f}"))} · '
                f'{esc(tr("sq.counts", n=len(players), g=lc["GK"], d=lc["DEF"], m=lc["MID"], a=lc["ATT"]))}</div>']
+        trows = []                                     # та же информация таблицей для широкого экрана (как в десктопной версии)
         for ln in squad_mod.LINES:
             group = [p for p in players if squad_mod.LINE[p["pos"]] == ln]
             if not group:
@@ -269,7 +272,17 @@ class CoachScreens:
                             f'<span style="color:{fit_col}">{fit:.0f}%</span> · {esc(eur(price(p["ovr"], p["age"], p["pot"])))}</div>'
                             f'<div class="small" style="color:{stc or role_col}">{esc(stt or role_txt)}</div>{buttons}</div>'
                             f'<b class="povr">{p["ovr"]:.0f}</b></div>')
-            out.append(f'<div class="blk"><div class="bh">{esc(tr("line." + ln))} ({len(group)})</div>{"".join(rows)}</div>')
+                trows.append(f'<tr class="{"xi" if starter else ""}"><td>{esc(p["pos"])}</td><td class="l{" b" if starter else ""}">{name}</td>'
+                             f'<td>{p["age"]}</td><td class="b">{p["ovr"]:.0f}</td><td>{pot_html(p, pw)}</td>'
+                             f'<td style="color:{fit_col}">{fit:.0f}%</td><td class="muted">{esc(eur(price(p["ovr"], p["age"], p["pot"])))}</td>'
+                             f'<td class="l" style="color:{stc or role_col}">{esc(stt or role_txt)}</td>'
+                             + (f'<td class="l">{buttons}</td>' if sell else "") + "</tr>")
+            out.append(f'<div class="blk m-only"><div class="bh">{esc(tr("line." + ln))} ({len(group)})</div>{"".join(rows)}</div>')
+            span = 9 if sell else 8
+            trows.insert(len(trows) - len(group), f'<tr class="grp"><td colspan="{span}" class="l">{esc(tr("line." + ln))} ({len(group)})</td></tr>')
+        heads = ["pos", "player", "age", "ovr", "pot", "fit", "value", "role"]
+        th = "".join(f'<th{" class=l" if k in ("player", "role") else ""}>{esc(tr("col." + k))}</th>' for k in heads) + ("<th></th>" if sell else "")
+        out.append(f'<div class="d-only twrap"><table class="tbl wide squad"><thead><tr>{th}</tr></thead><tbody>{"".join(trows)}</tbody></table></div>')
         return "".join(out)
 
     def lineup_html(self):
@@ -414,7 +427,8 @@ class CoachScreens:
             content = self.lineup_html()
         else:
             content = self.coach_seasons_html() + self.records_html(4)
-        body = head + info + anger + setup + tabs + content + f'<p class="muted small">{esc(tr("career.autosave"))}</p>'
+        body = (head.replace('class="panel club-h"', 'class="panel club-h a-head"', 1) + f'<div class="a-left">{info}{anger}{setup}</div>'
+                + f'<div class="a-right">{tabs}{content}<p class="muted small">{esc(tr("career.autosave"))}</p></div>')
         footer = btn(esc(tr("coach.retire")), "coach_retire", kind="danger") + btn(esc(tr("coach.play_half")), "coach_play", kind="primary")
         return self.screen(esc(cl["name"]), body, footer, left=self.menu_btn())
 
@@ -508,7 +522,9 @@ class CoachScreens:
         cur_sort = next((k for k, col, _ in SORTS if sort and sort[0] == col), "")
         filters = chips("tw_filter", [("", tr("filter.all"))] + [(ln, tr("line." + ln)) for ln in squad_mod.LINES], filt)
         sort_sel = select("tw_sort", [("", tr("web.sort_default"))] + [(k, tr("web.sort_" + k)) for k, _, _ in SORTS], cur_sort, tr("web.sort"))
-        out = [f'<div class="muted small">{esc(tr("tw.scouting", q=f"{100 * scouting(s):.0f}", w=pw))}</div>', filters, sort_sel]
+        out = [f'<div class="muted small">{esc(tr("tw.scouting", q=f"{100 * scouting(s):.0f}", w=pw))}</div>',
+               f'<div class="mk-tools">{filters}{sort_sel}</div>']
+        cards, trows = [], []
         for i in idx:
             cd = win["cands"][i]
             real = bool(cd.get("pid")) and bool((stars_mod.find(c.stars, cd["pid"]) or {}).get("real"))
@@ -526,10 +542,17 @@ class CoachScreens:
                 buy_txt = tr("tw.loan_take") if cd.get("loan") else tr("tw.buy")
                 txt = tr("tw.bought") if cd["done"] else buy_txt if ok else (tr("tw.no_money") if cd["price"] > s["budget"] else buy_txt)
                 b = btn(esc(txt), "tw_buy", str(i), "sm" + (" btn-primary" if ok else ""), "" if ok else "disabled")
-            out.append(f'<div class="pl"><b class="ppos">{esc(cd["pos"])}</b><div class="pl-m"><div class="{ncls}">{name}</div>'
-                       f'<div class="muted small">{cd["age"]} · {esc(tr("col.pot"))} {pot_html(cd, pw)} · {esc(club)}</div>'
-                       f'<div class="small"><span class="gold">{esc(eur(cd["price"]))}</span> · {esc(tr("col.effect"))} {eff}</div>{b}</div>'
-                       f'<b class="povr">{cd["ovr"]:.0f}</b></div>')
+            cards.append(f'<div class="pl"><b class="ppos">{esc(cd["pos"])}</b><div class="pl-m"><div class="{ncls}">{name}</div>'
+                         f'<div class="muted small">{cd["age"]} · {esc(tr("col.pot"))} {pot_html(cd, pw)} · {esc(club)}</div>'
+                         f'<div class="small"><span class="gold">{esc(eur(cd["price"]))}</span> · {esc(tr("col.effect"))} {eff}</div>{b}</div>'
+                         f'<b class="povr">{cd["ovr"]:.0f}</b></div>')
+            trows.append(f'<tr><td class="l {ncls}">{name}</td><td>{esc(cd["pos"])}</td><td>{cd["age"]}</td><td class="b">{cd["ovr"]:.0f}</td>'
+                         f'<td>{pot_html(cd, pw)}</td><td class="l muted">{esc(club)}</td><td class="gold">{esc(eur(cd["price"]))}</td>'
+                         f'<td>{eff}</td><td class="l">{b}</td></tr>')
+        th = "".join(f'<th{" class=l" if k in ("player", "club") else ""}>{esc(tr("col." + k))}</th>'
+                     for k in ("player", "pos", "age", "ovr", "pot", "club", "price", "effect")) + "<th></th>"
+        out.append(f'<div class="m-only mk-cards">{"".join(cards)}</div>'
+                   f'<div class="d-only twrap"><table class="tbl wide"><thead><tr>{th}</tr></thead><tbody>{"".join(trows)}</tbody></table></div>')
         if win["youth"]:
             out.append(f'<div class="h2 mt">{esc(tr("tw.youth"))}</div>')
             for i, y in enumerate(win["youth"]):
@@ -650,21 +673,24 @@ class CoachScreens:
         cid = s["club"]
         msg = tr("mid.fired") if mid["fired"] else tr("mid.warn") if mid["anger"] >= 70 else tr("mid.ok")
         mc = theme.RED if mid["fired"] or mid["anger"] >= 70 else theme.ACCENT
-        body = (f'<div class="panel"><div class="h2">{esc(tr("mid.place", r=mid["rank"], n=mid["n"], t=kind_text(mid["kind"]), e=mid["target"]))}</div>'
-                f'<div>{esc(tr("mid.anger", a=f"{mid['anger_before']:.0f}", b=f"{mid['anger']:.0f}"))}</div>{meter(mid["anger"])}'
-                f'<div class="b" style="color:{mc}">{esc(msg)}</div></div>')
+        # широкий экран (как в десктопной версии): сверху итог половины | тактика, снизу события и таблица | основа
+        top = (f'<div class="panel"><div class="h2">{esc(tr("mid.place", r=mid["rank"], n=mid["n"], t=kind_text(mid["kind"]), e=mid["target"]))}</div>'
+               f'<div>{esc(tr("mid.anger", a=f"{mid['anger_before']:.0f}", b=f"{mid['anger']:.0f}"))}</div>{meter(mid["anger"])}'
+               f'<div class="b" style="color:{mc}">{esc(msg)}</div></div>')
+        left, right = "", ""
         if not mid["fired"]:
             tactic = self.ctx.get("tactic") or s.get("tactic", "balanced")
-            body += (f'<div class="panel">{self.tactic_html(tr("mid.second_half"), tactic)}{self.formation_select("m_formation")}'
-                     f'{self.rotation_select("m_rotation")}</div>')
+            top += (f'<div class="panel">{self.tactic_html(tr("mid.second_half"), tactic)}{self.formation_select("m_formation")}'
+                    f'{self.rotation_select("m_rotation")}</div>')
             ev = squad_events_html(mid.get("squad_events") or [])
             if ev:
-                body += f'<div class="blk"><div class="bh">{esc(tr("sqev.title"))}</div><div class="pad lines">{ev}</div></div>'
-            body += f'<details class="panel"><summary class="b">{esc(tr("tab.lineup"))}</summary>{self.lineup_html()}</details>'
+                left += f'<div class="blk"><div class="bh">{esc(tr("sqev.title"))}</div><div class="pad lines">{ev}</div></div>'
+            right = f'<details class="panel dopen"><summary class="b">{esc(tr("tab.lineup"))}</summary>{self.lineup_html()}</details>'
         lg = d.leagues[mid["lid"]]
         x = {"name_ru": f"{tr('mid.table')}: {lg['name']}", "name_en": f"{tr('mid.table')}: {lg['name']}", "table": mid["table"],
              "result": {"rank": mid["rank"], "n": mid["n"], "pts": next(r[6] for r in mid["table"] if r[0] == cid)}}
-        body += '<div class="blk">' + league_table_html(x, d, cid).replace("<details", "<details open", 1) + "</div>"
+        left += '<div class="blk">' + league_table_html(x, d, cid).replace("<details", "<details open", 1) + "</div>"
+        body = f'<div class="m-top">{top}</div><div class="m-bot"><div class="s-l">{left}</div><div class="s-r">{right}</div></div>'
         footer = ""
         if not mid["fired"]:
             footer += btn(esc(tr("tw.winter_btn")), "mid_winter")

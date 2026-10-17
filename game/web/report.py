@@ -71,12 +71,14 @@ def cup_path_html(x, d, me):
 def details_html(d, s):
     comps = s.get("comps") or []
     me = s["club"]
-    parts = [league_table_html(x, d, me) for x in comps if x["code"] in ("league", "youth") and not x.get("senior")]
-    parts += [cup_path_html(x, d, me) for x in comps if x["code"] not in ("league", "youth") and (x["result"].get("path") or x["result"].get("vs") or x.get("table"))]
-    parts = [p for p in parts if p]
-    if not parts:
+    lg = [league_table_html(x, d, me) for x in comps if x["code"] in ("league", "youth") and not x.get("senior")]
+    cups = [cup_path_html(x, d, me) for x in comps if x["code"] not in ("league", "youth") and (x["result"].get("path") or x["result"].get("vs") or x.get("table"))]
+    lg, cups = [p for p in lg if p], [p for p in cups if p]
+    if not lg and not cups:
         return ""
-    return f'<div class="blk"><div class="bh">{esc(tr("web.details"))}</div>{"".join(parts)}</div>'
+    # на широком экране: таблица лиги слева, кубки справа (как в десктопной версии)
+    return (f'<div class="blk s-full"><div class="bh">{esc(tr("web.details"))}</div>'
+            f'<div class="dt"><div class="dt-l">{"".join(lg)}</div><div class="dt-r">{"".join(cups)}</div></div></div>')
 
 def ballon_html(b, d):
     rows = []
@@ -122,6 +124,7 @@ def season_html(c, d, s, open_details=False):
     extra = [tr("report.ovr", a=s["ovr"], b=s["ovr_end"])]
     if s.get("rating"):
         extra.append(tr("report.rating", r=f"{s['rating']:.2f}"))
+    h.append('<div class="s-cols"><div class="s-l">')          # широкий экран: клуб и сборная слева, трофеи и события справа
     h.append(f'<div class="blk">{_table(head, rows, "comps")}<div class="muted small pad">{esc(" · ".join(extra))}</div></div>')
     # --- сборная
     if s.get("nat_comps"):
@@ -156,6 +159,7 @@ def season_html(c, d, s, open_details=False):
     if not s["trophies"]:
         hon.append(f'<div class="muted">{esc(tr("report.no_trophies"))}</div>')
     hon += [f'<div class="award">★ {esc(a)}</div>' for a in season_award_names(s)]
+    h.append('</div><div class="s-r">')
     h.append(f'<div class="blk"><div class="bh">{esc(tr("report.honours"))}</div><div class="pad lines">{"".join(hon)}</div></div>')
     if s.get("ballon"):
         h.append(ballon_html(s["ballon"], d))
@@ -163,5 +167,6 @@ def season_html(c, d, s, open_details=False):
     ev += [f"<div>▸ {esc(chronicle_text(e, d))}</div>" for e in s.get("chronicle") or []]
     if ev:
         h.append(f'<div class="blk"><div class="bh">{esc(tr("chron.title"))}</div><div class="pad lines">{"".join(ev)}</div></div>')
+    h.append("</div></div>")
     h.append(details_html(d, s))
     return '<section class="season">' + "".join(h) + "</section>"

@@ -35,12 +35,19 @@ function collectForm() {
   return f;
 }
 
+// на широком экране таблицы турниров и основа сразу раскрыты (как в десктопной версии), на телефоне - свёрнуты
+const wide = matchMedia("(min-width: 1000px)");
+function draw(html) {
+  root.innerHTML = html;
+  if (wide.matches) root.querySelectorAll("details.sub, details.dopen").forEach((el) => { el.open = true; });
+}
+
 async function act(name, arg, busy) {
   const keep = window.scrollY;
   if (busy) { document.getElementById("busy").hidden = false; await nextFrame(); }
   try {
     const res = JSON.parse(app.act(name, arg || "", JSON.stringify(collectForm())));
-    root.innerHTML = res.html;
+    draw(res.html);
     window.scrollTo(0, res.scroll === "top" ? 0 : keep);
     if (res.toast) toast(res.toast);
     if (res.download) download(res.download);
@@ -120,7 +127,7 @@ async function main() {
   py.runPython(`import sys; sys.path.insert(0, "${APP_DIR}")\nfrom game.web.app import WebApp\nweb_app = WebApp()`);
   app = py.globals.get("web_app");
   document.documentElement.lang = py.runPython("from game import i18n; i18n.LANG");
-  root.innerHTML = app.render();
+  draw(app.render());
 }
 
 main().catch((e) => {

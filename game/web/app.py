@@ -109,6 +109,8 @@ class WebApp(CoachScreens):
     # ------------------------------------------------------------------ вход из JS
     def render(self):
         html = getattr(self, "v_" + self.view)()
+        # класс экрана: по нему style.css раскладывает блоки в колонки на широком экране (как в десктопной версии)
+        html = html.replace('<main class="content">', f'<main class="content v-{self.view}">', 1)
         if self.modal:
             m = self.modal
             bs = "".join(btn(esc(t), a, arg, k) for t, a, arg, k in m["buttons"])
@@ -155,7 +157,7 @@ class WebApp(CoachScreens):
         d, f, lang = self.d, self.form, i18n.LANG
         langs = "".join(f'<button class="chip{" on" if lang == k else ""}" data-act="lang" data-arg="{k}">{k.upper()}</button>' for k in ("ru", "en"))
         right = f'<div class="langs">{langs}</div>'
-        name = (f'<div class="panel"><div class="muted small">{esc(tr("start.name"))}</div><div class="row">'
+        name = (f'<div class="panel a-name"><div class="muted small">{esc(tr("start.name"))}</div><div class="row">'
                 f'<input name="first" value="{esc(f["first"])}" placeholder="{esc(tr("start.first"))}" autocomplete="off">'
                 f'<input name="last" value="{esc(f["last"])}" placeholder="{esc(tr("start.last"))}" autocomplete="off">'
                 f'<button class="btn icon" data-partial="random_name" title="{esc(tr("start.random_name_tip"))}" aria-label="{esc(tr("start.random_name"))}">🎲</button></div></div>')
@@ -167,7 +169,7 @@ class WebApp(CoachScreens):
             chk = " checked" if f["nat"] == code else ""
             items.append(f'<label class="opt" data-search="{esc(search)}"><input type="radio" name="nat" value="{code}" data-partial="phys"{chk}>'
                          f'<span>{esc(nm)}</span><span class="muted small">{code}</span><span class="gold small">{stars_text(d.nat_stars(code))}</span></label>')
-        country = (f'<div class="panel"><div class="h2">{esc(tr("start.country"))}</div>'
+        country = (f'<div class="panel a-country"><div class="h2">{esc(tr("start.country"))}</div>'
                    f'<input type="search" data-filter="#natlist" placeholder="{esc(tr("start.search"))}" autocomplete="off">'
                    f'<div class="optlist" id="natlist">{"".join(items)}</div><div class="muted small" id="sel_label">{esc(self._sel_text())}</div></div>')
         groups = []
@@ -175,11 +177,11 @@ class WebApp(CoachScreens):
             chips = "".join(f'<label class="pos"><input type="radio" name="pos" value="{p}" data-partial="phys"{" checked" if f["pos"] == p else ""}>'
                             f'<span><b>{p}</b><small>{esc(tr("pos." + p))}</small></span></label>' for p in plist)
             groups.append(f'<div class="muted small">{esc(tr("posgrp." + gkey))}</div><div class="posrow">{chips}</div>')
-        position = f'<div class="panel"><div class="h2">{esc(tr("start.position"))}</div>{"".join(groups)}</div>'
+        position = f'<div class="panel a-pos"><div class="h2">{esc(tr("start.position"))}</div>{"".join(groups)}</div>'
         feet = "".join(f'<label class="chip-r"><input type="radio" name="foot" value="{k}" data-partial="phys"{" checked" if f["foot"] == k else ""}>'
                        f'<span>{esc(tr("foot." + k))}</span></label>' for k in ("R", "L", "B"))
         hint, typ = self._phys()
-        phys = (f'<div class="panel"><div class="h2">{esc(tr("start.foot"))}</div><div class="row">{feet}</div>'
+        phys = (f'<div class="panel a-phys"><div class="h2">{esc(tr("start.foot"))}</div><div class="row">{feet}</div>'
                 f'<div class="h2 mt">{esc(tr("start.height"))}: <span id="hval">{f["height"]}</span> {esc(tr("start.cm"))}</div>'
                 f'<input type="range" name="height" min="{HEIGHT_MIN}" max="{HEIGHT_MAX}" value="{f["height"]}" data-partial="phys" data-live="#hval">'
                 f'<div class="muted small" id="height_typ">{esc(typ)}</div><div class="hint" id="phys_hint">{esc(hint)}</div></div>')
@@ -255,8 +257,8 @@ class WebApp(CoachScreens):
                 (tr("summary.position"), pos_text(c.pos)),
                 (tr("summary.physique"), f"{tr('foot_short.' + c.player.foot)} · {c.player.height} {tr('start.cm')}"),
                 (tr("summary.age"), tr("summary.age_val", n=15)), (tr("summary.start"), "2026/27")]
-        body = (player_card(c.player, d.country_name(c.nat, i18n.LANG)) + kv(rows) +
-                f'<p class="muted small">{esc(tr("summary.pot"))}</p><p class="muted small">{esc(tr("summary.rule"))}</p>')
+        body = (f'<div class="a-card">{player_card(c.player, d.country_name(c.nat, i18n.LANG))}</div><div class="a-info">{kv(rows)}'
+                f'<p class="muted small">{esc(tr("summary.pot"))}</p><p class="muted small">{esc(tr("summary.rule"))}</p></div>')
         footer = btn(esc(tr("summary.reroll")), "reroll") + btn(esc(tr("summary.go")), "to_academy", kind="primary")
         return screen(esc(tr("summary.title")), body, footer, left=btn("‹", "home", kind="ghost", extra=f'aria-label="{esc(tr("summary.back"))}"'))
 
@@ -303,7 +305,28 @@ class WebApp(CoachScreens):
         if not out:
             return f'<p class="muted">{esc(tr("web.no_seasons"))}</p>'
         head = tr("col.games") + " · " + tr("col.goals") + " · " + tr("col.cs" if gk else "col.assists")
-        return f'<div class="muted small">{esc(tr("web.season_tap"))}</div><div class="srows"><div class="srh muted small">{esc(head)}</div>{"".join(out)}</div>'
+        return (f'<div class="muted small">{esc(tr("web.season_tap"))}</div>'
+                f'<div class="srows m-only"><div class="srh muted small">{esc(head)}</div>{"".join(out)}</div>' + self.seasons_table(back))
+
+    def seasons_table(self, back):
+        """Таблица сезонов для широкого экрана - те же столбцы, что в десктопной версии; строка открывает отчёт сезона."""
+        c, d = self.career, self.d
+        gk = c.pos == "GK"
+        cols = ["season", "age", "club", "league", "rank", "games", "goals", "cs" if gk else "assists", "ovr", "nat", "trophies_only", "awards"]
+        rows = []
+        for i, s in enumerate(c.seasons):
+            cl = d.clubs[s["club"]]
+            intl = s["intl"]
+            nat = f"{intl['caps']}/{intl['goals']}" if intl and intl.get("called") else "—"
+            tro = ", ".join(short_trophy(t["code"]) for t in s["trophies"])
+            aws = ", ".join(season_award_names(s))
+            rows.append(f'<tr class="click" data-act="season" data-arg="{i}|{back}"><td>{esc(s["season"])}</td><td>{s["age"]}</td>'
+                        f'<td class="l"><span class="cl">{logo(cl, 22)}{esc(cl["name"])}{" " + esc(tr("report.loan_tag")) if s["loan"] else ""}</span></td>'
+                        f'<td class="l">{esc(youth_league_name(s))}</td><td>{s["rank"]}/{s["n"]}</td><td>{s["games"]}</td><td>{s["goals"]}</td>'
+                        f'<td>{s["cs"] if gk else s["assists"]}</td><td>{s["ovr"]}→{s["ovr_end"]}</td><td>{nat}</td>'
+                        f'<td class="l gold">{esc(tro)}</td><td class="l award">{esc(aws)}</td></tr>')
+        th = "".join(f'<th{" class=l" if k in ("club", "league", "trophies_only", "awards") else ""}>{esc(tr("col." + k))}</th>' for k in cols)
+        return f'<div class="d-only twrap"><table class="tbl wide"><thead><tr>{th}</tr></thead><tbody>{"".join(rows)}</tbody></table></div>'
 
     def v_career(self):
         c, d, w = self.career, self.d, self.career.world
@@ -321,11 +344,12 @@ class WebApp(CoachScreens):
         g = sum(s["games"] for s in c.seasons); go = sum(s["goals"] for s in c.seasons); a = sum(s["assists"] for s in c.seasons)
         n_aw = sum(1 for x in c.awards if x["code"] != "ballon_top30")
         totals = f'<div class="panel muted small">{esc(tr("career.totals", g=g, a=go, s=a, t=len(c.trophies), w=n_aw))}</div>'
-        body = head + player_card(pl, d.country_name(c.nat, i18n.LANG)) + ovr_chart(pts, tr("chart.title")) + totals + \
-               f'<div class="h2 mt">{esc(tr("web.seasons"))}</div>' + self.season_rows("career")
+        body = (head.replace('class="panel club-h"', 'class="panel club-h a-head"', 1)
+                + f'<div class="a-left">{player_card(pl, d.country_name(c.nat, i18n.LANG))}{ovr_chart(pts, tr("chart.title"))}</div>'
+                + f'<div class="a-seasons"><div class="h2 mt m-only">{esc(tr("web.seasons"))}</div>{self.season_rows("career")}{totals}'
+                + f'<p class="muted small">{esc(tr("career.autosave"))}</p></div>')
         play = tr("career.play_academy") if youth else tr(f"career.play_{c.freq if not c.parent_id else 1}")
         footer = btn(esc(tr("career.retire")), "retire", kind="danger") + btn(esc(play), "play", kind="primary", extra="data-busy")
-        body += f'<p class="muted small">{esc(tr("career.autosave"))}</p>'
         return screen(esc(pl.name), body, footer, left=btn("☰", "home", kind="ghost", extra=f'aria-label="{esc(tr("career.menu"))}"'))
 
     def a_season(self, arg):
@@ -469,13 +493,22 @@ class WebApp(CoachScreens):
 
     def end_transfers(self, rep):
         c, d = self.career, self.d
-        out = []
-        for t in c.transfers:
+        out, rows = [], []
+        tl = c.transfers
+        for i, t in enumerate(tl):
             fee = money(t["fee"]) if t["fee"] > 0 else ""
             frm = d.clubs[t["from"]]["name"] if t["from"] else "—"
             out.append(f'<div class="li"><div><b>{esc(t["season"])}</b> · {esc(tr("type." + t["type"]))}</div>'
                        f'<div>{esc(frm)} → <b>{esc(d.clubs[t["to"]]["name"])}</b></div>' + (f'<div class="gold small">{esc(fee)}</div>' if fee else "") + "</div>")
-        return '<div class="panel list">' + ("".join(out) or esc(tr("end.none"))) + "</div>"
+            y0 = int(t["season"][:4])
+            y1 = int(tl[i + 1]["season"][:4]) if i + 1 < len(tl) else c.year
+            rows.append(f'<tr><td>{esc(t["season"])}</td><td class="l">{esc(frm)}</td><td class="l"><b>{esc(d.clubs[t["to"]]["name"])}</b></td>'
+                        f'<td class="l">{esc(tr("type." + t["type"]))}</td><td class="gold">{esc(fee) or "—"}</td><td>{y0}–{y1}</td></tr>')
+        if not out:
+            return f'<div class="panel">{esc(tr("end.none"))}</div>'
+        th = "".join(f'<th{" class=l" if k in ("from", "to", "type") else ""}>{esc(tr("col." + k))}</th>' for k in ("years", "from", "to", "type", "fee", "period"))
+        return (f'<div class="panel list m-only">{"".join(out)}</div>'
+                f'<div class="d-only twrap"><table class="tbl wide"><thead><tr>{th}</tr></thead><tbody>{"".join(rows)}</tbody></table></div>')
 
     def end_honours(self, rep):
         c, d = self.career, self.d
