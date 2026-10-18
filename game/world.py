@@ -39,6 +39,18 @@ def flip(sc):
 SENS = 0.024           # насколько разница в силе клубов (шкала 0..100) влияет на ожидаемые голы
 MIN_SCORE = -32.5      # нижняя граница силы клуба (OVR 35, как в recompute_stars.py): полупрофессиональные лиги слабее OVR 48
 UPDOWN = {"ENG": [3, 3, 4], "ESP": [3], "GER": [3, 3], "ITA": [3], "FRA": [3]}   # сколько клубов меняются между уровнями
+# Дрейф силы между сезонами: сила клуба возвращается к его «базовой» (историческому уровню) на REVERT в год, чемпион получает
+# небольшой толчок CHAMP_BONUS; базовая сила очень медленно (BASE_TO_MEAN) тянется к среднему лиги - гранды остаются грандами.
+REVERT, CHAMP_BONUS, BASE_TO_MEAN = 0.2, 0.4, 0.01
+# «Гегемон» лиги: время от времени один из сильнейших клубов высшей лиги (деньги, состав) на 5-10 сезонов уходит в отрыв -
+# его сила тянется (HEG_REVERT в год) к уровню на HEG_LEAD выше сильнейшего соперника; тот же клуб - не чаще раза в HEG_COOLDOWN лет. Шанс начала эпохи - HEG_P за сезон, если
+# гегемона нет; кандидаты - 6 сильнейших клубов, чем сильнее клуб, тем вероятнее (вес exp(сила / HEG_TEMP)).
+HEG_P, HEG_YEARS, HEG_LEAD, HEG_MAX, HEG_REVERT, HEG_TEMP, HEG_COOLDOWN = 0.07, (5, 10), (5.0, 9.0), 25.0, 0.35, 8.0, 10
+# «Форма сезона»: случайная добавка к силе клуба на один сезон (удачный или провальный год), на рейтинг клуба не влияет
+FORM_SD = 3.5
+# Отрыв базовой силы лидера лиги от второго клуба больше LEAD_GAP (~2.5 OVR) тает на LEAD_FADE в год: давний гегемон (ПСЖ, Бурирам)
+# остаётся фаворитом, но не навсегда. Там, где гранды рядом (Реал, Барселона, Атлетико), это не срабатывает.
+LEAD_GAP, LEAD_FADE = 6.0, 0.15
 NAT_SIZES = {"WC": 48, "EURO": 24, "CA": 16, "AFCON": 24, "ASIAN": 24, "GOLD": 16, "OFCNC": 8}
 WC_QUOTA = {"UEFA": 16, "CAF": 9, "AFC": 8, "CONMEBOL": 6, "CONCACAF": 6, "OFC": 1}      # + 2 места через межконтинентальный плей-офф
 ADVANCE = {48: 32, 24: 16, 16: 8, 8: 4}
@@ -86,12 +98,15 @@ class World:
         self.nat = dict(data.nat_strength)
         self.unl_div = self._unl_divisions()
         self.prev_uel_winner = None
+        self.hegemon = {}                  # лига -> {"club", "until" (последний сезон эпохи), "boost"}
+        self.heg_last = {}                 # клуб -> последний сезон его эпохи гегемона
+        self._form = {}                    # форма сезона: {клуб: добавка к силе}, разыгрывается в begin_season
         self._boost = {}
         self._tactics = {}                 # тактика тренера на время розыгрыша: {клуб: (множитель своих голов, пропущенных)}
 
     # ---------- доступ ----------
     def eff(self, cid):
-        return self.score[cid] + self._boost.get(cid, 0.0)
+        return self.score[cid] + self._boost.get(cid, 0.0) + self._form.get(cid, 0.0)
 
     def team_ovr(self, cid):
         return 48.0 + 0.40 * self.score[cid]
@@ -179,6 +194,7 @@ class World:
         """Первая половина чемпионатов (половина матчей каждой команды). -> res с таблицами середины сезона (res["half"]).
         tactics: {клуб: (множитель своих голов, множитель пропущенных)} - тактика тренера."""
         self._boost, self._tactics = boost or {}, tactics or {}
+        self._form = {c: self.rng.gauss(0, FORM_SD) for c in self.score}       # удачный / провальный сезон каждого клуба
         res = {"year": year, "tables": {}, "cups": {}, "supercups": {}, "cont": {}, "nat": {}, "nat_season": {}, "lg_ovr": {},
                "half": {}, "_pending": {}}
         for lid in self.league_clubs:
@@ -807,32 +823,62 @@ class World:
                     self.league_clubs[up_l].remove(c); self.league_clubs[lo_l].append(c); self.club_league[c] = lo_l; changed[c] = "relegated"
                 for c in promoted:
                     self.league_clubs[lo_l].remove(c); self.league_clubs[up_l].append(c); self.club_league[c] = up_l; changed[c] = "promoted"
+        self._hegemons()
         for lid, ids in self.league_clubs.items():
             if not ids:
                 continue
             mean = sum(self.base[c] for c in ids) / len(ids)
+            bases = sorted((self.base[c] for c in ids), reverse=True)
+            second = bases[1] if len(bases) > 1 else bases[0]
             top = res["tables"][lid]["order"][0] if lid in res["tables"] else None
+            h = self.hegemon.get(lid)
             for c in ids:
                 s, b = self.score[c], self.base[c]
-                s += 0.12 * (b - s) + rng.gauss(0, 1.8)
-                if c == top: s += 1.5
+                if h and h["club"] == c:
+                    s += HEG_REVERT * (b + h["boost"] - s) + rng.gauss(0, 1.8)
+                else:
+                    s += REVERT * (b - s) + rng.gauss(0, 1.8)
+                if c == top: s += CHAMP_BONUS
                 if changed.get(c) == "promoted": s += 1.0
                 if changed.get(c) == "relegated": s -= 2.0
                 u = rng.random()
                 if u < 0.008: s += 8
                 elif u > 0.992: s -= 6
                 self.score[c] = max(MIN_SCORE, min(100.0, s))
-                self.base[c] = b + 0.04 * (mean - b)
+                b += BASE_TO_MEAN * (mean - b)
+                if b > second + LEAD_GAP:
+                    b -= LEAD_FADE * (b - second - LEAD_GAP)
+                self.base[c] = b
         for c in self.nat:
             self.nat[c] = max(0.0, min(100.0, self.nat[c] + 0.08 * (self.d.nat_strength[c] - self.nat[c]) + rng.gauss(0, 1.0)))
         self.prev_uel_winner = res["cont"].get("UEL", {}).get("winner")
         self.year += 1
         return changed
 
+    def _hegemons(self):
+        """Начало и конец эпох «гегемонов» в высших лигах (см. HEG_*). Сезон, который сейчас закончился, - self.year."""
+        rng = self.rng
+        for lid, ids in self.league_clubs.items():
+            h = self.hegemon.get(lid)
+            if h and (h["until"] <= self.year or self.club_league.get(h["club"]) != lid):
+                del self.hegemon[lid]                                # эпоха кончилась: дальше клуб постепенно возвращается к своей силе
+                self.heg_last[h["club"]] = self.year
+            if lid in self.hegemon or self.d.leagues[lid]["tier"] != 1 or len(ids) < 8 or rng.random() >= HEG_P:
+                continue
+            ranked = sorted((c for c in ids if not self.d.clubs[c]["reserve"]), key=lambda c: -self.score[c])
+            pool = [c for c in ranked[:6] if self.year - self.heg_last.get(c, -99) >= HEG_COOLDOWN]
+            if not pool:
+                continue
+            c = rng.choices(pool, weights=[math.exp((self.score[x] - self.score[ranked[0]]) / HEG_TEMP) for x in pool])[0]
+            rival = max(self.score[x] for x in ranked if x != c)
+            boost = min(HEG_MAX, max(0.0, rival - self.base[c]) + rng.uniform(*HEG_LEAD))
+            self.hegemon[lid] = {"club": c, "until": self.year + rng.randint(*HEG_YEARS), "boost": round(boost, 1)}
+
     # ---------- сохранение ----------
     def to_dict(self):
         return {"year": self.year, "score": self.score, "base": self.base, "club_league": self.club_league,
-                "nat": self.nat, "prev_uel_winner": self.prev_uel_winner, "unl_div": self.unl_div}
+                "nat": self.nat, "prev_uel_winner": self.prev_uel_winner, "unl_div": self.unl_div, "hegemon": self.hegemon,
+                "heg_last": self.heg_last}
 
     def load_dict(self, d, migrate=False):
         """migrate=True: сохранение старой версии (до базы FC 27) - силы клубов и сборных берутся из новой базы."""
@@ -846,6 +892,8 @@ class World:
             self.base = {c: d["base"].get(c, self.d.clubs[c]["score"]) for c in self.d.clubs}
             self.nat = {c: d["nat"].get(c, self.d.nat_strength[c]) for c in self.d.nat_strength}
         self.unl_div = {c: l for c, l in (d.get("unl_div") or {}).items() if c in self.nat} or self._unl_divisions()
+        self.hegemon = {l: h for l, h in (d.get("hegemon") or {}).items() if l in self.d.leagues and h.get("club") in self.d.clubs}
+        self.heg_last = {c: y for c, y in (d.get("heg_last") or {}).items() if c in self.d.clubs}
         self.league_clubs = {l: [] for l in self.d.leagues}
         for c, l in self.club_league.items():
             self.league_clubs[l].append(c)

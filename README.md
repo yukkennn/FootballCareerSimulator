@@ -55,6 +55,10 @@ macOS / Linux: `./run.sh`.
 
 The language (Russian / English) can be switched on the start screen.
 
+**Leagues live their own life.** Every club has good and bad seasons, and now and then one of the strongest clubs in a league starts an era
+of dominance for 5-10 seasons (money and squad), then gradually returns to its usual level. Historical giants stay giants: in Spain the title
+almost always goes to Real Madrid, Barcelona or Atlético, but which of them wins changes. Settings are at the top of `game/world.py` (REVERT, HEG_*, FORM_SD, LEAD_*).
+
 ## Awards
 The Ballon d'Or, the World Team of the Year and the best young player are contested between your player and 60 world stars
 (real ones at the start: Mbappé, Haaland, Yamal and others; later they age and new talents appear). Goals and assists
@@ -166,6 +170,10 @@ macOS / Linux: `./run.sh`.
    Сохранения прошлой версии открываются: силы клубов в них берутся из новой базы.
 
 Язык (русский / английский) переключается на стартовом экране.
+
+**Лиги живут своей жизнью.** У каждого клуба бывают удачные и провальные сезоны, а время от времени один из сильнейших клубов лиги начинает
+эпоху гегемонии на 5-10 сезонов (деньги и состав), после чего постепенно возвращается к своему обычному уровню. Гранды остаются грандами: в Испании
+титул почти всегда берут Реал, Барселона или Атлетико, но кто из них - меняется. Настройки - в начале `game/world.py` (REVERT, HEG_*, FORM_SD, LEAD_*).
 
 ## Награды
 Золотой мяч, символическая сборная мира и лучший молодой игрок разыгрываются между вашим игроком и 60 звёздами мира
