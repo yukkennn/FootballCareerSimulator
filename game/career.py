@@ -225,6 +225,11 @@ class Career:
               and (rec["rating"] or 0) >= 7.0 and ovr >= team - 2):
             self.captain = True
             self._chron_pending.append({"k": "captain", "club": cid})
+        if not youth:                                    # результаты матчей лиги и место после первого круга - только для истории сезона
+            rec["matches"] = w.club_matches(res, cid)
+            half = res.get("half", {}).get(lid)
+            if half and cid in half["order"]:
+                rec["mid_rank"] = half["order"].index(cid) + 1
         rec["chronicle"] = self._chronicle(rec)
         self.seasons.append(rec)
         return rec

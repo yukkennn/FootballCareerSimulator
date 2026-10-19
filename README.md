@@ -55,6 +55,12 @@ macOS / Linux: `./run.sh`.
 
 The language (Russian / English) can be switched on the start screen.
 
+**Season diary (web version).** After every season the "📖 Season diary" button asks an AI to write the hero's diary for that season:
+matches, trophies, everyday life, family, friends and romance. Every sporting fact (scores, places, goals, trophies) comes from the game,
+and the AI only turns it into prose; personal life carries over from season to season. Choose the service (Google Gemini or Anthropic Claude),
+the model and the API key under ⚙ Settings on the start screen. The key is stored only in your browser and sent only to the chosen service.
+A free Gemini key: aistudio.google.com -> Get API key. Code: `game/story.py` (facts and the prompt), `web/llm.js` (API calls).
+
 **Leagues live their own life.** Every club has good and bad seasons, and now and then one of the strongest clubs in a league starts an era
 of dominance for 5-10 seasons (money and squad), then gradually returns to its usual level. Historical giants stay giants: in Spain the title
 almost always goes to Real Madrid, Barcelona or Atlético, but which of them wins changes. Settings are at the top of `game/world.py` (REVERT, HEG_*, FORM_SD, LEAD_*).
@@ -170,6 +176,12 @@ macOS / Linux: `./run.sh`.
    Сохранения прошлой версии открываются: силы клубов в них берутся из новой базы.
 
 Язык (русский / английский) переключается на стартовом экране.
+
+**Дневник сезона (веб-версия).** После каждого сезона кнопка «📖 Дневник сезона» просит нейросеть написать дневник героя за этот сезон:
+матчи, трофеи, повседневная жизнь, семья, друзья, романтика. Все спортивные факты (счёт, места, голы, трофеи) берутся из игры, нейросеть
+только превращает их в текст; личная жизнь продолжается из сезона в сезон. Сервис (Google Gemini или Anthropic Claude), модель и API-ключ
+выбираются в ⚙ Настройках на стартовом экране. Ключ хранится только в вашем браузере и отправляется только выбранному сервису.
+Бесплатный ключ Gemini: aistudio.google.com -> Get API key. Код: `game/story.py` (факты и задание), `web/llm.js` (запросы к нейросетям).
 
 **Лиги живут своей жизнью.** У каждого клуба бывают удачные и провальные сезоны, а время от времени один из сильнейших клубов лиги начинает
 эпоху гегемонии на 5-10 сезонов (деньги и состав), после чего постепенно возвращается к своему обычному уровню. Гранды остаются грандами: в Испании

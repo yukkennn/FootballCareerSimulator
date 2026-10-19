@@ -40,6 +40,60 @@ const wide = matchMedia("(min-width: 1000px)");
 function draw(html) {
   root.innerHTML = html;
   if (wide.matches) root.querySelectorAll("details.sub, details.dopen").forEach((el) => { el.open = true; });
+  if (root.querySelector("#ai-settings")) settingsFill();
+}
+
+// --- дневник сезона: Python готовит задание (res.llm), нейросеть пишет, результат сохраняется в сезоне (story_save)
+async function writeStory(job) {
+  try {
+    const r = await aiWrite(job.system, job.user);
+    await act("story_save", JSON.stringify({ idx: job.idx, text: r.text, provider: r.provider, model: r.model }));
+  } catch (e) {
+    console.error(e);
+    await act("story_fail", e.message === "__need__" ? "__need__" : String(e.message || e));
+  }
+}
+
+// --- настройки нейросети: значения из localStorage, ключ в Python не передаётся
+let aiDraft = null;
+function settingsFill() {
+  aiDraft = aiLoad();
+  const prov = root.querySelector("#ai-provider");
+  prov.value = aiDraft.provider || "gemini";
+  aiDraft._shown = prov.value;
+  settingsShow();
+}
+function settingsShow() {
+  const p = root.querySelector("#ai-provider").value;
+  root.querySelector("#ai-key").value = (aiDraft.key || {})[p] || "";
+  root.querySelector("#ai-model").value = (aiDraft.model || {})[p] || AI_DEFAULT_MODEL[p] || "";
+  const off = p === "off";
+  root.querySelector("#ai-key").disabled = off; root.querySelector("#ai-model").disabled = off;
+}
+function settingsShowSwitch() {
+  const sel = root.querySelector("#ai-provider"), now = sel.value;
+  sel.value = aiDraft._shown || aiDraft.provider || "gemini"; settingsTake();
+  sel.value = now; aiDraft._shown = now; settingsShow();
+}
+function settingsTake() {
+  const p = root.querySelector("#ai-provider").value;
+  if (p !== "off") {
+    aiDraft.key = aiDraft.key || {}; aiDraft.model = aiDraft.model || {};
+    aiDraft.key[p] = root.querySelector("#ai-key").value.trim();
+    aiDraft.model[p] = root.querySelector("#ai-model").value.trim();
+  }
+}
+async function settingsModels() {
+  settingsTake();
+  const p = root.querySelector("#ai-provider").value, key = (aiDraft.key || {})[p];
+  if (p === "off" || !key) { toast(app.tr("web.ai_need")); return; }
+  document.getElementById("busy").hidden = false;
+  try {
+    const list = await aiModels(p, key);
+    root.querySelector("#ai-models").innerHTML = list.map((m) => `<option value="${m}">`).join("");
+    toast(list.length ? list.slice(0, 12).join(", ") + (list.length > 12 ? " …" : "") : "—");
+  } catch (e) { toast(String(e.message || e)); }
+  finally { document.getElementById("busy").hidden = true; }
 }
 
 async function act(name, arg, busy) {
@@ -51,6 +105,7 @@ async function act(name, arg, busy) {
     window.scrollTo(0, res.scroll === "top" ? 0 : keep);
     if (res.toast) toast(res.toast);
     if (res.download) download(res.download);
+    if (res.llm) writeStory(res.llm);
   } catch (e) {
     console.error(e); toast(String(e));
   } finally {
@@ -84,6 +139,16 @@ async function download(d) {
 
 // --- события
 root.addEventListener("click", (e) => {
+  const j = e.target.closest("[data-js]");
+  if (j) {
+    e.preventDefault();
+    if (j.dataset.js === "ai-models") settingsModels();
+    if (j.dataset.js === "ai-save") {
+      settingsTake(); aiDraft.provider = root.querySelector("#ai-provider").value;
+      delete aiDraft._shown; aiSave(aiDraft); toast(app.tr("web.ai_saved")); act("settings_back");
+    }
+    return;
+  }
   const p = e.target.closest("button[data-partial]");
   if (p) { e.preventDefault(); partial(p.dataset.partial); return; }
   const b = e.target.closest("[data-act]");
@@ -91,6 +156,7 @@ root.addEventListener("click", (e) => {
 });
 root.addEventListener("change", (e) => {
   const el = e.target;
+  if (el.id === "ai-provider") { const prev = aiDraft._shown; settingsShowSwitch(prev); return; }
   if (el.matches("input[data-partial]")) partial(el.dataset.partial);
   // списки (схема, ротация, игрок на позиции) и галочки: действие с выбранным значением
   if (el.dataset.onchange) act(el.dataset.onchange, el.type === "checkbox" ? (el.checked ? "1" : "0") : el.value);

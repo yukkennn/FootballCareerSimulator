@@ -213,6 +213,7 @@ class World:
             self._league_play(st, 2)
             res["tables"][lid] = self._league_table(st, lid, final=True)
             res["lg_ovr"][lid] = self.league_avg_ovr(lid)
+            res.setdefault("mlog", {})[lid] = st["log"]
         for country, top in self.d.top_league.items():
             ids = [c for lid in self.league_clubs if self.d.leagues[lid]["country"] == country for c in self.league_clubs[lid]
                    if not self.d.clubs[c]["reserve"]]
@@ -231,6 +232,12 @@ class World:
         self._national(res)
         self._boost, self._tactics = {}, {}
         return res
+
+    def club_matches(self, res, cid):
+        """Матчи клуба в лиге за сезон: [[соперник, 1 дома / 0 в гостях, забито, пропущено, половина сезона], ...]."""
+        lid = self.club_league.get(cid)
+        return [[g if h == cid else h, int(h == cid), x if h == cid else y, y if h == cid else x, hf]
+                for h, g, x, y, hf in res.get("mlog", {}).get(lid, []) if cid in (h, g)]
 
     def _tac(self, team, x, y):
         """Тактика команды: (её голы, голы соперника) -> с поправкой на её тактику."""
@@ -260,7 +267,7 @@ class World:
                         half = 1 + (i + j) % 2
                     matches.append((h, g, half))
         z = lambda: {c: 0 for c in ids}
-        return {"ids": ids, "rounds": rounds, "matches": matches, "pts": z(), "w": z(), "d": z(), "l": z(), "gf": z(), "ga": z()}
+        return {"ids": ids, "rounds": rounds, "matches": matches, "pts": z(), "w": z(), "d": z(), "l": z(), "gf": z(), "ga": z(), "log": []}
 
     def _league_play(self, st, half):
         rng = self.rng
@@ -274,6 +281,7 @@ class World:
             lh, lg = self._tac(h, lh, lg)
             lg, lh = self._tac(g, lg, lh)
             x, y = poisson(rng, lh), poisson(rng, lg)
+            st["log"].append((h, g, x, y, hf))                    # результаты матчей - для истории сезона (club_matches)
             gf[h] += x; ga[h] += y; gf[g] += y; ga[g] += x
             if x > y:
                 pts[h] += 3; w[h] += 1; l[g] += 1

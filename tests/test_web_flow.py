@@ -39,6 +39,21 @@ def run(lang):
         n += 1
         if n == 3:
             act(app, "season", "0|career"); assert app.view == "season"; act(app, "back", "career")
+        if n == 4:                                   # дневник сезона: задание для нейросети, сохранение ответа, экран
+            idx = len(app.career.seasons) - 1
+            prev = app.view
+            act(app, "story", str(idx)); assert app.view == "story"
+            out = act(app, "story_gen")
+            job = out["llm"]; assert job["idx"] == idx and len(job["user"]) > 500 and job["system"]
+            assert app.career.seasons[idx].get("matches"), "матчи сезона не сохранились"
+            ans = "**1 августа**\nПервая запись.\n\nВторая запись.\n\n" + ("ПАМЯТЬ:" if lang == "ru" else "MEMORY:") + "\n- Подруга Лейла"
+            act(app, "story_save", json.dumps({"idx": idx, "text": ans, "provider": "Gemini", "model": "test"}))
+            st = app.career.seasons[idx]["story"]
+            assert st["memory"].endswith("Лейла") and "ПАМЯТЬ" not in st["text"] and "MEMORY" not in st["text"]
+            assert "<b>1 августа</b>" in app.render()
+            act(app, "story_fail", "boom"); assert "boom" in app.render()
+            act(app, "story_back"); assert app.view == prev, app.view
+            act(app, "settings"); assert "ai-settings" in app.render(); act(app, "settings_back"); assert app.view == prev
     if app.career.status != "retired":
         act(app, "retire"); act(app, "retire_yes")
     elif app.modal:                                   # 40 лет: окно «завершить / стать тренером»

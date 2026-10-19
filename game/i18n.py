@@ -499,6 +499,24 @@ T = {
  "web.license_note": ("Некоммерческая фанатская игра. Рейтинги, эмблемы, названия клубов и имена игроков принадлежат их правообладателям.",
                       "Non-commercial fan game. Ratings, crests, club names and player names belong to their respective owners."),
  "web.details": ("Таблицы турниров", "Competition tables"),
+ "web.diary": ("Дневник сезона", "Season diary"), "web.diary_btn": ("📖 Дневник сезона", "📖 Season diary"),
+ "web.diary_none": ("Дневник этого сезона ещё не написан.", "This season's diary has not been written yet."),
+ "web.diary_write": ("Написать дневник", "Write the diary"), "web.diary_rewrite": ("Написать заново", "Rewrite"),
+ "web.diary_writing": ("Нейросеть пишет дневник сезона. Обычно это занимает 20-60 секунд…", "The AI is writing the season diary. This usually takes 20-60 seconds…"),
+ "web.diary_failed": ("Не получилось написать дневник", "Could not write the diary"),
+ "web.diary_by": ("Написано: {p}, модель {m}", "Written by {p}, model {m}"),
+ "web.diary_hint": ("Дневник пишет нейросеть (Gemini или Claude) по фактам сезона из игры. Ключ нейросети хранится только в этом браузере.",
+                    "The diary is written by an AI (Gemini or Claude) from the season's facts in the game. The AI key is stored only in this browser."),
+ "web.settings": ("Настройки", "Settings"), "web.ai_title": ("Нейросеть для дневников", "AI for diaries"),
+ "web.ai_provider": ("Сервис", "Service"), "web.ai_off": ("Выключено", "Off"),
+ "web.ai_model": ("Модель", "Model"), "web.ai_key": ("API-ключ", "API key"),
+ "web.ai_models_btn": ("Загрузить список моделей", "Load the model list"), "web.ai_save": ("Сохранить", "Save"),
+ "web.ai_saved": ("Настройки сохранены", "Settings saved"),
+ "web.ai_key_hint": ("Gemini: ключ создаётся бесплатно в Google AI Studio (aistudio.google.com, раздел Get API key). Claude: ключ в консоли platform.claude.com, нужен пополненный баланс. "
+                     "Ключ хранится только в этом браузере и отправляется только выбранному сервису.",
+                     "Gemini: create a free key in Google AI Studio (aistudio.google.com, Get API key). Claude: key in the platform.claude.com console, requires a funded balance. "
+                     "The key is stored only in this browser and sent only to the chosen service."),
+ "web.ai_need": ("Сначала выберите нейросеть и введите ключ в настройках", "First choose an AI service and enter the key in settings"),
  "web.delete_q": ("Удалить это сохранение? Отменить будет нельзя.", "Delete this save? This cannot be undone."),}
 
 def tr(key, **kw):

@@ -6,7 +6,7 @@ const VERSION = "__BUILD__";
 const CACHE = "fcs-" + VERSION;                          // файлы игры: новая версия - новый кэш
 const PYODIDE = "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/";
 const PY_CACHE = "pyodide-v0.27.7";                      // Python не меняется между версиями игры - качается один раз
-const SHELL = ["./", "index.html", "style.css?v=" + VERSION, "app.js?v=" + VERSION, "game.zip?v=" + VERSION, "manifest.webmanifest",
+const SHELL = ["./", "index.html", "style.css?v=" + VERSION, "app.js?v=" + VERSION, "llm.js?v=" + VERSION, "game.zip?v=" + VERSION, "manifest.webmanifest",
                "icon-192.png", "icon-512.png", "icon-180.png"];
 const PY_FILES = ["pyodide.js", "pyodide.asm.js", "pyodide.asm.wasm", "python_stdlib.zip", "pyodide-lock.json",
                   "sqlite3-1.0.0-cp312-cp312-pyodide_2024_0_wasm32.whl"].map((f) => PYODIDE + f);

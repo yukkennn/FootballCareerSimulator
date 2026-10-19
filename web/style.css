@@ -202,6 +202,17 @@ details.panel > summary { cursor: pointer; padding: 2px 0; }
 details.panel[open] > .panel { border: 0; padding: 8px 0 0; }
 .mbtns.col { flex-direction: column; }
 
+/* --- дневник сезона */
+.btn-diary { align-self: flex-start; border-color: var(--gold); color: var(--gold); }
+.diary { background: #f4ecd8; color: #2b2418; border-radius: 12px; padding: 18px 20px; font-family: Georgia, "Times New Roman", serif;
+  font-size: 16.5px; line-height: 1.62; box-shadow: 0 6px 22px rgba(0,0,0,.35); }
+.diary p { margin: 0 0 12px; }
+.diary b { color: #6b3a12; }
+.diary h3 { margin: 16px 0 8px; font-size: 18px; color: #6b3a12; }
+.panel.err { border-color: var(--red); }
+.panel.center { align-items: center; text-align: center; padding: 28px 16px; }
+@media (min-width: 1000px) { .v-story .diary { max-width: 860px; margin: 0 auto; padding: 32px 44px; font-size: 18px; } .v-story > .panel, .v-story > p { max-width: 860px; width: 100%; margin: 0 auto; } }
+
 /* --- окна, загрузка, уведомления */
 .modal-bg { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.6); display: flex; align-items: flex-end; justify-content: center; }
 .modal { width: 100%; max-width: 640px; background: var(--panel); border-radius: 16px 16px 0 0; padding: 18px 16px calc(16px + var(--safe-b));

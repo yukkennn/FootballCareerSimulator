@@ -19,6 +19,8 @@ from ..ui import theme
 from .parts import esc, btn, logo, player_card, ovr_chart, club_card, kv
 from .report import season_html
 from .coach import CoachScreens
+from .. import story as story_mod
+import html as _html, re
 
 POS_GROUPS = [("gk", ["GK"]), ("def", ["CB", "LB", "RB"]), ("mid", ["CDM", "CM", "CAM", "LM", "RM"]), ("att", ["LW", "RW", "CF", "ST"])]
 
@@ -84,6 +86,19 @@ def copyright_html():
     return (f'<p class="legal">© 2026 <a href="{REPO_URL}" target="_blank" rel="noopener">yukkennn</a> · '
             f'<a href="{LICENSE_URL}" target="_blank" rel="noopener">CC BY-NC 4.0</a><br>{esc(tr("web.license_note"))}</p>')
 
+def diary_html(text):
+    """Текст дневника -> HTML: абзацы, **жирное** (даты записей), # заголовки."""
+    out = []
+    for block in re.split(r"\n\s*\n", text.strip()):
+        b = _html.escape(block.strip())
+        b = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", b)
+        b = re.sub(r"(?<![*\w])\*(?!\s)(.+?)(?<!\s)\*(?![*\w])", r"<i>\1</i>", b)
+        if b.startswith("#"):
+            out.append(f"<h3>{b.lstrip('# ')}</h3>")
+        elif b:
+            out.append("<p>" + b.replace("\n", "<br>") + "</p>")
+    return "".join(out)
+
 def screen(title, body, footer="", left="", right=""):
     """Каркас экрана: верхняя панель, прокручиваемое содержимое, нижняя панель с кнопками."""
     top = f'<header class="topbar"><div class="tb-l">{left}</div><h1>{title}</h1><div class="tb-r">{right}</div></header>'
@@ -102,6 +117,10 @@ class WebApp(CoachScreens):
         self._out = {}
 
     screen = staticmethod(screen)
+
+    def tr(self, key):
+        """Перевод для app.js (тексты настроек нейросети)."""
+        return tr(key)
 
     def menu_btn(self):
         return btn("☰", "home", kind="ghost", extra=f'aria-label="{esc(tr("career.menu"))}"')
@@ -156,7 +175,7 @@ class WebApp(CoachScreens):
     def v_start(self):
         d, f, lang = self.d, self.form, i18n.LANG
         langs = "".join(f'<button class="chip{" on" if lang == k else ""}" data-act="lang" data-arg="{k}">{k.upper()}</button>' for k in ("ru", "en"))
-        right = f'<div class="langs">{langs}</div>'
+        right = f'<div class="langs">{langs}{btn("⚙", "settings", kind="ghost", extra=f'aria-label="{esc(tr("web.settings"))}"')}</div>'
         name = (f'<div class="panel a-name"><div class="muted small">{esc(tr("start.name"))}</div><div class="row">'
                 f'<input name="first" value="{esc(f["first"])}" placeholder="{esc(tr("start.first"))}" autocomplete="off">'
                 f'<input name="last" value="{esc(f["last"])}" placeholder="{esc(tr("start.last"))}" autocomplete="off">'
@@ -359,8 +378,89 @@ class WebApp(CoachScreens):
 
     def v_season(self):
         s = self.career.seasons[self.ctx["idx"]]
-        return screen(esc(tr("report.season", s=s["season"])), season_html(self.career, self.d, s),
+        return screen(esc(tr("report.season", s=s["season"])), self.diary_btn(self.ctx["idx"]) + season_html(self.career, self.d, s),
                       left=btn("‹", "back", self.ctx["back"], kind="ghost", extra=f'aria-label="{esc(tr("web.back"))}"'))
+
+    # ------------------------------------------------------------------ дневник сезона (пишет нейросеть, см. game/story.py и web/llm.js)
+    def diary_btn(self, idx):
+        s = self.career.seasons[idx]
+        if s.get("youth") and not s.get("comps"):
+            return ""
+        return btn(esc(tr("web.diary_btn")), "story", str(idx), "diary")
+
+    def a_story(self, idx):
+        self._story_return = (self.view, dict(self.ctx))
+        self.go("story", idx=int(idx))
+
+    def a_story_back(self, _):
+        view, ctx = getattr(self, "_story_return", ("career", {}))
+        self.view, self.ctx, self.modal = view, ctx, None
+
+    def a_story_gen(self, _):
+        idx = self.ctx["idx"]
+        self.ctx.update(writing=True, error=None)
+        self._out["llm"] = dict(story_mod.prompt(self.career, self.d, idx), idx=idx)
+        self._out["scroll"] = "top"
+
+    def a_story_save(self, payload):
+        r = json.loads(payload)
+        s = self.career.seasons[int(r["idx"])]
+        text, memory = story_mod.split_answer(r["text"])
+        s["story"] = {"text": text, "memory": memory, "provider": r.get("provider", ""), "model": r.get("model", ""), "lang": i18n.LANG}
+        self.save()
+        if self.view == "story":
+            self.ctx.update(writing=False, error=None)
+        else:
+            self._out["toast"] = tr("web.diary") + " " + s["season"] + " ✓"
+
+    def a_story_fail(self, msg):
+        if self.view == "story":
+            self.ctx.update(writing=False, error=tr("web.ai_need") if msg == "__need__" else msg)
+        self._out["scroll"] = "keep"
+
+    def v_story(self):
+        idx = self.ctx["idx"]
+        s = self.career.seasons[idx]
+        st = s.get("story")
+        head = (f'<div class="panel club-h">{logo(self.d.clubs[s["club"]], 48)}<div><div class="h2">{esc(self.career.name)}</div>'
+                f'<div class="muted small">{esc(s["season"])} · {esc(s["club_name"])} · {esc(tr("career.age", n=s["age"]))}</div></div></div>')
+        if self.ctx.get("writing"):
+            body = head + f'<div class="panel center"><div class="spinner"></div><p class="muted">{esc(tr("web.diary_writing"))}</p></div>'
+            return screen(esc(tr("web.diary")), body, left=btn("‹", "story_back", kind="ghost"))
+        parts = [head]
+        if self.ctx.get("error"):
+            parts.append(f'<div class="panel err"><b>{esc(tr("web.diary_failed"))}</b><div class="small">{esc(self.ctx["error"])}</div></div>')
+        if st:
+            parts.append(f'<article class="diary">{diary_html(st["text"])}</article>')
+            if st.get("model"):
+                parts.append(f'<p class="muted small">{esc(tr("web.diary_by", p=st.get("provider", ""), m=st["model"]))}</p>')
+            footer = btn(esc(tr("web.settings")), "settings") + btn(esc(tr("web.diary_rewrite")), "story_gen", kind="primary", extra="data-llm")
+        else:
+            parts.append(f'<div class="panel"><p>{esc(tr("web.diary_none"))}</p><p class="muted small">{esc(tr("web.diary_hint"))}</p></div>')
+            footer = btn(esc(tr("web.settings")), "settings") + btn(esc(tr("web.diary_write")), "story_gen", kind="primary", extra="data-llm")
+        return screen(esc(tr("web.diary")), "".join(parts), footer, left=btn("‹", "story_back", kind="ghost", extra=f'aria-label="{esc(tr("web.back"))}"'))
+
+    # ------------------------------------------------------------------ настройки (значения хранит и заполняет app.js: ключ не попадает в Python)
+    def a_settings(self, _):
+        if self.view != "settings":
+            self._settings_return = (self.view, dict(self.ctx))
+        self.go("settings")
+
+    def a_settings_back(self, _):
+        view, ctx = getattr(self, "_settings_return", ("start", {}))
+        self.view, self.ctx, self.modal = view, ctx, None
+
+    def v_settings(self):
+        opts = "".join(f'<option value="{k}">{esc(v)}</option>' for k, v in (("off", tr("web.ai_off")), ("gemini", "Google Gemini"), ("claude", "Anthropic Claude")))
+        body = (f'<div class="panel" id="ai-settings"><div class="h2">{esc(tr("web.ai_title"))}</div>'
+                f'<label class="sel"><span class="muted small">{esc(tr("web.ai_provider"))}</span><select id="ai-provider">{opts}</select></label>'
+                f'<label class="sel"><span class="muted small">{esc(tr("web.ai_key"))}</span><input id="ai-key" type="password" autocomplete="off" spellcheck="false"></label>'
+                f'<label class="sel"><span class="muted small">{esc(tr("web.ai_model"))}</span><input id="ai-model" list="ai-models" autocomplete="off" spellcheck="false">'
+                f'<datalist id="ai-models"></datalist></label>'
+                f'<button class="btn" data-js="ai-models">{esc(tr("web.ai_models_btn"))}</button>'
+                f'<p class="muted small">{esc(tr("web.ai_key_hint"))}</p></div>')
+        footer = btn(esc(tr("web.ai_save")), "", kind="primary", extra='data-js="ai-save"')
+        return screen(esc(tr("web.settings")), body, footer, left=btn("‹", "settings_back", kind="ghost", extra=f'aria-label="{esc(tr("web.back"))}"'))
 
     def a_back(self, view):
         self.go(view, tab=self.ctx.get("tab"))
@@ -373,7 +473,7 @@ class WebApp(CoachScreens):
     def v_report(self):
         c, recs, reason = self.career, self.ctx["recs"], self.ctx["reason"]
         a, b = recs[0]["season"], recs[-1]["season"]
-        body = "".join(season_html(c, self.d, s) for s in recs)
+        body = "".join(self.diary_btn(next(i for i, x in enumerate(c.seasons) if x is s)) + season_html(c, self.d, s) for s in recs)
         if len(recs) > 1:
             G = sum(s["games"] for s in recs); A = sum(s["goals"] for s in recs); S = sum(s["assists"] for s in recs); CS = sum(s["cs"] for s in recs)
             tot = tr("report.stats_gk", g=G, c=CS) if c.pos == "GK" else tr("report.stats", g=G, a=A, s=S)
