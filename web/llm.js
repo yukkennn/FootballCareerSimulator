@@ -20,6 +20,26 @@ function aiCurrent() {
   return { provider: p, key: (s.key || {})[p] || "", model: (s.model || {})[p] || AI_DEFAULT_MODEL[p] || "" };
 }
 
+// перегрузка сервиса (429/5xx) обычно временная: повторяем запрос с паузами 4, 10 и 20 секунд
+const RETRY_STATUS = [429, 500, 502, 503, 504, 529];
+const RETRY_DELAYS = [4000, 10000, 20000];
+class BusyError extends Error {}
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function withRetry(call, onRetry) {
+  for (let i = 0; ; i++) {
+    try { return await call(); }
+    catch (e) {
+      const busy = e instanceof BusyError || RETRY_STATUS.includes(e.status);
+      if (!busy || i >= RETRY_DELAYS.length) {
+        if (busy) { const be = new Error("__busy__"); be.detail = e.message; throw be; }
+        throw e;
+      }
+      if (onRetry) onRetry(i + 1, RETRY_DELAYS.length);
+      await sleep(RETRY_DELAYS[i]);
+    }
+  }
+}
+
 // --- Gemini
 async function geminiWrite(key, model, system, user) {
   const r = await fetch(`${GEMINI_API}/models/${encodeURIComponent(model)}:generateContent`, {
@@ -32,7 +52,11 @@ async function geminiWrite(key, model, system, user) {
     }),
   });
   const data = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error((data.error && data.error.message) || `HTTP ${r.status}`);
+  if (!r.ok) {
+    const msg = (data.error && data.error.message) || `HTTP ${r.status}`;
+    if (RETRY_STATUS.includes(r.status)) throw new BusyError(msg);
+    throw new Error(msg);
+  }
   const cand = (data.candidates || [])[0];
   if (!cand) throw new Error((data.promptFeedback && "blocked: " + data.promptFeedback.blockReason) || "empty response");
   const text = ((cand.content && cand.content.parts) || []).filter((p) => !p.thought).map((p) => p.text || "").join("");
@@ -77,11 +101,19 @@ async function claudeModels(key) {
   return out;
 }
 
-async function aiWrite(system, user) {
+async function aiWrite(system, user, onRetry) {
   const ai = aiCurrent();
   if (ai.provider === "off" || !ai.key) throw new Error("__need__");
-  const text = ai.provider === "claude" ? await claudeWrite(ai.key, ai.model, system, user) : await geminiWrite(ai.key, ai.model, system, user);
+  const call = () => ai.provider === "claude" ? claudeWrite(ai.key, ai.model, system, user) : geminiWrite(ai.key, ai.model, system, user);
+  const text = await withRetry(call, onRetry);
   return { text, provider: ai.provider === "claude" ? "Claude" : "Gemini", model: ai.model };
+}
+
+// текст ошибки для игрока: перегрузку и отсутствие настроек - своими словами, остальное как есть
+function aiErrorText(e) {
+  if (e.message === "__need__") return app.tr("web.ai_need");
+  if (e.message === "__busy__") return app.tr("web.ai_busy") + (e.detail ? ` (${e.detail})` : "");
+  return String(e.message || e);
 }
 async function aiModels(provider, key) {
   return provider === "claude" ? claudeModels(key) : geminiModels(key);

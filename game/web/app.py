@@ -420,7 +420,7 @@ class WebApp(CoachScreens):
         r = json.loads(payload)
         self._writing.discard(r.get("key"))
         if self.view == "story":
-            self.ctx["error"] = tr("web.ai_need") if r["error"] == "__need__" else r["error"]
+            self.ctx["error"] = r["error"]
         self._out["scroll"] = "keep"
 
     # --- автоматический дневник: после сезона app.js по очереди берёт задания (auto_next) и сохраняет ответы (store_story),

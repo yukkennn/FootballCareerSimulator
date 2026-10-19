@@ -3,8 +3,11 @@
 Настройки (сервис, модель, ключи, автодневник) хранятся в settings.json папки пользователя (~/.football_career_sim), как язык игры.
 В веб-версии то же самое делает web/llm.js.
 """
-import json, urllib.error, urllib.request
+import json, time, urllib.error, urllib.request
 from . import i18n
+
+RETRY_STATUS = {429, 500, 502, 503, 504, 529}
+RETRY_DELAYS = (4, 10, 20)                       # перегрузка обычно временная: повторы через 4, 10 и 20 секунд
 
 GEMINI_API = "https://generativelanguage.googleapis.com/v1beta"
 DEFAULT_MODEL = {"gemini": "gemini-2.5-flash", "claude": "claude-opus-5-5"}
@@ -13,6 +16,21 @@ CLAUDE_FALLBACK = {"claude-fable-5-1", "claude-opus-5-5", "claude-opus-5", "clau
 
 class AIError(Exception):
     pass
+
+class BusyError(AIError):
+    """Сервис перегружен (429/5xx): запрос стоит повторить."""
+    pass
+
+def _with_retry(call, on_retry=None):
+    for i in range(len(RETRY_DELAYS) + 1):
+        try:
+            return call()
+        except BusyError as e:
+            if i >= len(RETRY_DELAYS):
+                raise AIError(i18n.tr("web.ai_busy") + f" ({e})")
+            if on_retry:
+                on_retry(i + 1, len(RETRY_DELAYS))
+            time.sleep(RETRY_DELAYS[i])
 
 # ---------------------------------------------------------------- настройки
 def settings():
@@ -46,7 +64,7 @@ def _gemini(path, key, body=None, timeout=300):
             msg = json.loads(e.read().decode("utf-8")).get("error", {}).get("message")
         except Exception:
             msg = None
-        raise AIError(msg or f"HTTP {e.code}")
+        raise (BusyError if e.code in RETRY_STATUS else AIError)(msg or f"HTTP {e.code}")
     except urllib.error.URLError as e:
         raise AIError(str(e.reason))
 
@@ -89,7 +107,7 @@ def claude_write(key, model, system, user):
     except anthropic.AuthenticationError:
         raise AIError("invalid x-api-key")
     except anthropic.APIStatusError as e:
-        raise AIError(f"{e.status_code}: {e.message}")
+        raise (BusyError if e.status_code in RETRY_STATUS else AIError)(f"{e.status_code}: {e.message}")
     except anthropic.APIConnectionError as e:
         raise AIError(str(e))
     if msg.stop_reason == "refusal":
@@ -113,9 +131,9 @@ def write(system, user):
     c = current()
     if c["provider"] not in ("gemini", "claude") or not c["key"]:
         raise AIError(i18n.tr("web.ai_need"))
-    if c["provider"] == "claude":
-        return claude_write(c["key"], c["model"], system, user), "Claude", c["model"]
-    return gemini_write(c["key"], c["model"], system, user), "Gemini", c["model"]
+    fn = claude_write if c["provider"] == "claude" else gemini_write
+    text = _with_retry(lambda: fn(c["key"], c["model"], system, user))
+    return text, ("Claude" if c["provider"] == "claude" else "Gemini"), c["model"]
 
 def models(provider, key):
     return claude_models(key) if provider == "claude" else gemini_models(key)

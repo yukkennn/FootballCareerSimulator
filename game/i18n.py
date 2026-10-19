@@ -527,6 +527,11 @@ T = {
                  "The key is stored in the settings file on this computer (.football_career_sim folder) and sent only to the chosen service."),
  "ai.key_local": ("Ключ хранится в файле настроек на этом компьютере (папка .football_career_sim) и отправляется только выбранному сервису.",
                   "The key is stored in the settings file on this computer (.football_career_sim folder) and sent only to the chosen service."),
+ "web.ai_busy": ("Серверы нейросети сейчас перегружены (так бывает в часы пик, особенно на бесплатном Gemini). Игра повторила запрос несколько раз. "
+                 "Попробуйте ещё раз через пару минут или выберите в настройках другую модель.",
+                 "The AI servers are overloaded right now (it happens at peak hours, especially on free Gemini). The game retried several times. "
+                 "Try again in a couple of minutes or pick another model in settings."),
+ "web.ai_retry": ("Нейросеть перегружена, повторяю запрос ({n} из {t})…", "The AI is overloaded, retrying ({n} of {t})…"),
  "web.ai_need": ("Сначала выберите нейросеть и введите ключ в настройках", "First choose an AI service and enter the key in settings"),
  "web.delete_q": ("Удалить это сохранение? Отменить будет нельзя.", "Delete this save? This cannot be undone."),}
 

@@ -46,11 +46,11 @@ function draw(html) {
 // --- дневник сезона: Python готовит задание (res.llm), нейросеть пишет, результат сохраняется в сезоне (story_save)
 async function writeStory(job) {
   try {
-    const r = await aiWrite(job.system, job.user);
+    const r = await aiWrite(job.system, job.user, (n, total) => toast(app.tr("web.ai_retry").replace("{n}", n).replace("{t}", total)));
     await act("story_save", JSON.stringify({ key: job.key, text: r.text, provider: r.provider, model: r.model }));
   } catch (e) {
     console.error(e);
-    await act("story_fail", JSON.stringify({ key: job.key, error: e.message === "__need__" ? "__need__" : String(e.message || e) }));
+    await act("story_fail", JSON.stringify({ key: job.key, error: aiErrorText(e) }));
   }
 }
 
@@ -71,13 +71,13 @@ async function runAuto() {
       toast(app.tr("web.diary_auto"));
       if (root.querySelector(".v-story")) redrawKeepScroll();
       try {
-        const r = await aiWrite(job.system, job.user);
+        const r = await aiWrite(job.system, job.user, (n, total) => toast(app.tr("web.ai_retry").replace("{n}", n).replace("{t}", total)));
         if (app.store_story(JSON.stringify({ key: job.key, text: r.text, provider: r.provider, model: r.model }))) redrawKeepScroll();
         syncfs(false);
       } catch (e) {
         console.error(e);
         if (app.auto_fail(job.key)) redrawKeepScroll();
-        toast(app.tr("web.diary_failed") + ": " + String(e.message || e));
+        toast(app.tr("web.diary_failed") + ": " + aiErrorText(e));
         break;
       }
     }
