@@ -8,6 +8,7 @@
 import random, re
 from . import i18n
 from . import stars as stars_mod
+from . import love
 from .text import trophy_name, award_name, club_result, lang_name, nat_comp_name, nat_result, score_text, chronicle_text, money, stage
 
 MEMORY_RU, MEMORY_EN = "ПАМЯТЬ:", "MEMORY:"
@@ -350,7 +351,9 @@ def prompt(c, d, key):
             "1. Все спортивные факты (счёт, соперники, место в таблице, трофеи, голы, передачи, травмы, награды, решения руководства) бери ТОЛЬКО "
             "из данных сезона и никогда им не противоречь. Детали матчей (минуты, как забили, атмосфера, погода) можно придумывать, если они не меняют фактов.\n"
             f"2. Кроме футбола, пиши о жизни: {life}. Личную жизнь можно придумывать, но она должна продолжать то, что записано "
-            "в памяти о прошлых сезонах (имена, отношения, события), и развиваться со временем.\n"
+            "в памяти о прошлых сезонах (имена, отношения, события), и развиваться со временем. Романтическую линию веди СТРОГО по пункту "
+            "«Личная жизнь в этом сезоне»: не начинай отношений, если там сказано, что герой одинок, и не заканчивай их раньше срока. "
+            "Если в памяти есть девушка, а по пункту герой одинок или встречает другую, значит, они расстались - коротко объясни как.\n"
             f"3. Герою сейчас {age} лет. Если ему меньше 18, романтика только невинная (симпатия, прогулки, переписка). В любом возрасте "
             "никаких откровенных сцен.\n"
             "4. Объём большой: 2500-3500 слов. Ключевые матчи (финалы, решающие туры, дерби" + ("" if coach else ", матчи с голами героя") +
@@ -358,7 +361,8 @@ def prompt(c, d, key):
             "5. В самом конце, после дневника, отдельной строкой напиши «ПАМЯТЬ:» и под ней 5-10 коротких строк - факты о личной жизни "
             "и окружении героя, которые важно помнить в следующих сезонах (имена близких, отношения, друзья, дом, питомцы, тренер или помощники, "
             "соперники, обещания). Этот блок читатель не увидит.")
-        user = (f"Данные сезона:\n\n{data}\n\n{career_so_far(c, d, key)}\n\n"
+        user = (f"Данные сезона:\n\n{data}\n\nЛИЧНАЯ ЖИЗНЬ В ЭТОМ СЕЗОНЕ (обязательно, важнее памяти): {love.season_line(c.id, age)}\n\n"
+                f"{career_so_far(c, d, key)}\n\n"
                 + (f"Память о прошлых сезонах (продолжай эти линии):\n{mem}\n\n" if mem else "Прошлых записей нет: придумай окружение героя с нуля.\n\n")
                 + "Напиши дневник этого сезона.")
     else:
@@ -375,14 +379,17 @@ def prompt(c, d, key):
             "1. Take every sporting fact (scores, opponents, league position, trophies, goals, assists, injuries, awards, board decisions) ONLY "
             "from the season data and never contradict it. Match details (minutes, how goals were scored, atmosphere, weather) may be invented if they do not change the facts.\n"
             f"2. Beyond football, write about life: {life}. Personal life may be invented, but it must continue what the memory of previous "
-            "seasons says (names, relationships, events) and develop over time.\n"
+            "seasons says (names, relationships, events) and develop over time. Follow the romantic line STRICTLY by the item "
+            "\"Personal life this season\": do not start a relationship if it says the hero is single, and do not end one early. "
+            "If the memory mentions a girlfriend but the item says the hero is single or meets someone new, they broke up - briefly explain how.\n"
             f"3. The hero is {age}. If under 18, romance stays innocent (a crush, walks, messages). At any age, no explicit scenes.\n"
             "4. Make it long: 2500-3500 words. Key matches (finals, decisive matchdays, derbies" + ("" if coach else ", games where the hero scored") +
             ") in detail, routine ones briefly. Cover the whole season from start to finish.\n"
             "5. At the very end, after the diary, write «MEMORY:» on its own line followed by 5-10 short lines of facts about the hero's personal "
             "life and people around him worth remembering next season (names, relationships, friends, home, pets, coach or assistants, rivals, "
             "promises). The reader will not see this block.")
-        user = (f"Season data:\n\n{data}\n\n{career_so_far(c, d, key)}\n\n"
+        user = (f"Season data:\n\n{data}\n\nPERSONAL LIFE THIS SEASON (mandatory, overrides the memory): {love.season_line(c.id, age)}\n\n"
+                f"{career_so_far(c, d, key)}\n\n"
                 + (f"Memory of previous seasons (continue these threads):\n{mem}\n\n" if mem else "No previous entries: create the hero's circle from scratch.\n\n")
                 + "Write this season's diary.")
     return {"system": system, "user": user}
