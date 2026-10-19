@@ -315,7 +315,7 @@ class CoachScreens:
     def coach_seasons_html(self):
         c, d = self.career, self.d
         out = []
-        for r in reversed(c.coach.get("seasons") or []):
+        for ci, r in reversed(list(enumerate(c.coach.get("seasons") or []))):
             tro = [short_trophy(t["code"]) for t in r["trophies"]] + [award_name(a) for a in r["awards"]]
             diff = r["target"] - r["rank"]
             pc = "ok" if diff > 0 else "bad" if diff < -1 else ""
@@ -329,6 +329,7 @@ class CoachScreens:
                        + (f'<div class="muted small">{esc(tac)}</div>' if tac else "")
                        + (f'<div class="gold small">◆ {esc(", ".join(tro))}</div>' if tro else "")
                        + (f'<div class="small {"bad" if fired else "muted"}">{esc(vt)}</div>' if vt else "")
+                       + self.diary_btn(f"c:{ci}").replace('class="btn btn-diary"', 'class="btn btn-diary btn-sm"')
                        + f'</div><div class="sr-num"><div class="small" style="color:{anger_color(r["anger_after"])}">'
                        f'{r["anger_before"]:.0f} → {r["anger_after"]:.0f}</div></div></div>')
         if not out:
@@ -714,11 +715,13 @@ class CoachScreens:
         rec = self.career.coaching().finish_season(tactic or None)
         self.save()
         self.go("creport", rec=rec)
+        self.queue_diaries([f"c:{len(self.career.coach['seasons']) - 1}"])
 
     # --- итоги сезона тренера
     def v_creport(self):
         rec = self.ctx["rec"]
-        return self.screen(esc(tr("creport.title", s=rec["season"])), coach_season_html(self.career, self.d, rec),
+        key = f"c:{len(self.career.coach['seasons']) - 1}"
+        return self.screen(esc(tr("creport.title", s=rec["season"])), self.diary_btn(key) + coach_season_html(self.career, self.d, rec),
                            btn(esc(tr("report.continue")), "creport_done", kind="primary"))
 
     def a_creport_done(self, _):

@@ -516,6 +516,17 @@ T = {
                      "Ключ хранится только в этом браузере и отправляется только выбранному сервису.",
                      "Gemini: create a free key in Google AI Studio (aistudio.google.com, Get API key). Claude: key in the platform.claude.com console, requires a funded balance. "
                      "The key is stored only in this browser and sent only to the chosen service."),
+ "web.ai_auto": ("Писать дневник сам после каждого сезона", "Write the diary automatically after every season"),
+ "web.diary_auto": ("Пишется дневник сезона…", "Writing the season diary…"),
+ "ai.no_sdk": ("Для Claude нужен пакет anthropic: выполните pip install -r requirements.txt", "Claude needs the anthropic package: run pip install -r requirements.txt"),
+ "ai.season": ("Сезон", "Season"), "ai.close": ("Закрыть", "Close"), "ai.diaries": ("📖 Дневники", "📖 Diaries"),
+ "ai.coach_tag": ("тренер", "coach"), "ai.models_loaded": ("Загружено моделей: {n}", "Models loaded: {n}"),
+ "ai.key_hint": ("Gemini: ключ создаётся бесплатно в Google AI Studio (aistudio.google.com, раздел Get API key). Claude: ключ в консоли platform.claude.com, нужен пополненный баланс. "
+                 "Ключ хранится в файле настроек на этом компьютере (папка .football_career_sim) и отправляется только выбранному сервису.",
+                 "Gemini: create a free key in Google AI Studio (aistudio.google.com, Get API key). Claude: key in the platform.claude.com console, requires a funded balance. "
+                 "The key is stored in the settings file on this computer (.football_career_sim folder) and sent only to the chosen service."),
+ "ai.key_local": ("Ключ хранится в файле настроек на этом компьютере (папка .football_career_sim) и отправляется только выбранному сервису.",
+                  "The key is stored in the settings file on this computer (.football_career_sim folder) and sent only to the chosen service."),
  "web.ai_need": ("Сначала выберите нейросеть и введите ключ в настройках", "First choose an AI service and enter the key in settings"),
  "web.delete_q": ("Удалить это сохранение? Отменить будет нельзя.", "Delete this save? This cannot be undone."),}
 

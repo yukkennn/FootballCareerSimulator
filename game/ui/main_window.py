@@ -9,6 +9,8 @@ from ..i18n import tr
 from ..career import Career
 from ..text import money, trophy_name, lang_name, club_result, nat_comp_name, nat_result, award_name
 from . import pages, coach_pages
+from .diary import DiaryManager, DiaryDialog, SettingsDialog
+from .. import story
 
 def summary_text(c, d):
     rep = c.report(); t = rep["totals"]
@@ -85,9 +87,19 @@ class MainWindow(QMainWindow):
     def __init__(self, data):
         super().__init__()
         self.d, self.career = data, None
+        self.diaries = DiaryManager(self)                     # дневники сезонов: нейросеть пишет в фоне (game/ui/diary.py)
         self.stack = QStackedWidget(); self.setCentralWidget(self.stack)
         self.setWindowTitle(tr("app.title")); self.resize(1360, 820); self.setMinimumSize(1200, 740)
         self.show_start()
+
+    def open_diary(self, key=""):
+        if self.career is None:
+            return
+        self.diaries.attach(self.career, self.d)
+        DiaryDialog(self.diaries, key or None, self).exec()
+
+    def open_settings(self):
+        SettingsDialog(self).exec()
 
     def _set(self, w):
         while self.stack.count():
@@ -99,6 +111,7 @@ class MainWindow(QMainWindow):
     def show_start(self):
         p = pages.StartPage(self.d)
         p.proceed.connect(self.on_start); p.load_clicked.connect(self.on_load); p.lang_changed.connect(self.on_lang)
+        p.settings_clicked.connect(self.open_settings)
         self._set(p)
 
     def on_lang(self, lang):
@@ -120,16 +133,19 @@ class MainWindow(QMainWindow):
         self.career.choose_academy(cid); saves.save(self.career); self.show_career()
 
     def show_career(self):
-        p = pages.CareerPage(self.career, self.d); p.play.connect(self.on_play); p.menu.connect(self.show_start)
+        p = pages.CareerPage(self.career, self.d); p.play.connect(self.on_play); p.menu.connect(self.show_start); p.diary.connect(self.open_diary)
         p.retire.connect(self.ask_retire); self._set(p)
 
     def on_play(self):
         recs, reason = self.career.play_period()
         saves.save(self.career)
         self.show_report(recs, reason)
+        n = len(self.career.seasons)                             # автодневник: нейросеть пишет новые сезоны в фоне
+        self.diaries.attach(self.career, self.d)
+        self.diaries.request(story.missing(self.career, [f"p:{i}" for i in range(n - len(recs), n)]), auto=True)
 
     def show_report(self, recs, reason):
-        p = pages.ReportPage(self.career, self.d, recs, reason); p.done.connect(self.after_report); self._set(p)
+        p = pages.ReportPage(self.career, self.d, recs, reason); p.done.connect(self.after_report); p.diary.connect(self.open_diary); self._set(p)
 
     def after_report(self):
         if self.career.status != "retired":
@@ -173,7 +189,7 @@ class MainWindow(QMainWindow):
     def show_end(self):
         p = pages.EndPage(self.career, self.d)
         p.new_career.connect(self.show_start); p.quit_game.connect(self.close); p.export.connect(self.on_export)
-        p.become_coach.connect(lambda: self.on_retire(coach=True)); self._set(p)
+        p.become_coach.connect(lambda: self.on_retire(coach=True)); p.diary.connect(self.open_diary); self._set(p)
 
     # --- тренерская карьера
     def show_coach_offers(self):
@@ -184,7 +200,7 @@ class MainWindow(QMainWindow):
         self.career.coaching().accept(idx); saves.save(self.career); self.show_coach()
 
     def show_coach(self):
-        p = coach_pages.CoachPage(self.career, self.d); p.play.connect(self.on_coach_play); p.menu.connect(self.show_start)
+        p = coach_pages.CoachPage(self.career, self.d); p.play.connect(self.on_coach_play); p.menu.connect(self.show_start); p.diary.connect(self.open_diary)
         p.retire.connect(self.ask_coach_retire); self._set(p)
 
     def on_coach_play(self, tactic="balanced"):
@@ -223,7 +239,9 @@ class MainWindow(QMainWindow):
     def on_coach_second_half(self, tactic=""):
         rec = self.career.coaching().finish_season(tactic or None)
         saves.save(self.career)
-        p = coach_pages.CoachReportPage(self.career, self.d, rec); p.done.connect(self.after_coach_report); self._set(p)
+        p = coach_pages.CoachReportPage(self.career, self.d, rec); p.done.connect(self.after_coach_report); p.diary.connect(self.open_diary); self._set(p)
+        self.diaries.attach(self.career, self.d)
+        self.diaries.request(story.missing(self.career, [f"c:{len(self.career.coach['seasons']) - 1}"]), auto=True)
 
     def after_coach_report(self):
         st = self.career.status
@@ -243,7 +261,8 @@ class MainWindow(QMainWindow):
         name = f"{self.career.name}_career.txt"
         path, _ = QFileDialog.getSaveFileName(self, tr("end.export"), str(Path.home() / name), "Text (*.txt)")
         if path:
-            Path(path).write_text(summary_text(self.career, self.d), encoding="utf-8")
+            book = story.book_text(self.career, self.d)                 # дневники сезонов - «книгой» после итогов
+            Path(path).write_text(summary_text(self.career, self.d) + ("\n\n\n" + book if book else ""), encoding="utf-8")
             QMessageBox.information(self, tr("app.title"), tr("end.exported", p=path))
 
     def on_load(self):

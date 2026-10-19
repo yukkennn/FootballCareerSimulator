@@ -103,7 +103,7 @@ class CoachOffersPage(QWidget):
 
 # ======================================================================================= клуб тренера
 class CoachPage(QWidget):
-    play = Signal(str); menu = Signal(); retire = Signal()          # play: тактика на первую половину сезона
+    play = Signal(str); menu = Signal(); retire = Signal(); diary = Signal(str)   # play: тактика на первую половину сезона
 
     def __init__(self, career, data):
         super().__init__(); self.setObjectName("page")
@@ -164,6 +164,7 @@ class CoachPage(QWidget):
         bar = QHBoxLayout()
         b = QPushButton(tr("career.menu")); b.clicked.connect(self.menu.emit); bar.addWidget(b)
         r = QPushButton(tr("coach.retire")); r.setObjectName("danger"); r.clicked.connect(self.retire.emit); bar.addWidget(r)
+        dz = QPushButton(tr("ai.diaries")); dz.clicked.connect(lambda: self.diary.emit("")); bar.addWidget(dz)
         bar.addStretch(); bar.addWidget(label(tr("career.autosave"), "muted"))
         p = QPushButton(tr("coach.play_half")); p.setObjectName("primary"); p.clicked.connect(lambda: self.play.emit(self.tactic.value()))
         bar.addWidget(p)
@@ -902,7 +903,7 @@ def coach_season_html(c, d, r):
     return "".join(h)
 
 class CoachReportPage(QWidget):
-    done = Signal()
+    done = Signal(); diary = Signal(str)
 
     def __init__(self, career, data, rec):
         super().__init__(); self.setObjectName("page")
@@ -910,7 +911,10 @@ class CoachReportPage(QWidget):
         root.addWidget(label(tr("creport.title", s=rec["season"]), "title"))
         view = QTextBrowser(); view.setOpenLinks(False); root.addWidget(view, 1)
         view.setHtml(coach_season_html(career, data, rec))
-        row = QHBoxLayout(); row.addStretch()
+        row = QHBoxLayout()
+        key = f"c:{len(career.coach['seasons']) - 1}"
+        dz = QPushButton(f"{tr('web.diary_btn')} {rec['season']}"); dz.clicked.connect(lambda: self.diary.emit(key)); row.addWidget(dz)
+        row.addStretch()
         btn = QPushButton(tr("report.continue")); btn.setObjectName("primary"); btn.clicked.connect(self.done.emit); row.addWidget(btn)
         root.addLayout(row)
 

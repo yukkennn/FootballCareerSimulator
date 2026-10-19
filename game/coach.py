@@ -358,6 +358,8 @@ class CoachCareer:
                 s["rep"] = round(min(100.0, s["rep"] + 4), 1)
             s["euro"] = league["tier"] == 1 and rank <= 4 or any(x["code"] in CONT and x["result"].get("stage") == "W" for x in comps)
         # --- деньги сезона: сделки, призовые (придут в бюджет следующим летом)
+        rec["matches"] = w.club_matches(res, cid)                          # для дневника сезона (на экранах не показывается)
+        rec["mid_rank"] = mid["rank"]
         rec["moves"] = s.pop("season_moves", []) or []
         fin = s.get("fin") or {"spent": 0.0, "income": 0.0}
         rec["fin"] = {"spent": round(fin["spent"], 2), "income": round(fin["income"], 2), "budget": round(s.get("budget", 0.0), 2)}

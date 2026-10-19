@@ -47,11 +47,41 @@ function draw(html) {
 async function writeStory(job) {
   try {
     const r = await aiWrite(job.system, job.user);
-    await act("story_save", JSON.stringify({ idx: job.idx, text: r.text, provider: r.provider, model: r.model }));
+    await act("story_save", JSON.stringify({ key: job.key, text: r.text, provider: r.provider, model: r.model }));
   } catch (e) {
     console.error(e);
-    await act("story_fail", e.message === "__need__" ? "__need__" : String(e.message || e));
+    await act("story_fail", JSON.stringify({ key: job.key, error: e.message === "__need__" ? "__need__" : String(e.message || e) }));
   }
+}
+
+// автодневник: после сезона, если нейросеть настроена и галочка включена, дневники пишутся по очереди в фоне
+let autoRunning = false;
+function redrawKeepScroll() {
+  const y = window.scrollY; draw(app.render()); window.scrollTo(0, y);
+}
+async function runAuto() {
+  const ai = aiCurrent();
+  if (autoRunning || ai.provider === "off" || !ai.key || aiLoad().auto === false) { if (!autoRunning) app.auto_next_clear(); return; }
+  autoRunning = true;
+  try {
+    for (;;) {
+      const raw = app.auto_next();
+      if (!raw) break;
+      const job = JSON.parse(raw);
+      toast(app.tr("web.diary_auto"));
+      if (root.querySelector(".v-story")) redrawKeepScroll();
+      try {
+        const r = await aiWrite(job.system, job.user);
+        if (app.store_story(JSON.stringify({ key: job.key, text: r.text, provider: r.provider, model: r.model }))) redrawKeepScroll();
+        syncfs(false);
+      } catch (e) {
+        console.error(e);
+        if (app.auto_fail(job.key)) redrawKeepScroll();
+        toast(app.tr("web.diary_failed") + ": " + String(e.message || e));
+        break;
+      }
+    }
+  } finally { autoRunning = false; }
 }
 
 // --- настройки нейросети: значения из localStorage, ключ в Python не передаётся
@@ -61,6 +91,7 @@ function settingsFill() {
   const prov = root.querySelector("#ai-provider");
   prov.value = aiDraft.provider || "gemini";
   aiDraft._shown = prov.value;
+  root.querySelector("#ai-auto").checked = aiDraft.auto !== false;
   settingsShow();
 }
 function settingsShow() {
@@ -106,6 +137,7 @@ async function act(name, arg, busy) {
     if (res.toast) toast(res.toast);
     if (res.download) download(res.download);
     if (res.llm) writeStory(res.llm);
+    if (res.auto) runAuto();
   } catch (e) {
     console.error(e); toast(String(e));
   } finally {
@@ -145,6 +177,7 @@ root.addEventListener("click", (e) => {
     if (j.dataset.js === "ai-models") settingsModels();
     if (j.dataset.js === "ai-save") {
       settingsTake(); aiDraft.provider = root.querySelector("#ai-provider").value;
+      aiDraft.auto = root.querySelector("#ai-auto").checked;
       delete aiDraft._shown; aiSave(aiDraft); toast(app.tr("web.ai_saved")); act("settings_back");
     }
     return;

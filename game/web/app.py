@@ -115,6 +115,8 @@ class WebApp(CoachScreens):
         self.form = {"first": "", "last": "", "nat": "", "pos": "", "foot": "R", "height": 180}
         self.last_form = {}
         self._out = {}
+        self._writing = set()             # сезоны, дневник которых сейчас пишет нейросеть
+        self._auto = []                   # очередь автодневников (см. queue_diaries)
 
     screen = staticmethod(screen)
 
@@ -378,53 +380,91 @@ class WebApp(CoachScreens):
 
     def v_season(self):
         s = self.career.seasons[self.ctx["idx"]]
-        return screen(esc(tr("report.season", s=s["season"])), self.diary_btn(self.ctx["idx"]) + season_html(self.career, self.d, s),
+        return screen(esc(tr("report.season", s=s["season"])), self.diary_btn(f"p:{self.ctx['idx']}") + season_html(self.career, self.d, s),
                       left=btn("‹", "back", self.ctx["back"], kind="ghost", extra=f'aria-label="{esc(tr("web.back"))}"'))
 
     # ------------------------------------------------------------------ дневник сезона (пишет нейросеть, см. game/story.py и web/llm.js)
-    def diary_btn(self, idx):
-        s = self.career.seasons[idx]
-        if s.get("youth") and not s.get("comps"):
+    def diary_btn(self, key):
+        """Кнопка дневника сезона; key - "p:3" (сезон игрока) или "c:1" (сезон тренера)."""
+        kind, _, s = story_mod.record(self.career, key)
+        if kind == "p" and s.get("youth") and not s.get("comps"):
             return ""
-        return btn(esc(tr("web.diary_btn")), "story", str(idx), "diary")
+        return btn(esc(tr("web.diary_btn")), "story", key, "diary")
 
-    def a_story(self, idx):
+    def a_story(self, key):
         self._story_return = (self.view, dict(self.ctx))
-        self.go("story", idx=int(idx))
+        self.go("story", key=key)
 
     def a_story_back(self, _):
         view, ctx = getattr(self, "_story_return", ("career", {}))
         self.view, self.ctx, self.modal = view, ctx, None
 
+    def _job(self, key):
+        """Задание нейросети для дневника сезона key (его выполняет app.js: writeStory)."""
+        self._writing.add(key)
+        return dict(story_mod.prompt(self.career, self.d, key), key=key)
+
     def a_story_gen(self, _):
-        idx = self.ctx["idx"]
-        self.ctx.update(writing=True, error=None)
-        self._out["llm"] = dict(story_mod.prompt(self.career, self.d, idx), idx=idx)
+        self.ctx["error"] = None
+        self._out["llm"] = self._job(self.ctx["key"])
         self._out["scroll"] = "top"
 
     def a_story_save(self, payload):
         r = json.loads(payload)
-        s = self.career.seasons[int(r["idx"])]
-        text, memory = story_mod.split_answer(r["text"])
-        s["story"] = {"text": text, "memory": memory, "provider": r.get("provider", ""), "model": r.get("model", ""), "lang": i18n.LANG}
-        self.save()
-        if self.view == "story":
-            self.ctx.update(writing=False, error=None)
-        else:
+        self.store_story(payload)
+        if self.view != "story" or self.ctx.get("key") != r["key"]:
+            _, _, s = story_mod.record(self.career, r["key"])
             self._out["toast"] = tr("web.diary") + " " + s["season"] + " ✓"
 
-    def a_story_fail(self, msg):
+    def a_story_fail(self, payload):
+        r = json.loads(payload)
+        self._writing.discard(r.get("key"))
         if self.view == "story":
-            self.ctx.update(writing=False, error=tr("web.ai_need") if msg == "__need__" else msg)
+            self.ctx["error"] = tr("web.ai_need") if r["error"] == "__need__" else r["error"]
         self._out["scroll"] = "keep"
 
+    # --- автоматический дневник: после сезона app.js по очереди берёт задания (auto_next) и сохраняет ответы (store_story),
+    # не перерисовывая экран, - каждый следующий дневник уже видит «память» предыдущего
+    def queue_diaries(self, ks):
+        self._auto = [k for k in story_mod.missing(self.career, ks) if k not in self._auto]
+        if self._auto:
+            self._out["auto"] = True
+
+    def auto_next(self):
+        while self._auto and self.career is not None:
+            k = self._auto.pop(0)
+            if k in story_mod.keys(self.career) and k in story_mod.missing(self.career, [k]):
+                return json.dumps(self._job(k), ensure_ascii=False)
+        return ""
+
+    def store_story(self, payload):
+        """Сохранить ответ нейросети. -> "1", если сейчас открыт дневник этого сезона и экран надо перерисовать."""
+        r = json.loads(payload)
+        self._writing.discard(r["key"])
+        if self.career is None or r["key"] not in story_mod.keys(self.career):
+            return ""
+        story_mod.save_answer(self.career, r["key"], r["text"], r.get("provider", ""), r.get("model", ""))
+        self.save()
+        return "1" if self.view == "story" and self.ctx.get("key") == r["key"] else ""
+
+    def auto_next_clear(self):
+        """Нейросеть не настроена или автодневник выключен: очередь не нужна."""
+        self._auto = []
+        return ""
+
+    def auto_fail(self, key):
+        self._writing.discard(key)
+        self._auto = []
+        return "1" if self.view == "story" and self.ctx.get("key") == key else ""
+
     def v_story(self):
-        idx = self.ctx["idx"]
-        s = self.career.seasons[idx]
+        key = self.ctx["key"]
+        kind, _, s = story_mod.record(self.career, key)
         st = s.get("story")
+        role = f" · {tr('end.tab.coach')}" if kind == "c" else ""
         head = (f'<div class="panel club-h">{logo(self.d.clubs[s["club"]], 48)}<div><div class="h2">{esc(self.career.name)}</div>'
-                f'<div class="muted small">{esc(s["season"])} · {esc(s["club_name"])} · {esc(tr("career.age", n=s["age"]))}</div></div></div>')
-        if self.ctx.get("writing"):
+                f'<div class="muted small">{esc(s["season"])} · {esc(s["club_name"])} · {esc(tr("career.age", n=s["age"]))}{esc(role)}</div></div></div>')
+        if key in self._writing:
             body = head + f'<div class="panel center"><div class="spinner"></div><p class="muted">{esc(tr("web.diary_writing"))}</p></div>'
             return screen(esc(tr("web.diary")), body, left=btn("‹", "story_back", kind="ghost"))
         parts = [head]
@@ -458,6 +498,7 @@ class WebApp(CoachScreens):
                 f'<label class="sel"><span class="muted small">{esc(tr("web.ai_model"))}</span><input id="ai-model" list="ai-models" autocomplete="off" spellcheck="false">'
                 f'<datalist id="ai-models"></datalist></label>'
                 f'<button class="btn" data-js="ai-models">{esc(tr("web.ai_models_btn"))}</button>'
+                f'<label class="check"><input type="checkbox" id="ai-auto"> {esc(tr("web.ai_auto"))}</label>'
                 f'<p class="muted small">{esc(tr("web.ai_key_hint"))}</p></div>')
         footer = btn(esc(tr("web.ai_save")), "", kind="primary", extra='data-js="ai-save"')
         return screen(esc(tr("web.settings")), body, footer, left=btn("‹", "settings_back", kind="ghost", extra=f'aria-label="{esc(tr("web.back"))}"'))
@@ -469,11 +510,13 @@ class WebApp(CoachScreens):
         recs, reason = self.career.play_period()
         self.save()
         self.go("report", recs=recs, reason=reason)
+        n = len(self.career.seasons)
+        self.queue_diaries([f"p:{i}" for i in range(n - len(recs), n)])
 
     def v_report(self):
         c, recs, reason = self.career, self.ctx["recs"], self.ctx["reason"]
         a, b = recs[0]["season"], recs[-1]["season"]
-        body = "".join(self.diary_btn(next(i for i, x in enumerate(c.seasons) if x is s)) + season_html(c, self.d, s) for s in recs)
+        body = "".join(self.diary_btn(f"p:{next(i for i, x in enumerate(c.seasons) if x is s)}") + season_html(c, self.d, s) for s in recs)
         if len(recs) > 1:
             G = sum(s["games"] for s in recs); A = sum(s["goals"] for s in recs); S = sum(s["assists"] for s in recs); CS = sum(s["cs"] for s in recs)
             tot = tr("report.stats_gk", g=G, c=CS) if c.pos == "GK" else tr("report.stats", g=G, a=A, s=S)
@@ -632,7 +675,9 @@ class WebApp(CoachScreens):
         return '<div class="panel list">' + "".join(out) + "</div>"
 
     def a_export_text(self, _):
-        self._out["download"] = {"name": f"{self.career.name}_career.txt", "text": summary_text(self.career, self.d), "mime": "text/plain"}
+        book = story_mod.book_text(self.career, self.d)
+        text = summary_text(self.career, self.d) + ("\n\n\n" + book if book else "")
+        self._out["download"] = {"name": f"{self.career.name}_career.txt", "text": text, "mime": "text/plain"}
 
     # ------------------------------------------------------------------ сохранения
     def v_load(self):

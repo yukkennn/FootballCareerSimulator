@@ -31,8 +31,15 @@ def run(lang):
     act(app, "academy", app.career.academy_ids[0])
     n = 0
     while app.career.status != "retired" and n < 40:
-        act(app, "play")
+        out = act(app, "play")
         assert app.view == "report"
+        if n == 6:
+            assert out.get("auto"), "после сезона нет очереди автодневника"
+            job = json.loads(app.auto_next()); assert job["key"].startswith("p:")
+            app.store_story(json.dumps({"key": job["key"], "text": "Авто.\nMEMORY:\n- x", "provider": "Gemini", "model": "t"}))
+            _, _, srec = __import__("game.story", fromlist=["record"]).record(app.career, job["key"])
+            assert srec["story"]["text"] == "Авто."
+            app.auto_next_clear()
         act(app, "after_report")
         if app.view == "offers":
             act(app, "accept", "0" if app.career.offers else "stay")
@@ -42,16 +49,17 @@ def run(lang):
         if n == 4:                                   # дневник сезона: задание для нейросети, сохранение ответа, экран
             idx = len(app.career.seasons) - 1
             prev = app.view
-            act(app, "story", str(idx)); assert app.view == "story"
+            key = f"p:{idx}"
+            act(app, "story", key); assert app.view == "story"
             out = act(app, "story_gen")
-            job = out["llm"]; assert job["idx"] == idx and len(job["user"]) > 500 and job["system"]
+            job = out["llm"]; assert job["key"] == key and len(job["user"]) > 500 and job["system"]
             assert app.career.seasons[idx].get("matches"), "матчи сезона не сохранились"
             ans = "**1 августа**\nПервая запись.\n\nВторая запись.\n\n" + ("ПАМЯТЬ:" if lang == "ru" else "MEMORY:") + "\n- Подруга Лейла"
-            act(app, "story_save", json.dumps({"idx": idx, "text": ans, "provider": "Gemini", "model": "test"}))
+            act(app, "story_save", json.dumps({"key": key, "text": ans, "provider": "Gemini", "model": "test"}))
             st = app.career.seasons[idx]["story"]
             assert st["memory"].endswith("Лейла") and "ПАМЯТЬ" not in st["text"] and "MEMORY" not in st["text"]
             assert "<b>1 августа</b>" in app.render()
-            act(app, "story_fail", "boom"); assert "boom" in app.render()
+            act(app, "story_fail", json.dumps({"key": key, "error": "boom"})); assert "boom" in app.render()
             act(app, "story_back"); assert app.view == prev, app.view
             act(app, "settings"); assert "ai-settings" in app.render(); act(app, "settings_back"); assert app.view == prev
     if app.career.status != "retired":
@@ -62,7 +70,8 @@ def run(lang):
     assert app.view == "end", app.view
     for tab in ("summary", "seasons", "comps", "transfers", "honours", "chronicle"):
         act(app, "tab", tab)
-    assert act(app, "export_text")["download"]["text"]
+    exp = act(app, "export_text")["download"]["text"]
+    assert ("ДНЕВНИК" in exp or "DIARY" in exp), "дневники не попали в экспорт"
     act(app, "show_load")
     sid = app.career.id
     exp = act(app, "export_save", sid)["download"]["text"]
@@ -123,8 +132,16 @@ def run_coach(lang, seasons=6):
             act(app, "m_formation", "4-2-3-1"); act(app, "m_rotation", "none")
             act(app, "mid_winter", "", {"tactic": "defense"}); assert app.view == "transfer"
             act(app, "tw_done"); assert app.view == "mid"
-        act(app, "mid_done", "", {"tactic": "balanced"})
+        out = act(app, "mid_done", "", {"tactic": "balanced"})
         assert app.view == "creport", app.view
+        ck = f"c:{len(app.career.coach['seasons']) - 1}"
+        assert out.get("auto") and f'data-arg="{ck}"' in app.render(), "нет дневника тренерского сезона"
+        if k == 0:
+            act(app, "story", ck); job = act(app, "story_gen")["llm"]
+            assert job["key"] == ck and ("тренер" in job["system"] or "coach" in job["system"])
+            act(app, "story_save", json.dumps({"key": ck, "text": "Тренер.\nПАМЯТЬ:\n- штаб", "provider": "Gemini", "model": "t"}))
+            act(app, "story_back"); assert app.view == "creport"
+        app.auto_next_clear()
         act(app, "creport_done")
         if app.view == "end":
             break

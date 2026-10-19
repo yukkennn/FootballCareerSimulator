@@ -51,6 +51,7 @@ class StartPage(QWidget):
     proceed = Signal(str, str, str, str, int)          # имя, страна, позиция, ведущая нога, рост
     load_clicked = Signal()
     lang_changed = Signal(str)
+    settings_clicked = Signal()
 
     def __init__(self, data):
         super().__init__(); self.setObjectName("page")
@@ -63,6 +64,7 @@ class StartPage(QWidget):
         self.lang.currentIndexChanged.connect(lambda: self.lang_changed.emit(self.lang.currentData()))
         top.addWidget(self.lang)
         self.btn_load = QPushButton(tr("start.load")); self.btn_load.clicked.connect(self.load_clicked.emit); top.addWidget(self.btn_load)
+        st = QPushButton("⚙ " + tr("web.settings")); st.clicked.connect(self.settings_clicked.emit); top.addWidget(st)
         root.addLayout(top)
         body = QHBoxLayout(); body.setSpacing(20); root.addLayout(body, 1)
 
@@ -234,7 +236,7 @@ class AcademyPage(QWidget):
 
 # ======================================================================================= карьера
 class CareerPage(QWidget):
-    play = Signal(); menu = Signal(); retire = Signal()
+    play = Signal(); menu = Signal(); retire = Signal(); diary = Signal(str)
 
     def __init__(self, career, data):
         super().__init__(); self.setObjectName("page")
@@ -262,6 +264,8 @@ class CareerPage(QWidget):
         body.addWidget(self.table, 1)
         bar = QHBoxLayout(); b = QPushButton(tr("career.menu")); b.clicked.connect(self.menu.emit); bar.addWidget(b)
         r = QPushButton(tr("career.retire")); r.setObjectName("danger"); r.clicked.connect(self.retire.emit); bar.addWidget(r)
+        dz = QPushButton(tr("ai.diaries")); dz.clicked.connect(lambda: self.diary.emit("")); bar.addWidget(dz)
+        self.table.cellDoubleClicked.connect(lambda row, _col: self.diary.emit(f"p:{row}"))
         self.totals = label("", "muted"); bar.addWidget(self.totals); bar.addStretch()
         bar.addWidget(label(tr("career.autosave"), "muted"))
         self.btn = QPushButton(); self.btn.setObjectName("primary"); self.btn.clicked.connect(self.play.emit); bar.addWidget(self.btn)
@@ -428,7 +432,7 @@ def details_html(c, d, s):
             f"<td width='55%' valign='top'>{''.join(lg)}</td><td width='45%' valign='top'>{''.join(cups)}</td></tr></table>")
 
 class ReportPage(QWidget):
-    done = Signal()
+    done = Signal(); diary = Signal(str)
 
     def __init__(self, career, data, recs, reason):
         super().__init__(); self.setObjectName("page")
@@ -437,7 +441,12 @@ class ReportPage(QWidget):
         root.addWidget(label(tr("report.title1", a=a) if a == b else tr("report.title", a=a, b=b), "title"))
         view = QTextBrowser(); view.setOpenLinks(False); root.addWidget(view, 1)
         view.setHtml(self._html(career, data, recs, reason))
-        row = QHBoxLayout(); row.addStretch()
+        row = QHBoxLayout()
+        for s in recs:
+            key = f"p:{next(i for i, x in enumerate(career.seasons) if x is s)}"
+            if s.get("comps"):
+                b = QPushButton(f"{tr('web.diary_btn')} {s['season']}"); b.clicked.connect(lambda _=False, k=key: self.diary.emit(k)); row.addWidget(b)
+        row.addStretch()
         btn = QPushButton(tr("report.continue")); btn.setObjectName("primary"); btn.clicked.connect(self.done.emit); row.addWidget(btn)
         root.addLayout(row)
 
@@ -676,7 +685,7 @@ class SortTable(QTableWidget):
                 self.setItem(r, i, it)
 
 class EndPage(QWidget):
-    new_career = Signal(); export = Signal(); quit_game = Signal(); become_coach = Signal()
+    new_career = Signal(); export = Signal(); quit_game = Signal(); become_coach = Signal(); diary = Signal(str)
 
     def __init__(self, career, data):
         super().__init__(); self.setObjectName("page")
@@ -702,7 +711,8 @@ class EndPage(QWidget):
             tabs.addTab(coach_seasons_table(c, d), tr("end.tab.coach_seasons"))
             tabs.setCurrentIndex(tabs.count() - 2)
         row = QHBoxLayout()
-        b = QPushButton(tr("end.export")); b.clicked.connect(self.export.emit); row.addWidget(b); row.addStretch()
+        b = QPushButton(tr("end.export")); b.clicked.connect(self.export.emit); row.addWidget(b)
+        dz = QPushButton(tr("ai.diaries")); dz.clicked.connect(lambda: self.diary.emit("")); row.addWidget(dz); row.addStretch()
         if c.coach is None:                                    # игрок завершил карьеру без тренерства: можно стать тренером и сейчас
             bc = QPushButton(tr("end.become_coach")); bc.clicked.connect(self.become_coach.emit); row.addWidget(bc)
         n = QPushButton(tr("end.new")); n.setObjectName("primary"); n.clicked.connect(self.new_career.emit); row.addWidget(n)

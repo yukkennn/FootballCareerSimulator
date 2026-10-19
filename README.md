@@ -55,11 +55,14 @@ macOS / Linux: `./run.sh`.
 
 The language (Russian / English) can be switched on the start screen.
 
-**Season diary (web version).** After every season the "📖 Season diary" button asks an AI to write the hero's diary for that season:
-matches, trophies, everyday life, family, friends and romance. Every sporting fact (scores, places, goals, trophies) comes from the game,
-and the AI only turns it into prose; personal life carries over from season to season. Choose the service (Google Gemini or Anthropic Claude),
-the model and the API key under ⚙ Settings on the start screen. The key is stored only in your browser and sent only to the chosen service.
-A free Gemini key: aistudio.google.com -> Get API key. Code: `game/story.py` (facts and the prompt), `web/llm.js` (API calls).
+**Season diary (web and desktop).** An AI writes the hero's diary for every season, as a player and as a coach: matches, trophies,
+everyday life, family, friends and romance. Every sporting fact (scores, places, goals, trophies, board decisions) comes from the game, and
+the AI only turns it into prose; personal life carries over from season to season. With "Write the diary automatically" on, the diary is written
+in the background right after each season; otherwise use the "📖 Season diary" button (desktop: "📖 Diaries", or double-click a season).
+"Export" on the career summary adds all diaries as one book after the statistics. Choose the service (Google Gemini or Anthropic Claude), the model
+and the API key under ⚙ Settings on the start screen. The key is stored only in your browser (desktop: in the settings file in the
+`.football_career_sim` folder) and sent only to the chosen service. A free Gemini key: aistudio.google.com -> Get API key.
+Code: `game/story.py` (facts and the prompt), `web/llm.js` and `game/llm.py` (API calls), `game/ui/diary.py` (desktop windows).
 
 **Leagues live their own life.** Every club has good and bad seasons, and now and then one of the strongest clubs in a league starts an era
 of dominance for 5-10 seasons (money and squad), then gradually returns to its usual level. Historical giants stay giants: in Spain the title
@@ -76,7 +79,8 @@ The league Team of the Season, Player of the Season and the Golden Boot depend o
   `stars.py` world stars; `player.py` development and decline; `ui/` desktop screens; `web/` web screens).
 - `data/football.db`, `assets/logos/`: club database and crests (1214 clubs, 83 leagues, 211 countries; team ratings from EA FC 27, smaller UEFA leagues rated by hand from the UEFA coefficient).
 - `database/`, `tools/`, `data/`, `docs/DATA_SOURCES.md`: building the database, importing FC 27, Elo and EA FC ratings, downloading missing crests.
-- `tests/`: `balance.py` (mass career runs), `test_ui_flow.py` (headless desktop interface), `test_web_flow.py` (headless web interface), importer tests.
+- `tests/`: `balance.py` (mass career runs), `test_ui_flow.py` (headless desktop interface), `test_web_flow.py` (headless web interface),
+  `test_diary_desktop.py` (desktop season diary with a stub instead of the AI), importer tests.
 
 ## Known limitations
 - **Clubs exist for 78 countries**: all 55 UEFA members, 10 CONMEBOL countries (Argentina, Brazil, Colombia, Chile, Peru, Ecuador, Uruguay, Paraguay, Bolivia,
@@ -177,11 +181,14 @@ macOS / Linux: `./run.sh`.
 
 Язык (русский / английский) переключается на стартовом экране.
 
-**Дневник сезона (веб-версия).** После каждого сезона кнопка «📖 Дневник сезона» просит нейросеть написать дневник героя за этот сезон:
-матчи, трофеи, повседневная жизнь, семья, друзья, романтика. Все спортивные факты (счёт, места, голы, трофеи) берутся из игры, нейросеть
-только превращает их в текст; личная жизнь продолжается из сезона в сезон. Сервис (Google Gemini или Anthropic Claude), модель и API-ключ
-выбираются в ⚙ Настройках на стартовом экране. Ключ хранится только в вашем браузере и отправляется только выбранному сервису.
-Бесплатный ключ Gemini: aistudio.google.com -> Get API key. Код: `game/story.py` (факты и задание), `web/llm.js` (запросы к нейросетям).
+**Дневник сезона (сайт и версия для компьютера).** Нейросеть пишет дневник героя за каждый сезон - и игрока, и тренера: матчи, трофеи,
+повседневная жизнь, семья, друзья, романтика. Все спортивные факты (счёт, места, голы, трофеи, решения руководства) берутся из игры, нейросеть
+только превращает их в текст; личная жизнь продолжается из сезона в сезон. С галочкой «Писать дневник сам после каждого сезона» дневник пишется
+в фоне сразу после сезона, иначе - кнопкой «📖 Дневник сезона» (в версии для компьютера - «📖 Дневники» или двойной щелчок по сезону).
+«Экспорт» в итогах карьеры добавляет после статистики все дневники одной книгой. Сервис (Google Gemini или Anthropic Claude), модель и API-ключ
+выбираются в ⚙ Настройках на стартовом экране. Ключ хранится только в вашем браузере (в версии для компьютера - в файле настроек в папке
+`.football_career_sim`) и отправляется только выбранному сервису. Бесплатный ключ Gemini: aistudio.google.com -> Get API key.
+Код: `game/story.py` (факты и задание), `web/llm.js` и `game/llm.py` (запросы к нейросетям), `game/ui/diary.py` (окна версии для компьютера).
 
 **Лиги живут своей жизнью.** У каждого клуба бывают удачные и провальные сезоны, а время от времени один из сильнейших клубов лиги начинает
 эпоху гегемонии на 5-10 сезонов (деньги и состав), после чего постепенно возвращается к своему обычному уровню. Гранды остаются грандами: в Испании
@@ -198,7 +205,8 @@ macOS / Linux: `./run.sh`.
   `stars.py` звёзды мира; `player.py` рост и спад; `ui/` экраны для компьютера; `web/` экраны сайта).
 - `data/football.db`, `assets/logos/`: база клубов и эмблемы (1214 клубов, 83 лиги, 211 стран; рейтинги команд из EA FC 27, у небольших лиг УЕФА ручная оценка по коэффициенту УЕФА).
 - `database/`, `tools/`, `data/`, `docs/DATA_SOURCES.md`: сборка базы, импорт FC 27, Elo, рейтингов EA FC, докачка эмблем.
-- `tests/`: `balance.py` (массовый прогон карьер), `test_ui_flow.py` (десктопный интерфейс без экрана), `test_web_flow.py` (веб-интерфейс без браузера), тесты импортёров.
+- `tests/`: `balance.py` (массовый прогон карьер), `test_ui_flow.py` (десктопный интерфейс без экрана), `test_web_flow.py` (веб-интерфейс без браузера),
+  `test_diary_desktop.py` (дневник сезона в версии для компьютера, нейросеть заменена заглушкой), тесты импортёров.
 
 ## Честно об ограничениях
 - **Клубы есть у 78 стран**: все 55 стран УЕФА, 10 стран КОНМЕБОЛ (Аргентина, Бразилия, Колумбия, Чили, Перу, Эквадор, Уругвай, Парагвай, Боливия,
