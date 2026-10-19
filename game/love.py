@@ -1,5 +1,6 @@
 """Личная жизнь героя для дневника сезона: игра заранее «планирует» романтическую линию каждой карьеры, а нейросеть только
-пишет её по этому плану. Иначе нейросеть почти всегда даёт герою девушку в первом же сезоне.
+пишет её по этому плану. Иначе нейросеть почти всегда даёт герою девушку в первом же сезоне. Пара в итоге есть у каждого,
+различается только возраст, когда он её встречает, и путь к ней.
 
 План строится из id карьеры (детерминированно: та же карьера - тот же план, переписанный дневник его не меняет):
 у кого-то первая любовь в 17, у кого-то в 30; бывают невзаимная симпатия, короткий роман, тяжёлые отношения, расставания,
@@ -72,11 +73,12 @@ def plan(career_id):
         ch.append({"kind": "crush", "start": a, "end": a, "type": rng.randrange(len(TYPES))})
     age = _first_love_age(rng)
     used = set()
-    marries = rng.random() < 0.78                                 # примерно каждый пятый так и не женится
-    while age <= 72:
+    settle = rng.randint(27, 36)                                  # к этому возрасту герой встречает «ту самую» (у всех по-разному)
+    divorced = False
+    while True:
         t = rng.choice([i for i in range(len(TYPES)) if i not in used] or list(range(len(TYPES))))
         used.add(t)
-        r = rng.random()
+        r = 1.0 if age >= settle else rng.random()               # пора: дальше только серьёзные отношения
         if r < 0.2:                                               # короткий роман на один сезон
             ch.append({"kind": "fling", "start": age, "end": age, "type": t, "reason": rng.randrange(len(BREAKUP))})
             age += 1 + rng.randint(0, 3)
@@ -89,12 +91,13 @@ def plan(career_id):
             continue
         n = rng.randint(2, 7)                                     # серьёзные отношения
         c = {"kind": "serious", "start": age, "end": age + n - 1, "type": t}
-        if marries and age + n - 1 >= 22 and rng.random() < 0.55:  # свадьба, дети, иногда развод
-            c["married"] = max(age + 1, 22) if n > 1 else age
+        if age >= settle or (age + n - 1 >= 22 and rng.random() < 0.45):  # свадьба, дети, иногда развод
+            c["married"] = max(age + rng.randint(1, 3), 22)
             c["end"] = 99
             if rng.random() < 0.65:
                 c["kids"] = c["married"] + rng.randint(1, 4)
-            if rng.random() < 0.22:
+            if not divorced and rng.random() < 0.2:              # развод бывает не больше одного раза
+                divorced = True
                 c["divorce"] = c["married"] + rng.randint(3, 12)
                 c["end"] = c["divorce"]
                 c["reason"] = rng.randrange(len(BREAKUP))
