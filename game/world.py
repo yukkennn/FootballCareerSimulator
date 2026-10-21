@@ -66,11 +66,17 @@ IC_FROM = {"CONMEBOL": 1, "CONCACAF": 2, "AFC": 1, "CAF": 1, "OFC": 1}   # ка�
 HOSTS = {("WC", 2030): ["ESP", "POR", "MAR", "ARG", "URU", "PAR"], ("WC", 2034): ["KSA"], ("EURO", 2032): ["ITA", "TUR"]}
 WC_HOST_ROT = ["CONCACAF", "UEFA", "AFC", "CAF", "CONMEBOL"]
 NAT_ORDER = ["WC", "EURO", "CA", "AFCON", "ASIAN", "GOLD", "OFCNC"]
-# слоты в еврокубки по месту страны в рейтинге UEFA: (до какого места, ЛЧ, ЛЕ, ЛК); значения - места в лиге
-EURO_SLOTS = [
-    (4, [1, 2, 3, 4], [5], [6]), (6, [1, 2, 3], [4], [5]), (10, [1, 2], [3], [4]),
-    (15, [1], [2], [3]), (25, [1], [], [2, 3]), (99, [], [], [1]),
+# путёвки в еврокубки по месту страны в рейтинге UEFA: (до какого места, {(турнир, путь): места в лиге или "cup" - обладатель кубка}).
+# direct - сразу на общий этап; champ - путь чемпионов в отборе ЛЧ; league - путь представителей лиг; qual - отборочные раунды ЛЕ и ЛК
+EURO_ACCESS = [
+    (4, {("UCL", "direct"): [1, 2, 3, 4], ("UEL", "direct"): [5, "cup"], ("UECL", "direct"): [6]}),
+    (6, {("UCL", "direct"): [1, 2, 3], ("UEL", "direct"): [4, "cup"], ("UECL", "direct"): [5]}),
+    (12, {("UCL", "direct"): [1], ("UCL", "league"): [2], ("UEL", "direct"): ["cup"], ("UEL", "qual"): [3], ("UECL", "qual"): [4]}),
+    (15, {("UCL", "champ"): [1], ("UEL", "qual"): [2, "cup"], ("UECL", "qual"): [3]}),
+    (25, {("UCL", "champ"): [1], ("UEL", "qual"): ["cup"], ("UECL", "qual"): [2, 3]}),
+    (99, {("UCL", "champ"): [1], ("UECL", "qual"): [2, "cup"]}),
 ]
+UCL_LEAGUE_PATH = 2                # мест в ЛЧ через путь представителей лиг (остальные отборочные места - путь чемпионов)
 LIB_SLOTS = {"BRA": 7, "ARG": 6, "COL": 3, "ECU": 3, "PAR": 3, "CHI": 2, "PER": 2, "URU": 2, "BOL": 2, "VEN": 2}
 SUD_SLOTS = {"BRA": 6, "ARG": 6, "COL": 3, "CHI": 3, "PER": 3, "ECU": 3, "URU": 3, "PAR": 2, "BOL": 2, "VEN": 1}
 # ЛЧ АФК (Элит): по реальной раскладке мест между ассоциациями (запад - Саудовская Аравия, ОАЭ, Катар; восток - Япония, Корея, Китай, Таиланд, Австралия)
@@ -331,37 +337,124 @@ class World:
         return {"winner": nxt[0], "runner": runner, "res": res}
 
     # ---------- континентальные турниры клубов ----------
-    def _uefa_fields(self, res):
-        tickets = {"UCL": [], "UEL": [], "UECL": []}
+    def _uefa_tickets(self, res):
+        """Путёвки в еврокубки по месту страны в рейтинге UEFA (EURO_ACCESS).
+        -> {(турнир, "direct"/"champ"/"league"/"qual"): [(посев, клуб)]}; посев - чем меньше, тем выше."""
+        out = {}
         for country, top in self.d.top_league.items():
             if self.d.countries[country]["conf"] != "UEFA" or country not in self.d.uefa_rank:
                 continue
             rank = self.d.uefa_rank[country]
             order = [c for c in res["tables"][top]["order"] if not self.d.clubs[c]["reserve"]]
-            cw = res["cups"].get((country, "cup"), {}).get("winner")
-            slots = next(s for s in EURO_SLOTS if rank <= s[0])
-            for key, places in (("UCL", slots[1]), ("UEL", slots[2]), ("UECL", slots[3])):
+            if not order:
+                continue
+            acc = next(s for s in EURO_ACCESS if rank <= s[0])[1]
+            used = set()
+            for (comp, path), places in acc.items():
                 for pl in places:
-                    if pl <= len(order):
-                        tickets[key].append((rank * 100 + pl, order[pl - 1]))
-            if cw and cw in order:
-                tickets["UEL" if rank <= 25 else "UECL"].append((rank * 100 + 50, cw))
-        if self.prev_uel_winner and self.prev_uel_winner in self.club_league:
+                    if pl == "cup":
+                        continue
+                    if pl <= len(order) and order[pl - 1] not in used:
+                        used.add(order[pl - 1])
+                        out.setdefault((comp, path), []).append((rank * 100 + pl, order[pl - 1]))
+            # обладатель кубка; если он уже попал в еврокубки через чемпионат, путёвка уходит следующему клубу таблицы
+            cw = res["cups"].get((country, "cup"), {}).get("winner")
+            for (comp, path), places in acc.items():
+                if "cup" in places:
+                    c = cw if cw in order and cw not in used else next((x for x in order if x not in used), None)
+                    if c:
+                        used.add(c)
+                        out.setdefault((comp, path), []).append((rank * 100 + 50, c))
+        return out
+
+    def _qual_rounds(self, cands, target, names, pre):
+        """Отборочные раунды на вылет (по два матча). cands: [(посев, клуб)], чем меньше посев, тем позже клуб вступает
+        (сильные пропускают первые раунды). -> (прошедшие, [(раунд, проигравшие)])."""
+        alive = [c for _, c in sorted(cands)]
+        R = len(names)
+        out = []
+        for j, name in enumerate(names):
+            E = len(alive) - target
+            if E <= 0:
+                break
+            rl = R - j
+
+            def fits(m):                     # успеют ли оставшиеся раунды выбить остальных
+                al, e = len(alive) - m, E - m
+                for _ in range(rl - 1):
+                    k = min(al // 2, e)
+                    al, e = al - k, e - k
+                return e <= 0
+            m = -(-E // rl)
+            while m < min(len(alive) // 2, E) and not fits(m):
+                m += 1
+            m = min(m, len(alive) // 2, E)
+            if m <= 0:
+                break
+            play = alive[len(alive) - 2 * m:]                     # слабейшие по посеву играют, остальные ждут следующего раунда
+            hi, lo = play[:m], play[m:]
+            self.rng.shuffle(lo)
+            winners, losers = [], []
+            for h, l in zip(hi, lo):
+                w, sc = self._ko2(l, h)                             # первый матч дома у слабейшего по посеву
+                self._rec_ko(pre, l, h, w, sc, name, 2)
+                winners.append(w); losers.append(h if w == l else l)
+            keep = set(alive[:len(alive) - 2 * m]) | set(winners)
+            alive = [c for c in alive if c in keep]
+            out.append((name, losers))
+        return alive, out
+
+    def _uefa_fields(self, res):
+        """Составы ЛЧ, ЛЕ и ЛК на общий этап после отборочных раундов. Проигравший в отборе ЛЧ продолжает в ЛЕ или ЛК,
+        проигравший в отборе ЛЕ - в ЛК, а проигравший в отборе ЛК выбывает из еврокубков совсем.
+        -> ({турнир: состав общего этапа}, {турнир: {клуб: итог отбора}})."""
+        tk = self._uefa_tickets(res)
+        pre = {"UCL": {}, "UEL": {}, "UECL": {}}
+        used = set()
+
+        def take(lst):
+            r = []
+            for p, c in sorted(lst):
+                if c not in used:
+                    used.add(c); r.append((p, c))
+            return r
+        DROP = -1000                                              # выбывшие из турнира выше вступают в отбор позже всех
+        # Лига чемпионов
+        direct = take(tk.get(("UCL", "direct"), []))
+        if self.prev_uel_winner and self.prev_uel_winner in self.club_league and self.prev_uel_winner not in used:
             if self.d.leagues[self.club_league[self.prev_uel_winner]]["tier"] == 1:
-                tickets["UCL"].append((0, self.prev_uel_winner))
-        fields, used, carry = {}, set(), []
-        for key in ("UCL", "UEL", "UECL"):
-            pool = sorted(tickets[key] + [(p + 5000, c) for p, c in carry])
-            field, carry = [], []
-            for p, c in pool:
-                if c in used:
-                    continue
-                if len(field) < 36:
-                    field.append(c); used.add(c)
+                direct = [(0, self.prev_uel_winner)] + direct; used.add(self.prev_uel_winner)
+        lp = take(tk.get(("UCL", "league"), []))
+        ch = take(tk.get(("UCL", "champ"), []))
+        t_lp = min(UCL_LEAGUE_PATH, len(lp))
+        t_ch = max(0, 36 - len(direct) - t_lp)
+        q_lp, r_lp = self._qual_rounds(lp, t_lp, ["Q2", "Q3", "QPO"], pre["UCL"])
+        q_ch, r_ch = self._qual_rounds(ch, t_ch, ["Q1", "Q2", "Q3", "QPO"], pre["UCL"])
+        ucl = [c for _, c in direct] + q_lp + q_ch
+        uel_direct, uel_drop, uecl_drop = [], [], []
+        for rounds in (r_lp, r_ch):
+            for name, losers in rounds:
+                if name == "QPO":
+                    uel_direct += losers
+                elif name == "Q1":
+                    uecl_drop += [(DROP + self.d.uefa_rank.get(self.d.clubs[c]["country"], 99), c) for c in losers]
                 else:
-                    carry.append((p, c))
-            fields[key] = field
-        return fields
+                    uel_drop += [(DROP + (0 if name == "Q3" else 100) + self.d.uefa_rank.get(self.d.clubs[c]["country"], 99), c) for c in losers]
+        # Лига Европы
+        d2 = [c for _, c in take(tk.get(("UEL", "direct"), []))] + uel_direct
+        q2, r2 = self._qual_rounds(take(tk.get(("UEL", "qual"), [])) + uel_drop, max(0, 36 - len(d2)), ["Q1", "Q2", "Q3", "QPO"], pre["UEL"])
+        uel = d2 + q2
+        uecl_direct = []
+        for name, losers in r2:
+            if name == "QPO":
+                uecl_direct += losers
+            else:
+                uecl_drop += [(DROP + (0 if name == "Q3" else 100) + self.d.uefa_rank.get(self.d.clubs[c]["country"], 99), c) for c in losers]
+        # Лига конференций: проигравшие в её отборе выбывают
+        d3 = [c for _, c in take(tk.get(("UECL", "direct"), []))] + uecl_direct
+        q3, _ = self._qual_rounds(take(tk.get(("UECL", "qual"), [])) + uecl_drop, max(0, 36 - len(d3)), ["Q1", "Q2", "Q3", "QPO"], pre["UECL"])
+        uecl = d3 + q3
+        return {"UCL": ucl, "UEL": uel, "UECL": uecl}, pre
 
     def _region_fields(self, res, slots1, slots2=None):
         f1, f2 = [], []
@@ -380,9 +473,9 @@ class World:
         return f1, f2
 
     def _continental(self, res):
-        fields = self._uefa_fields(res)
+        fields, pre = self._uefa_fields(res)
         for key in ("UCL", "UEL", "UECL"):
-            r = self._cont_comp(fields[key])
+            r = self._cont_comp(fields[key], pre=pre[key])
             if r:
                 res["cont"][key] = r
         if "UCL" in res["cont"] and "UEL" in res["cont"]:
@@ -407,11 +500,16 @@ class World:
         if r:
             res["cont"]["CCC"] = r
 
-    def _cont_comp(self, teams, groups=False):
+    def _cont_comp(self, teams, groups=False, pre=None):
+        """pre - итоги отборочных раундов: {клуб: ...}; прошедшие отбор продолжают с ними, выбывшие остаются в итогах турнира."""
         rng, n = self.rng, len(teams)
         if n < 8:
             return None
-        res = {t: {"games": 0} for t in teams}
+        pre = pre or {}
+        res = dict(pre)
+        for t in teams:
+            res[t] = pre.get(t) or {"games": 0}
+            res[t].pop("stage", None); res[t].pop("vs", None); res[t].pop("score", None); res[t].pop("won", None)
         lp_table = None
         if groups and n >= 16:
             ko = []
@@ -799,7 +897,7 @@ class World:
                 comp = d.comps[code]
                 out.append({"code": code, "name_en": comp["name_en"], "name_ru": comp["name_ru"], "team_games": e["res"][cid]["games"],
                             "opp": sum(self.team_ovr(c) for c in f) / len(f), "result": e["res"][cid],
-                            "table": e.get("lp") or e["res"][cid].get("gtable")})      # общий этап или группа: клуб, очки, разница
+                            "table": (e.get("lp") if "lp_rank" in e["res"][cid] else None) or e["res"][cid].get("gtable")})  # общий этап или группа
         return out
 
     # ---------- конец сезона: переходы между дивизионами, дрейф силы ----------

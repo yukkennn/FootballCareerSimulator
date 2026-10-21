@@ -68,6 +68,12 @@ Code: `game/story.py` (facts and the prompt), `web/llm.js` and `game/llm.py` (AP
 of dominance for 5-10 seasons (money and squad), then gradually returns to its usual level. Historical giants stay giants: in Spain the title
 almost always goes to Real Madrid, Barcelona or Atlético, but which of them wins changes. Settings are at the top of `game/world.py` (REVERT, HEG_*, FORM_SD, LEAD_*).
 
+**European qualifying.** As in real life, not everyone goes straight into the league phase. The top clubs of the strongest leagues qualify directly,
+champions of smaller leagues go through the Champions League qualifying "champions path" (Q1, Q2, Q3, play-off round), runners-up of mid-ranked
+leagues through the "league path". A club knocked out of Champions League qualifying continues in the Europa League or Conference League qualifying,
+one knocked out of Europa League qualifying drops to the Conference League, and a club that loses in Conference League qualifying is out of Europe
+for the season. Access list: `EURO_ACCESS` in `game/world.py`.
+
 ## Awards
 The Ballon d'Or, the World Team of the Year and the best young player are contested between your player and 60 world stars
 (real ones at the start: Mbappé, Haaland, Yamal and others; later they age and new talents appear). Goals and assists
@@ -193,6 +199,12 @@ macOS / Linux: `./run.sh`.
 **Лиги живут своей жизнью.** У каждого клуба бывают удачные и провальные сезоны, а время от времени один из сильнейших клубов лиги начинает
 эпоху гегемонии на 5-10 сезонов (деньги и состав), после чего постепенно возвращается к своему обычному уровню. Гранды остаются грандами: в Испании
 титул почти всегда берут Реал, Барселона или Атлетико, но кто из них - меняется. Настройки - в начале `game/world.py` (REVERT, HEG_*, FORM_SD, LEAD_*).
+
+**Отбор в еврокубки.** Как в жизни, на общий этап сразу попадают не все. Лучшие клубы сильнейших лиг проходят напрямую, чемпионы небольших лиг
+играют квалификацию Лиги чемпионов по «пути чемпионов» (1-й, 2-й, 3-й раунды и плей-офф), серебряные призёры лиг среднего уровня - по «пути
+представителей лиг». Вылетевший из отбора Лиги чемпионов продолжает в квалификации Лиги Европы или Лиги конференций, вылетевший из отбора
+Лиги Европы - в Лиге конференций, а проигравший в отборе Лиги конференций выбывает из еврокубков до следующего сезона. Распределение путёвок -
+`EURO_ACCESS` в `game/world.py`.
 
 ## Награды
 Золотой мяч, символическая сборная мира и лучший молодой игрок разыгрываются между вашим игроком и 60 звёздами мира
