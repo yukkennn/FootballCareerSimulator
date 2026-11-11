@@ -7,10 +7,15 @@
 © 2026 yukkennn · License [CC BY-NC 4.0](LICENSE): you may copy and modify it only with attribution and only for non-commercial purposes
 (see [License](#license) for details).
 
-A desktop application (Python + PySide6 + SQLite): you choose a nationality, position, preferred foot and height,
-go through an academy from age 15, play senior football from 18 and keep playing until 40 (or retire earlier yourself).
-After every season you can pick a new club. Once your playing career is over, you can become a coach: choose a club,
-meet the board's target and keep the board's anger below 100 (otherwise you get sacked).
+A desktop application (Python + PySide6 + SQLite) and the same game in the browser. On the start screen you choose the mode:
+- **Player career**: choose a nationality, position, preferred foot and height, go through an academy from age 15, play senior football
+  from 18 and keep playing until 40 (or retire earlier yourself). After every season you can pick a new club. When the playing career is over,
+  you can carry on as a coach.
+- **Coach career**: start as a coach straight away, without a playing past. Enter a name, nationality and the age at which the coaching
+  career begins (25-65). The coach starts with a modest skill and reputation, so the first offers come from the most modest clubs of their own
+  country (or a neighbouring country if their own has no league in the game).
+
+As a coach you choose a club, meet the board's target and keep the board's anger below 100 (otherwise you get sacked).
 
 ## Phone version (web app)
 The same game in the browser: the Python code runs through Pyodide, and the interface was rewritten for small screens (`game/web/`, `web/`).
@@ -18,7 +23,7 @@ On a wide screen (computer) the site shows a desktop layout similar to the .exe;
 Both the playing career and the coaching career are available (transfer window, squad, starting XI, scouts, loans).
 1. Build: `python tools/build_web.py` (requires Pillow); the result goes to the `site/` folder.
 2. Test on a computer: `python -m http.server 8765 -d site`, then open http://localhost:8765.
-3. On a phone: open https://yukkennn.github.io/FootballCareerSimulator/ and choose "Add to Home Screen" (Android: the ⋮ menu; iPhone: "Share").
+3. On a phone: open https://yukkennn.github.io/FootballCareerSimulator/ and choose "Add to Home Screen" (Android: the browser menu; iPhone: "Share").
    The site is rebuilt and deployed automatically on every push to `main` (`.github/workflows/pages.yml`).
 Saves are stored in the browser. The "Export" button on the load screen saves a copy to a file, and "Import" brings it back.
 Headless test: `python tests/test_web_flow.py`.
@@ -58,15 +63,30 @@ The language (Russian / English) can be switched on the start screen.
 **Season diary (web and desktop).** An AI writes the hero's diary for every season, as a player and as a coach: matches, trophies,
 everyday life, family, friends and romance. Every sporting fact (scores, places, goals, trophies, board decisions) comes from the game, and
 the AI only turns it into prose; personal life carries over from season to season. With "Write the diary automatically" on, the diary is written
-in the background right after each season; otherwise use the "📖 Season diary" button (desktop: "📖 Diaries", or double-click a season).
+in the background right after each season; otherwise use the "Season diary" button (desktop: "Diaries", or double-click a season).
 "Export" on the career summary adds all diaries as one book after the statistics. Choose the service (Google Gemini or Anthropic Claude), the model
-and the API key under ⚙ Settings on the start screen. The key is stored only in your browser (desktop: in the settings file in the
+and the API key in Settings (the gear button on the start screen). The key is stored only in your browser (desktop: in the settings file in the
 `.football_career_sim` folder) and sent only to the chosen service. A free Gemini key: aistudio.google.com -> Get API key.
 Code: `game/story.py` (facts and the prompt), `web/llm.js` and `game/llm.py` (API calls), `game/ui/diary.py` (desktop windows).
 
 **Leagues live their own life.** Every club has good and bad seasons, and now and then one of the strongest clubs in a league starts an era
 of dominance for 5-10 seasons (money and squad), then gradually returns to its usual level. Historical giants stay giants: in Spain the title
 almost always goes to Real Madrid, Barcelona or Atlético, but which of them wins changes. Settings are at the top of `game/world.py` (REVERT, HEG_*, FORM_SD, LEAD_*).
+
+**Coach career: squad, formation, scouts.**
+- **Formation map.** The squad screen shows the starting XI on a pitch in the chosen formation (17 formations). Change the formation and the players
+  move to their new places. Each marker shows the player's rating in that position: a player out of position plays worse and is marked in orange.
+- **Scouts.** Only scouts bring players to the transfer market: without scouts there is nobody to buy. Each scout has two scales of 1 to 5 stars.
+  Judgement: how good the players he finds are and how precise the potential range is. Reach: how many players he brings per window
+  (2 to 8 in summer, half as many in winter). A newly hired scout brings his finds at once. Scouts work for the club, not for the coach:
+  when the coach moves to another club, they stay behind.
+- **Market.** Every find has a kind: a starter, a squad player for rotation, a prospect (18-21), a cheap veteran (30-33), a well-known player,
+  a gem (an undervalued youngster), a loan. The market also shows which scout found the player and what role he would have in your squad.
+- **Academy.** A graduate's potential is a lottery: most are a little below the starting XI, about 10% are talents and about 2% are stars.
+  Investing in the academy doubles the chance of a talent or a star for 3 seasons, but does not lift every graduate. About one young talent
+  in four never develops: usually that only shows by age 21, but a scout with 4-5 star judgement sees it at once.
+- **Flags.** Players, coaches and scouts are shown with their country's flag (`assets/flags/`, downloaded by `tools/fetch_flags.py`).
+- **Names.** Generated people get names from 36 regions of the world (`game/names.py`).
 
 **European qualifying.** As in real life, not everyone goes straight into the league phase. The top clubs of the strongest leagues qualify directly,
 champions of smaller leagues go through the Champions League qualifying "champions path" (Q1, Q2, Q3, play-off round), runners-up of mid-ranked
@@ -75,15 +95,16 @@ one knocked out of Europa League qualifying drops to the Conference League, and 
 for the season. Access list: `EURO_ACCESS` in `game/world.py`.
 
 ## Awards
-The Ballon d'Or, the World Team of the Year and the best young player are contested between your player and 60 world stars
+The Ballon d'Or, the World Team of the Year and the best young player are contested between your player and 90 world stars
 (real ones at the start: Mbappé, Haaland, Yamal and others; later they age and new talents appear). Goals and assists
 (adjusted for league level), club and national-team trophies and the player's class all count. A high rating without stats and trophies no longer wins an award.
 The league Team of the Season, Player of the Season and the Golden Boot depend on the average season rating and league goals.
 
 ## What's inside
 - `main.py`, `game/`: the application (`world.py` leagues, cups, continental competitions, national teams; `career.py` the career; `stats.py` goals and ratings;
-  `stars.py` world stars; `player.py` development and decline; `ui/` desktop screens; `web/` web screens).
-- `data/football.db`, `assets/logos/`: club database and crests (1214 clubs, 83 leagues, 211 countries; team ratings from EA FC 27, smaller UEFA leagues rated by hand from the UEFA coefficient).
+  `stars.py` world stars; `player.py` development and decline; `coach.py`, `squad.py`, `transfers.py` the coaching career, squad and transfers;
+  `names.py` names for generated people; `ui/` desktop screens; `web/` web screens).
+- `data/football.db`, `assets/logos/`, `assets/flags/`: club database, crests and country flags (1214 clubs, 83 leagues, 211 countries; team ratings from EA FC 27, smaller UEFA leagues rated by hand from the UEFA coefficient).
 - `database/`, `tools/`, `data/`, `docs/DATA_SOURCES.md`: building the database, importing FC 27, Elo and EA FC ratings, downloading missing crests.
 - `tests/`: `balance.py` (mass career runs), `test_ui_flow.py` (headless desktop interface), `test_web_flow.py` (headless web interface),
   `test_diary_desktop.py` (desktop season diary with a stub instead of the AI), importer tests.
@@ -108,7 +129,8 @@ The league Team of the Season, Player of the Season and the Golden Boot depend o
   but are not played in the game.
 - **8 clubs have no crest**: reserve and youth teams (Real Sociedad B, VfB Stuttgart II and others), United Tigers, Juvenes/Dogana and Khor Fakkan. A circle with initials is drawn instead.
   To download missing crests: `python tools/fetch_logos.py data/football.db`.
-- **Star players' clubs at the start** (574 real players in `data/real_players.csv`) are based on data up to summer 2026 and have not been re-checked: some may have moved.
+- **Real squads exist only for some clubs**: 574 real players at 95 clubs (`data/real_players.csv`), based on data up to summer 2026 and not re-checked
+  since (some may have moved). The rest of each squad is generated when a coach takes over the club.
 - **Testing**: the web version is checked automatically by `tests/test_web_flow.py` before every deployment (a full playing and coaching career, Russian and English)
   and was checked by hand in the browser at phone and desktop widths. Before deployment the JavaScript syntax is checked too.
   Offline mode was checked in Microsoft Edge (first visit online, then the network cut off and the game reopened) and confirmed on a real phone: without internet the game opens.
@@ -126,6 +148,7 @@ summary: https://creativecommons.org/licenses/by-nc/4.0/
 
 **Third-party data is not covered by this license.** Club and player ratings (EA SPORTS FC), club crests, the names of
 clubs and competitions and the names of real footballers belong to their respective owners and are used in a non-commercial fan game.
+Country flags come from flag-icons (MIT License, https://github.com/lipis/flag-icons).
 More about the sources: [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
 
 ---
@@ -139,10 +162,14 @@ More about the sources: [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
 © 2026 yukkennn · Лицензия [CC BY-NC 4.0](LICENSE): можно копировать и изменять только с указанием автора и только не для заработка
 (подробнее в разделе [Лицензия](#лицензия)).
 
-Десктопное приложение (Python + PySide6 + SQLite): вы выбираете страну, позицию, ведущую ногу и рост,
-проходите академию с 15 лет, взрослый футбол с 18 и играете до 40 лет (или завершаете карьеру раньше сами).
-После каждого сезона можно выбрать новый клуб. Завершив карьеру игрока, можно стать тренером: выбрать клуб,
-выполнять задачу руководства и не доводить его раздражение до 100 (иначе уволят).
+Десктопное приложение (Python + PySide6 + SQLite) и та же игра в браузере. На стартовом экране выбирается режим:
+- **Карьера игрока**: вы выбираете страну, позицию, ведущую ногу и рост, проходите академию с 15 лет, взрослый футбол с 18 и играете
+  до 40 лет (или завершаете карьеру раньше сами). После каждого сезона можно выбрать новый клуб. Завершив карьеру игрока, можно стать тренером.
+- **Карьера тренера**: сразу тренер, без игрового прошлого. Указываются имя, национальность и возраст, с которого начинается тренерская
+  карьера (25-65 лет). Навык и репутация на старте скромные, поэтому первые предложения - от самых скромных клубов своей страны
+  (или соседней, если лиги вашей страны в игре нет).
+
+Тренером вы выбираете клуб, выполняете задачу руководства и не доводите его раздражение до 100 (иначе уволят).
 
 ## Версия для телефона (веб-приложение)
 Та же игра в браузере: код Python работает через Pyodide, интерфейс написан заново под узкий экран (`game/web/`, `web/`).
@@ -150,7 +177,7 @@ More about the sources: [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
 Есть и карьера игрока, и тренерская карьера (трансферное окно, состав, основа, скауты, аренды).
 1. Сборка: `python tools/build_web.py` (нужен Pillow), результат в папке `site/`.
 2. Проверка на компьютере: `python -m http.server 8765 -d site`, затем открыть http://localhost:8765.
-3. На телефоне: открыть https://yukkennn.github.io/FootballCareerSimulator/ и выбрать «Добавить на главный экран» (Android: меню ⋮; iPhone: «Поделиться»).
+3. На телефоне: открыть https://yukkennn.github.io/FootballCareerSimulator/ и выбрать «Добавить на главный экран» (Android: меню браузера; iPhone: «Поделиться»).
    Сайт пересобирается и выкладывается сам при каждом push в `main` (`.github/workflows/pages.yml`).
 Сохранения хранятся в браузере. Кнопка «Экспорт» на экране загрузки сохраняет копию в файл, «Импорт» возвращает её.
 Тест без браузера: `python tests/test_web_flow.py`.
@@ -190,15 +217,30 @@ macOS / Linux: `./run.sh`.
 **Дневник сезона (сайт и версия для компьютера).** Нейросеть пишет дневник героя за каждый сезон - и игрока, и тренера: матчи, трофеи,
 повседневная жизнь, семья, друзья, романтика. Все спортивные факты (счёт, места, голы, трофеи, решения руководства) берутся из игры, нейросеть
 только превращает их в текст; личная жизнь продолжается из сезона в сезон. С галочкой «Писать дневник сам после каждого сезона» дневник пишется
-в фоне сразу после сезона, иначе - кнопкой «📖 Дневник сезона» (в версии для компьютера - «📖 Дневники» или двойной щелчок по сезону).
+в фоне сразу после сезона, иначе - кнопкой «Дневник сезона» (в версии для компьютера - «Дневники» или двойной щелчок по сезону).
 «Экспорт» в итогах карьеры добавляет после статистики все дневники одной книгой. Сервис (Google Gemini или Anthropic Claude), модель и API-ключ
-выбираются в ⚙ Настройках на стартовом экране. Ключ хранится только в вашем браузере (в версии для компьютера - в файле настроек в папке
+выбираются в Настройках (кнопка с шестерёнкой на стартовом экране). Ключ хранится только в вашем браузере (в версии для компьютера - в файле настроек в папке
 `.football_career_sim`) и отправляется только выбранному сервису. Бесплатный ключ Gemini: aistudio.google.com -> Get API key.
 Код: `game/story.py` (факты и задание), `web/llm.js` и `game/llm.py` (запросы к нейросетям), `game/ui/diary.py` (окна версии для компьютера).
 
 **Лиги живут своей жизнью.** У каждого клуба бывают удачные и провальные сезоны, а время от времени один из сильнейших клубов лиги начинает
 эпоху гегемонии на 5-10 сезонов (деньги и состав), после чего постепенно возвращается к своему обычному уровню. Гранды остаются грандами: в Испании
 титул почти всегда берут Реал, Барселона или Атлетико, но кто из них - меняется. Настройки - в начале `game/world.py` (REVERT, HEG_*, FORM_SD, LEAD_*).
+
+**Тренерская карьера: состав, схема, скауты.**
+- **Карта поля.** На экране состава основа стоит на поле в выбранной схеме (17 схем). Сменили схему - игроки встают на новые места.
+  У каждого игрока его рейтинг на этом месте: игрок не на своей позиции играет слабее и отмечен оранжевым.
+- **Скауты.** Игроков на трансферный рынок приносят только скауты: без них покупать некого. У скаута две шкалы по 1-5 звёзд.
+  Чутьё - насколько сильных игроков он находит и насколько точно видна вилка потенциала. Охват - сколько игроков он приносит за окно
+  (летом от 2 до 8, зимой вдвое меньше). Нанятый скаут сразу приносит своих игроков. Скауты работают на клуб, а не на тренера:
+  при переходе тренера в другой клуб они остаются в старом.
+- **Рынок.** У каждой находки есть вид: в основу, замена для ротации, перспективный (18-21 год), недорогой опытный (30-33), известный игрок,
+  находка (недооценённый молодой), аренда. Видно, какой скаут нашёл игрока и кем тот будет в вашей команде.
+- **Академия.** Потенциал воспитанника - лотерея: большинство чуть слабее основы, около 10% - таланты, около 2% - звёзды. Вложение в академию
+  на 3 сезона вдвое повышает шанс на таланта или звезду, но не усиливает всех подряд. Примерно каждый четвёртый молодой талант не раскрывается:
+  обычно это видно лишь к 21 году, а скаут с чутьём 4-5 звёзд видит сразу.
+- **Флаги.** У игроков, тренеров и скаутов показан флаг их страны (`assets/flags/`, скачивает `tools/fetch_flags.py`).
+- **Имена.** Сгенерированные люди получают имена 36 регионов мира (`game/names.py`).
 
 **Отбор в еврокубки.** Как в жизни, на общий этап сразу попадают не все. Лучшие клубы сильнейших лиг проходят напрямую, чемпионы небольших лиг
 играют квалификацию Лиги чемпионов по «пути чемпионов» (1-й, 2-й, 3-й раунды и плей-офф), серебряные призёры лиг среднего уровня - по «пути
@@ -207,15 +249,16 @@ macOS / Linux: `./run.sh`.
 `EURO_ACCESS` в `game/world.py`.
 
 ## Награды
-Золотой мяч, символическая сборная мира и лучший молодой игрок разыгрываются между вашим игроком и 60 звёздами мира
+Золотой мяч, символическая сборная мира и лучший молодой игрок разыгрываются между вашим игроком и 90 звёздами мира
 (на старте реальные: Мбаппе, Холанн, Ямаль и др.; потом они стареют, и появляются новые таланты). Учитываются голы и передачи
 (с поправкой на уровень лиги), трофеи клуба и сборной и класс игрока. Высокий рейтинг без статистики и трофеев награду больше не даёт.
 Символическая сборная лиги, игрок сезона и Золотая бутса зависят от средней оценки за сезон и голов в лиге.
 
 ## Что внутри
 - `main.py`, `game/`: приложение (`world.py` лиги, кубки, континентальные турниры, сборные; `career.py` карьера; `stats.py` голы и оценки;
-  `stars.py` звёзды мира; `player.py` рост и спад; `ui/` экраны для компьютера; `web/` экраны сайта).
-- `data/football.db`, `assets/logos/`: база клубов и эмблемы (1214 клубов, 83 лиги, 211 стран; рейтинги команд из EA FC 27, у небольших лиг УЕФА ручная оценка по коэффициенту УЕФА).
+  `stars.py` звёзды мира; `player.py` рост и спад; `coach.py`, `squad.py`, `transfers.py` тренерская карьера, состав и трансферы;
+  `names.py` имена сгенерированных людей; `ui/` экраны для компьютера; `web/` экраны сайта).
+- `data/football.db`, `assets/logos/`, `assets/flags/`: база клубов, эмблемы и флаги стран (1214 клубов, 83 лиги, 211 стран; рейтинги команд из EA FC 27, у небольших лиг УЕФА ручная оценка по коэффициенту УЕФА).
 - `database/`, `tools/`, `data/`, `docs/DATA_SOURCES.md`: сборка базы, импорт FC 27, Elo, рейтингов EA FC, докачка эмблем.
 - `tests/`: `balance.py` (массовый прогон карьер), `test_ui_flow.py` (десктопный интерфейс без экрана), `test_web_flow.py` (веб-интерфейс без браузера),
   `test_diary_desktop.py` (дневник сезона в версии для компьютера, нейросеть заменена заглушкой), тесты импортёров.
@@ -238,7 +281,8 @@ macOS / Linux: `./run.sh`.
   Мексики и MLS. Лига чемпионов АФК 2, клубные турниры Африки и Океании и клубный чемпионат мира есть в справочнике турниров, но в игре не разыгрываются.
 - **Эмблем нет у 8 клубов**: резервные и молодёжные команды (Real Sociedad B, VfB Stuttgart II и др.), United Tigers, Juvenes/Dogana и Khor Fakkan. Вместо них рисуется круг с инициалами.
   Докачать: `python tools/fetch_logos.py data/football.db`.
-- **Клубы звёзд на старте** (574 реальных игрока в `data/real_players.csv`) взяты по данным до лета 2026 года и с тех пор не перепроверялись: кто-то мог перейти в другой клуб.
+- **Реальные составы есть только у части клубов**: 574 реальных игрока в 95 клубах (`data/real_players.csv`), по данным до лета 2026 года, с тех пор
+  не перепроверялись (кто-то мог перейти в другой клуб). Остальная часть состава генерируется, когда тренер возглавляет клуб.
 - **Проверка**: веб-версию перед каждой публикацией автоматически проверяет `tests/test_web_flow.py` (полная карьера игрока и тренера, русский и английский);
   кроме того, она проверена вручную в браузере на ширине телефона и компьютера. Перед публикацией проверяется и синтаксис JavaScript.
   Работа без интернета проверена в Microsoft Edge (первый заход с интернетом, затем сеть отключена и игра открыта заново) и подтверждена на настоящем телефоне: без интернета игра открывается.
@@ -256,4 +300,5 @@ macOS / Linux: `./run.sh`.
 
 **Чужие данные под эту лицензию не попадают.** Рейтинги клубов и игроков (EA SPORTS FC), эмблемы клубов, названия
 клубов, турниров и имена реальных футболистов принадлежат их правообладателям и используются в некоммерческой фанатской игре.
+Флаги стран взяты из flag-icons (лицензия MIT, https://github.com/lipis/flag-icons).
 Подробнее об источниках: [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
