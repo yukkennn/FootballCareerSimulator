@@ -129,8 +129,10 @@ The league Team of the Season, Player of the Season and the Golden Boot depend o
   but are not played in the game.
 - **8 clubs have no crest**: reserve and youth teams (Real Sociedad B, VfB Stuttgart II and others), United Tigers, Juvenes/Dogana and Khor Fakkan. A circle with initials is drawn instead.
   To download missing crests: `python tools/fetch_logos.py data/football.db`.
-- **Real squads exist only for some clubs**: 574 real players at 95 clubs (`data/real_players.csv`), based on data up to summer 2026 and not re-checked
-  since (some may have moved). The rest of each squad is generated when a coach takes over the club.
+- **Real squads exist for the top five leagues** (England, Spain, Italy, Germany, France) and for the star players of other clubs:
+  1911 real players at 130 clubs (`data/real_players.csv`; squads of the top five leagues are listed in `tools/real_squads.py`). The data runs up to
+  summer 2026, so transfers of that summer may be missing. Clubs promoted in 2026 that played in the second division before have fewer real players.
+  The rest of each squad is generated when a coach takes over the club; over the years real players age, move and retire, and new ones appear.
 - **Testing**: the web version is checked automatically by `tests/test_web_flow.py` before every deployment (a full playing and coaching career, Russian and English)
   and was checked by hand in the browser at phone and desktop widths. Before deployment the JavaScript syntax is checked too.
   Offline mode was checked in Microsoft Edge (first visit online, then the network cut off and the game reopened) and confirmed on a real phone: without internet the game opens.
@@ -281,8 +283,10 @@ macOS / Linux: `./run.sh`.
   Мексики и MLS. Лига чемпионов АФК 2, клубные турниры Африки и Океании и клубный чемпионат мира есть в справочнике турниров, но в игре не разыгрываются.
 - **Эмблем нет у 8 клубов**: резервные и молодёжные команды (Real Sociedad B, VfB Stuttgart II и др.), United Tigers, Juvenes/Dogana и Khor Fakkan. Вместо них рисуется круг с инициалами.
   Докачать: `python tools/fetch_logos.py data/football.db`.
-- **Реальные составы есть только у части клубов**: 574 реальных игрока в 95 клубах (`data/real_players.csv`), по данным до лета 2026 года, с тех пор
-  не перепроверялись (кто-то мог перейти в другой клуб). Остальная часть состава генерируется, когда тренер возглавляет клуб.
+- **Реальные составы есть у клубов пяти ведущих лиг** (Англия, Испания, Италия, Германия, Франция) и звёзды у других клубов:
+  1911 реальных игроков в 130 клубах (`data/real_players.csv`; составы пяти лиг перечислены в `tools/real_squads.py`). Данные - до лета 2026 года,
+  поэтому переходы этого лета могут не совпадать. У клубов, поднявшихся в 2026 году из второго дивизиона, реальных игроков меньше.
+  Остальная часть состава генерируется, когда тренер возглавляет клуб; с годами реальные игроки стареют, переходят и уходят, приходят новые.
 - **Проверка**: веб-версию перед каждой публикацией автоматически проверяет `tests/test_web_flow.py` (полная карьера игрока и тренера, русский и английский);
   кроме того, она проверена вручную в браузере на ширине телефона и компьютера. Перед публикацией проверяется и синтаксис JavaScript.
   Работа без интернета проверена в Microsoft Edge (первый заход с интернетом, затем сеть отключена и игра открыта заново) и подтверждена на настоящем телефоне: без интернета игра открывается.

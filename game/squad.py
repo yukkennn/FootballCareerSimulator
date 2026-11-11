@@ -384,9 +384,14 @@ def _gen_player(c, cid, pos, ovr, age, pot):
     p["squad"] = True
     return p
 
+SQUAD_SIZE = 25           # до скольких игроков добирается заявка нового клуба тренера
+REAL_ENOUGH = 15          # столько известных (реальных) игроков - и сила клуба берётся из них, сгенерированные не подгоняются
+
 def build(c, cid):
-    """Полный состав для клуба, который возглавил тренер: известные игроки + сгенерированные по шаблону.
-    Сгенерированные подгоняются так, чтобы сила основы совпала с нынешним OVR клуба."""
+    """Полный состав для клуба, который возглавил тренер: известные игроки + сгенерированные по шаблону схемы до SQUAD_SIZE.
+    Сначала - места в основе, которые не заняли известные игроки (они уровня клуба), потом вратари и запасные (слабее основы).
+    Если известных игроков мало, сгенерированные подгоняются так, чтобы сила основы совпала с нынешним OVR клуба; если
+    состав почти целиком реальный (REAL_ENOUGH+), сила клуба - это сила реальной основы, и запасные не вытесняют реальных."""
     rng, w = c.rng, c.world
     target = w.team_ovr(cid)
     have = squad(c, cid)
@@ -395,26 +400,35 @@ def build(c, cid):
     f = club_formation(cid)                                   # состав собран под схему прошлого тренера
     slots = FORMATIONS[f][0]
     need = template_for(f, rng)
+    cnt = {}
     for p in have:
+        cnt[p["pos"]] = cnt.get(p["pos"], 0) + 1
         if need.get(p["pos"], 0) > 0:
             need[p["pos"]] -= 1
+    # места основы, на которые некого поставить: ни одного известного игрока, кто сыграл бы там не хуже чем на 4 ниже уровня клуба
+    starters = [slot for slot, p, val in best_xi(have, f) if p is None or val < target - 4]
+    for pos in starters:
+        need[pos] = max(0, need.get(pos, 0) - 1)
+    backups = [pos for pos, n in need.items() for _ in range(n)]
+    rng.shuffle(backups)
+    backups.sort(key=lambda pos: pos != "GK")                 # вратари - в первую очередь (их нужно хотя бы три)
+    room = max(len(starters), SQUAD_SIZE - len(have))
     gen = []
-    for pos, n in need.items():
-        n_start = slots.count(pos) - sum(1 for p in have if p["pos"] == pos)   # места в основе, которые не заняли известные игроки
-        for k in range(n):
-            first = k < n_start
-            age = rng.randint(22, 31) if first else rng.choice([rng.randint(18, 22), rng.randint(23, 33)])
-            ovr = target + (rng.gauss(0, 1.8) if first else -rng.uniform(3, 8))
-            pot = ovr + (rng.uniform(2, 9) if age <= 22 else rng.uniform(0, 1.5))
-            gen.append(_gen_player(c, cid, pos, ovr, age, pot))
+    for k, pos in enumerate(starters + backups[:max(0, room - len(starters))]):
+        first = k < len(starters)
+        age = rng.randint(22, 31) if first else rng.choice([rng.randint(18, 22), rng.randint(23, 33)])
+        ovr = target + (rng.gauss(0, 1.8) if first else -rng.uniform(3, 8))
+        pot = ovr + (rng.uniform(2, 9) if age <= 22 else rng.uniform(0, 1.5))
+        gen.append(_gen_player(c, cid, pos, ovr, age, pot))
     # подгонка: основа должна давать нынешний OVR клуба (известные игроки не трогаются)
-    for _ in range(3):
-        diff = target - xi_rating(squad(c, cid), f)
-        if abs(diff) < 0.2:
-            break
-        for p in gen:
-            p["ovr"] = round(clamp(p["ovr"] + diff, 35, 95), 1)
-            p["pot"] = round(max(p["pot"] + diff, p["ovr"]), 1)
+    if len(have) < REAL_ENOUGH:
+        for _ in range(3):
+            diff = target - xi_rating(squad(c, cid), f)
+            if abs(diff) < 0.2:
+                break
+            for p in gen:
+                p["ovr"] = round(clamp(p["ovr"] + diff, 35, 95), 1)
+                p["pot"] = round(max(p["pot"] + diff, p["ovr"]), 1)
     return squad(c, cid)
 
 ACADEMY_POS = {"GK": 2, "CB": 4, "LB": 2, "RB": 2, "CDM": 2, "CM": 4, "CAM": 2, "LM": 2, "RM": 2, "LW": 2, "RW": 2, "CF": 1, "ST": 3}
