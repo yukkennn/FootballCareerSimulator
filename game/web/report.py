@@ -5,7 +5,7 @@ from ..i18n import tr
 from ..text import (trophy_name, stage, event_text, intl_line, lang_name, club_result, nat_comp_name, nat_result, group_line,
                     season_award_names, score_text, chronicle_text)
 from ..ui import theme
-from .parts import esc
+from .parts import esc, flag
 
 def _club(d, cid):
     c = d.clubs.get(cid)
@@ -88,7 +88,7 @@ def ballon_html(b, d):
             continue
         who = tr("bdo.you") if me else x["name"]
         club = d.clubs[x["club"]]["name"] if x["club"] in d.clubs else ""
-        name = f'<b>{esc(who)}</b><br><span class="muted small">{esc(club)} · {esc(d.country_name(x["nat"], i18n.LANG))}</span>'
+        name = f'{flag(x.get("nat"), d)}<b>{esc(who)}</b><br><span class="muted small">{esc(club)} · {esc(d.country_name(x["nat"], i18n.LANG))}</span>'
         rows.append(_tr([i, name, f'<b>{esc(x["pos"])}</b>', x["goals"], x["assists"]], "me" if me else ""))
     r = b.get("rank")
     if r == 1:

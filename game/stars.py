@@ -44,79 +44,13 @@ OTHER_RETIRE = 37       # известные игроки уходят из фу
 OTHERS_MIN = 300        # меньше известных игроков клубов не бывает: когда реальные уходят, приходят сгенерированные
 PROTECTED = set()       # клубы, составом которых управляет тренер: мир не переводит игроков ни из них, ни в них
 
-# ---------- генерация имён новых талантов ----------
-NAMES = {
-    "es": (["Alejandro", "Pablo", "Diego", "Javier", "Sergio", "Mateo", "Nicolás", "Thiago", "Martín", "Hugo", "Álvaro", "Iker", "Marcos",
-             "Gonzalo", "Joaquín", "Santiago", "Emiliano", "Facundo", "Valentín", "Bruno", "Lucas", "Adrián", "Rodrigo", "Tomás"],
-           ["García", "Fernández", "Rodríguez", "López", "Martínez", "Sánchez", "Pérez", "Gómez", "Romero", "Torres", "Ruiz", "Navarro",
-            "Molina", "Ortega", "Castro", "Herrera", "Medina", "Vega", "Rojas", "Suárez", "Acosta", "Benítez", "Paredes", "Correa"]),
-    "pt": (["João", "Pedro", "Gabriel", "Rafael", "Lucas", "Matheus", "Vitor", "Gustavo", "Thiago", "Bruno", "Diogo", "Rodrigo", "Tiago",
-             "André", "Gonçalo", "Henrique", "Caio", "Davi", "Enzo", "Murilo"],
-           ["Silva", "Santos", "Oliveira", "Souza", "Costa", "Pereira", "Almeida", "Ferreira", "Carvalho", "Gomes", "Ribeiro", "Martins",
-            "Rocha", "Lima", "Araújo", "Mendes", "Nunes", "Moreira", "Barbosa", "Teixeira"]),
-    "en": (["Jack", "Harry", "James", "Oliver", "Charlie", "George", "Mason", "Callum", "Jacob", "Ethan", "Kai", "Leo", "Alfie", "Archie",
-             "Noah", "Tyler", "Reece", "Jayden", "Liam", "Connor"],
-           ["Smith", "Jones", "Taylor", "Brown", "Wilson", "Walker", "Wright", "Clarke", "Hughes", "Ward", "Morgan", "Bennett", "Hill",
-            "Cooper", "Mitchell", "Turner", "Robinson", "Hall", "Green", "Doherty"]),
-    "fr": (["Lucas", "Hugo", "Théo", "Nathan", "Enzo", "Mathis", "Rayan", "Ilyes", "Maxime", "Antoine", "Adrien", "Moussa", "Ibrahima",
-             "Yanis", "Evan", "Mathys", "Kylian", "Sacha", "Bradley", "Malo"],
-           ["Martin", "Bernard", "Dubois", "Moreau", "Laurent", "Lefebvre", "Fofana", "Diallo", "Camara", "Koné", "Traoré", "Mendy",
-            "Girard", "Bonnet", "Guerin", "Kamara", "Sissoko", "Mbaye", "Lacroix", "Faure"]),
-    "de": (["Lukas", "Leon", "Felix", "Jonas", "Maximilian", "Paul", "Niklas", "Tim", "Jan", "Florian", "Moritz", "Finn", "Luca", "Ben",
-             "Elias", "Noah"],
-           ["Müller", "Schmidt", "Schneider", "Fischer", "Weber", "Wagner", "Becker", "Hoffmann", "Koch", "Richter", "Wolf", "Neuhaus",
-            "Brandt", "Schulz", "Krämer", "Lehmann"]),
-    "it": (["Lorenzo", "Matteo", "Alessandro", "Andrea", "Francesco", "Federico", "Davide", "Riccardo", "Giacomo", "Nicolò", "Samuele",
-             "Tommaso", "Gabriele", "Pietro"],
-           ["Rossi", "Russo", "Ferrari", "Esposito", "Bianchi", "Romano", "Colombo", "Ricci", "Marino", "Greco", "Bruno", "Gallo",
-            "Conti", "De Luca", "Mancini", "Lombardi"]),
-    "nl": (["Daan", "Sem", "Jesse", "Thijs", "Milan", "Lars", "Ruben", "Bram", "Luuk", "Xavi", "Jorrel", "Noa"],
-           ["de Jong", "Jansen", "de Vries", "van Dijk", "Bakker", "Visser", "Smit", "Meijer", "Mulder", "Peeters", "Janssens", "Maes"]),
-    "sl": (["Ivan", "Luka", "Marko", "Nikola", "Filip", "Jakub", "Dominik", "Matej", "Andrei", "Mateusz", "Petar", "Stefan", "Artem", "Kirill"],
-           ["Novak", "Kovač", "Horvat", "Petrović", "Jovanović", "Nowak", "Kowalski", "Popescu", "Ionescu", "Dvořák", "Kovalenko",
-            "Bondarenko", "Ivanov", "Smirnov", "Marić", "Babić"]),
-    "sc": (["Erik", "Oscar", "William", "Elias", "Mathias", "Jonas", "Emil", "Kasper", "Viktor", "Magnus", "Sander", "Lucas"],
-           ["Hansen", "Johansson", "Andersen", "Larsen", "Nielsen", "Karlsson", "Berg", "Lindqvist", "Eriksen", "Olsen", "Holm", "Dahl"]),
-    "af": (["Victor", "Samuel", "Emmanuel", "Moses", "Ibrahim", "Sadio", "Ismaïla", "Kelechi", "Mohammed", "Yaw", "Kwame", "Ademola",
-             "Cheikh", "Amadou", "Lamine", "Pape"],
-           ["Osei", "Mensah", "Boateng", "Okafor", "Adeyemi", "Diop", "Sarr", "Ndiaye", "Onana", "Asante", "Eze", "Okonkwo", "Bamba",
-            "Touré", "Gueye", "Cissé"]),
-    "ar": (["Youssef", "Achraf", "Hakim", "Mohamed", "Riyad", "Ismael", "Amine", "Omar", "Karim", "Salem", "Bilal", "Ilias", "Saud", "Fahad"],
-           ["Benali", "Bensaïd", "Haddad", "El Amrani", "Mansouri", "Brahimi", "Ounahi", "Aboukhlal", "Al-Dawsari", "Al-Shehri",
-            "Al-Faraj", "Hamdi", "Ziani", "Belkacem"]),
-    "tr": (["Arda", "Kerem", "Kenan", "Hakan", "Orkun", "Ferdi", "Barış", "Emre", "Cengiz", "Yusuf", "Semih", "Can"],
-           ["Yılmaz", "Kaya", "Demir", "Şahin", "Çelik", "Aydın", "Öztürk", "Arslan", "Güler", "Yıldız", "Kökçü", "Akgün"]),
-    "jp": (["Takumi", "Kaoru", "Ritsu", "Daichi", "Takefusa", "Yuto", "Kota", "Hiroki", "Ao", "Sota"],
-           ["Tanaka", "Suzuki", "Takahashi", "Watanabe", "Ito", "Yamamoto", "Nakamura", "Kubo", "Mitoma", "Endo"]),
-    "kr": (["Min-jae", "Heung-min", "Kang-in", "Jae-sung", "Hyun-woo", "Seung-ho", "Jun-ho", "Ji-sung"],
-           ["Kim", "Lee", "Park", "Choi", "Son", "Hwang", "Jung", "Yang"]),
-    "cn": (["Wei", "Lei", "Hao", "Jun", "Tao", "Yang", "Chen", "Bo"], ["Wang", "Li", "Zhang", "Liu", "Chen", "Wu", "Zhao", "Huang"]),
-    "ca": (["Alisher", "Bauyrzhan", "Islam", "Ramazan", "Askhat", "Dastan", "Nurlan", "Arsen", "Timur", "Daniyar", "Abbos", "Eldor"],
-           ["Zhaksylykov", "Seydakhmet", "Tagybergen", "Kenzhebek", "Ismailov", "Abiken", "Orazov", "Fayzullaev", "Mamedov", "Aliyev"]),
-    "gr": (["Giorgos", "Dimitris", "Konstantinos", "Christos", "Nikos", "Vangelis"],
-           ["Papadopoulos", "Georgiou", "Nikolaidis", "Konstantinidis", "Pavlidis", "Tzolis"]),
-}
-REGION = {}
-for _r, _codes in {
-    "es": "ESP ARG URU COL CHI PER ECU PAR BOL VEN MEX CRC HON PAN SLV GUA CUB DOM NCA PUR",
-    "pt": "POR BRA ANG MOZ CPV GNB STP", "en": "ENG SCO WAL NIR IRL USA CAN AUS NZL JAM TRI",
-    "fr": "FRA HAI", "de": "GER AUT SUI LIE LUX", "it": "ITA SMR MLT", "nl": "NED BEL SUR",
-    "sl": "CRO SRB SVN BIH MNE MKD POL CZE SVK UKR RUS BLR BUL ROU MDA ALB KOS HUN LVA LTU EST GEO ARM",
-    "sc": "NOR SWE DEN ISL FIN FRO", "ar": "MAR ALG TUN EGY LBY KSA QAT UAE IRQ JOR SYR LBN KUW BHR OMA YEM PLE IRN",
-    "tr": "TUR", "jp": "JPN", "kr": "KOR PRK", "cn": "CHN HKG TPE", "ca": "KAZ UZB KGZ TJK TKM AZE", "gr": "GRE CYP",
-}.items():
-    for _c in _codes.split():
-        REGION[_c] = _r
-CONF_REGION = {"UEFA": "sl", "CAF": "af", "AFC": "ar", "CONCACAF": "es", "CONMEBOL": "es", "OFC": "en"}
+# ---------- имена новых талантов: game/names.py ----------
+from .names import gen_name, NAMES, REGION, CONF_REGION   # noqa: F401  (gen_name используют и другие модули)
 REGEN_NATS = {"FRA": 10, "ESP": 9, "ENG": 9, "BRA": 9, "GER": 7, "ARG": 7, "POR": 6, "NED": 5, "ITA": 5, "BEL": 4, "CRO": 2, "NOR": 2,
               "URU": 2, "COL": 2, "MAR": 2, "SEN": 2, "NGA": 2, "CIV": 2, "USA": 2, "JPN": 2, "TUR": 2, "DEN": 2, "SUI": 1, "AUT": 1,
               "POL": 1, "KOR": 1, "SRB": 1, "ECU": 1, "GHA": 1, "CMR": 1, "ALG": 1, "SWE": 1, "SCO": 1, "GEO": 1, "UKR": 1, "CZE": 1}
 GROUP_TARGET = {"GK": 9, "DEF": 24, "MID": 28, "ATT": 29}   # состав пула звёзд по линиям (в сумме POOL)
 REGEN_POS = {"GK": 2, "CB": 4, "LB": 2, "RB": 2, "CDM": 2, "CM": 4, "CAM": 3, "LM": 1, "RM": 1, "LW": 3, "RW": 3, "CF": 1, "ST": 5}
-
-def gen_name(rng, nat, conf):
-    first, last = NAMES[REGION.get(nat) or CONF_REGION.get(conf, "en")]
-    return f"{rng.choice(first)} {rng.choice(last)}"
 
 MAX_PER_CLUB = 4          # больше звёзд в одном клубе не собирается
 

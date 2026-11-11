@@ -270,8 +270,9 @@ details.panel[open] > .panel { border: 0; padding: 8px 0 0; }
   #app:has(.v-start) .topbar { padding: 12px 32px 6px; }
   #app:has(.v-start) .topbar h1 { font-size: 24px; }
   #app:has(.v-start) .actions { padding: 8px 32px 12px; }
-  .v-start { display: grid; grid-template-columns: minmax(360px, 4fr) 7fr; grid-template-areas: "name pos" "country pos" "country phys" "country legal";
-    grid-template-rows: auto auto auto 1fr; align-items: start; gap: 12px; min-height: 0; overflow: auto; padding-bottom: 8px; }
+  .v-start { display: grid; grid-template-columns: minmax(360px, 4fr) 7fr; grid-template-areas: "mode mode" "name pos" "country pos" "country phys" "country legal";
+    grid-template-rows: auto auto auto auto 1fr; align-items: start; gap: 12px; min-height: 0; overflow: auto; padding-bottom: 8px; }
+  .a-mode { grid-area: mode; flex-direction: row; align-items: center; gap: 14px; } .a-mode .tabs { margin: 0; }
   .a-name { grid-area: name; } .a-pos { grid-area: pos; } .a-phys { grid-area: phys; } .v-start .legal { grid-area: legal; align-self: end; }
   .a-country { grid-area: country; align-self: stretch; min-height: 0; }
   .a-country .optlist { flex: 1; min-height: 160px; max-height: none; }
@@ -331,4 +332,46 @@ details.panel[open] > .panel { border: 0; padding: 8px 0 0; }
   /* середина сезона: сверху итог половины и тактика, снизу таблица и основа */
   .m-top { display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
   .m-bot { display: grid; grid-template-columns: 1fr 420px; align-items: start; }
+}
+
+/* ============ флаги, карта поля, находки скаутов ============ */
+.flag { width: 1.25em; height: .94em; object-fit: cover; border-radius: 2px; vertical-align: -0.1em; margin-right: .38em;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); flex: none; }
+.pitch-wrap { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.pitch { position: relative; width: 100%; max-width: 380px; aspect-ratio: 68 / 92; border-radius: 10px; overflow: hidden;
+  background: repeating-linear-gradient(180deg, #1f6b3a 0 9.09%, #237541 9.09% 18.18%); border: 2px solid #2f8a50;
+  box-shadow: inset 0 0 0 6px rgba(255, 255, 255, .06); }
+.pitch > i { position: absolute; border: 2px solid rgba(255, 255, 255, .35); pointer-events: none; }
+.pitch .pl-half { left: 0; right: 0; top: 50%; height: 0; border-width: 2px 0 0; }
+.pitch .pl-circle { left: 50%; top: 50%; width: 26%; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); }
+.pitch .pl-box { left: 22%; right: 22%; height: 14%; }
+.pitch .pl-box.t { top: -2px; border-top: 0; }
+.pitch .pl-box.b { bottom: -2px; border-bottom: 0; }
+.pm { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 1px;
+  width: 23%; text-align: center; z-index: 1; }
+.pm b { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; background: #10141a;
+  color: var(--text); border: 2px solid var(--accent); font-variant-numeric: tabular-nums; box-shadow: 0 2px 6px rgba(0, 0, 0, .4); }
+.pm.off b { border-color: #e59b5a; color: #f0b884; }
+.pm.empty b { border-style: dashed; border-color: var(--muted); color: var(--muted); }
+.pm-n { font-size: 11.5px; font-weight: 700; line-height: 1.15; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .9);
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; justify-content: center; }
+.pm-n .flag { width: 13px; height: 10px; margin-right: 3px; }
+.pm-s { font-size: 10px; color: rgba(255, 255, 255, .75); text-shadow: 0 1px 2px rgba(0, 0, 0, .9); }
+.pitch-cap { text-align: center; }
+.sq-cols, .xi-cols { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.sq-list { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.kb { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; margin-top: 2px;
+  background: var(--panel2); color: var(--muted); border: 1px solid var(--line2); white-space: nowrap; }
+.kb-starter { color: var(--accent); border-color: rgba(46, 204, 113, .45); }
+.kb-known { color: var(--gold); border-color: rgba(230, 190, 80, .5); }
+.kb-gem { color: #7de3ff; border-color: rgba(125, 227, 255, .5); }
+.kb-prospect { color: #b7a6ff; border-color: rgba(183, 166, 255, .45); }
+.kb-loan { color: #e59b5a; border-color: rgba(229, 155, 90, .45); }
+.sc-scales { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; font-size: 13px; }
+.sc-st { letter-spacing: 1px; margin-right: 8px; }
+.empty-mk { align-items: flex-start; gap: 8px; }
+@media (min-width: 1000px) {
+  .sq-cols { display: grid; grid-template-columns: minmax(260px, 340px) 1fr; align-items: start; gap: 14px; }
+  .sq-cols .pitch-wrap { position: sticky; top: 8px; }
+  .xi-cols:has(.pitch-wrap) { display: grid; grid-template-columns: minmax(260px, 360px) 1fr; align-items: start; gap: 14px; }
 }

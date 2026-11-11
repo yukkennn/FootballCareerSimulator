@@ -144,3 +144,77 @@ class ClubCard(QFrame):
         btn.setCursor(Qt.PointingHandCursor)
         btn.clicked.connect(on_click); lay.addWidget(btn, 0, Qt.AlignVCenter)
         self.button = btn
+
+
+# ---------- флаги стран (assets/flags/<iso2>.svg, см. tools/fetch_flags.py) ----------
+_flags = {}
+
+def flag_pixmap(nat, data, h=12):
+    """Флаг сборной высотой h (ширина 4:3). Нет файла или страны - None."""
+    from ..paths import ROOT
+    if not nat or nat not in data.countries:
+        return None
+    key = (nat, h)
+    if key not in _flags:
+        f = ROOT / "assets" / "flags" / f"{data.countries[nat]['iso2'].lower()}.svg"
+        pm = QPixmap(str(f)) if f.exists() else QPixmap()
+        _flags[key] = None if pm.isNull() else pm.scaled(round(h * 4 / 3), h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+    return _flags[key]
+
+def flag_icon(nat, data):
+    from PySide6.QtGui import QIcon
+    pm = flag_pixmap(nat, data, 14)
+    return QIcon(pm) if pm else None
+
+def flag_label(nat, data, h=14):
+    from .. import i18n
+    l = QLabel(); pm = flag_pixmap(nat, data, h)
+    if pm:
+        l.setPixmap(pm); l.setToolTip(data.country_name(nat, i18n.LANG))
+    l.setStyleSheet("background: transparent; border: none;")
+    return l
+
+class PitchWidget(QWidget):
+    """Карта поля: основа в схеме (сверху - атака). В кружке - OVR игрока на этом месте (не на своей позиции - оранжевый),
+    под ним фамилия с флагом и позиция в схеме. Координаты - squad.pitch_layout."""
+    def __init__(self, career, data, formation=None, width=300, parent=None):
+        super().__init__(parent)
+        self.c, self.d, self.f = career, data, formation
+        self.setFixedSize(width, round(width * 92 / 68))
+
+    def set_formation(self, f):
+        self.f = f; self.update()
+
+    def paintEvent(self, _):
+        from .. import squad as squad_mod
+        c = self.c
+        f = self.f or c.coach.get("formation", squad_mod.DEFAULT_FORMATION)
+        p = QPainter(self); p.setRenderHint(QPainter.Antialiasing)
+        w, h = self.width(), self.height()
+        for i in range(11):                                         # полосы газона
+            p.fillRect(QRectF(0, h * i / 11, w, h / 11 + 1), QColor("#1f6b3a" if i % 2 == 0 else "#237541"))
+        pen = QPen(QColor(255, 255, 255, 90), 2); p.setPen(pen); p.setBrush(Qt.NoBrush)
+        p.drawRect(QRectF(1, 1, w - 2, h - 2)); p.drawLine(QPointF(0, h / 2), QPointF(w, h / 2))
+        p.drawEllipse(QPointF(w / 2, h / 2), w * 0.13, w * 0.13)
+        p.drawRect(QRectF(w * 0.22, -2, w * 0.56, h * 0.14)); p.drawRect(QRectF(w * 0.22, h * 0.86, w * 0.56, h * 0.14 + 2))
+        coords = squad_mod.pitch_layout(f)
+        fnt = QFont(); fnt.setBold(True)
+        for i, (slot, pl, val) in enumerate(squad_mod.current_xi(c, f)):
+            x, y = coords[i][0] / 100 * w, (100 - coords[i][1]) / 100 * h
+            off = bool(pl) and pl["pos"] != slot
+            ring = QColor("#e59b5a") if off else QColor(theme.ACCENT) if pl else QColor(theme.MUTED)
+            p.setPen(QPen(ring, 2)); p.setBrush(QColor("#10141a")); p.drawEllipse(QPointF(x, y - 8), 15, 15)
+            fnt.setPixelSize(13); p.setFont(fnt); p.setPen(QColor("#f0b884") if off else QColor(theme.TEXT))
+            p.drawText(QRectF(x - 15, y - 23, 30, 30), Qt.AlignCenter, f"{val:.0f}" if pl else "—")
+            name = (pl["name"].split(" ", 1)[1] if " " in pl["name"] else pl["name"]) if pl else ""
+            fnt.setPixelSize(11); p.setFont(fnt)
+            fm = p.fontMetrics(); name = fm.elidedText(name, Qt.ElideRight, int(w * 0.24))
+            fl = flag_pixmap(pl.get("nat"), self.d, 9) if pl else None
+            tw = fm.horizontalAdvance(name) + (15 if fl else 0)
+            x0 = x - tw / 2
+            if fl:
+                p.drawPixmap(int(x0), int(y + 11), fl); x0 += 15
+            p.setPen(QColor(0, 0, 0, 200)); p.drawText(QRectF(x0 + 1, y + 8, tw, 16), Qt.AlignLeft | Qt.AlignVCenter, name)
+            p.setPen(QColor("white")); p.drawText(QRectF(x0, y + 7, tw, 16), Qt.AlignLeft | Qt.AlignVCenter, name)
+            fnt.setPixelSize(9); fnt.setBold(False); p.setFont(fnt); p.setPen(QColor(255, 255, 255, 190))
+            p.drawText(QRectF(x - 30, y + 21, 60, 12), Qt.AlignCenter, slot); fnt.setBold(True)

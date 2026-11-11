@@ -6,7 +6,9 @@
 Бюджет (млн €) в год - по финансовому масштабу клуба (исходная сила из базы, 70%) и уровню лиги (Реал ~250, Аякс ~40,
 Селтик ~18, Кайрат ~2), плюс призовые за сезон, плюс деньги от продаж, минус зарплаты скаутов; неистраченное остаётся.
 Аренда: свой игрок уходит на сезон туда, где будет играть (растёт), чужой приходит на сезон за небольшую плату.
-Скауты (до трёх, со звёздами и рейтингом): сужают вилку потенциала, расширяют рынок и находят недооценённых молодых.
+Скауты (до трёх, две шкалы по 1-5 звёзд: чутьё и охват): только они и находят игроков на рынок - без скаутов покупать
+некого. Чутьё - насколько сильных игроков находит скаут и насколько точно видна вилка потенциала, охват - сколько игроков.
+Скауты работают на клуб: при переходе тренера в другой клуб они остаются в старом.
 Сильный игрок может отказаться перейти в клуб, который не играет в еврокубках.
 """
 import math
@@ -31,25 +33,45 @@ def price(ovr, age, pot):
     return round(market_value(ovr, age, pot), 2)
 
 # ---------- скауты ----------
+# У скаута две шкалы по 1-5 звёзд: judge (чутьё) - насколько сильных игроков он находит и насколько точно видит их потенциал;
+# reach (охват) - сколько игроков он приносит за окно. Без скаутов рынка нет: предлагать игроков некому.
+# Скауты работают на клуб, а не на тренера: при переходе в другой клуб они остаются в старом (см. coach.accept).
+SCOUT_FIND = {1: 2, 2: 3, 3: 4, 4: 6, 5: 8}     # сколько игроков находит скаут за летнее окно (зимой - половину)
+
 def scout_stars(rating):
     return 5 if rating >= 85 else 4 if rating >= 75 else 3 if rating >= 65 else 2 if rating >= 55 else 1
 
-def scout_salary(rating):
-    """Зарплата скаута за сезон, млн €: от 0.05 (рейтинг 40) до ~2 (рейтинг 95)."""
-    return round(0.05 * 1.07 ** (rating - 40), 2)
+def scout_salary(judge, reach=None):
+    """Зарплата скаута за сезон, млн €: чутьё стоит дороже охвата. 1/1 - 0.04, 3/3 - 0.25, 5/5 - 1.6."""
+    if reach is None:                                       # старый вызов: по рейтингу
+        judge = reach = scout_stars(judge)
+    return round(0.04 * 1.8 ** (judge - 1) * 1.4 ** (reach - 1), 2)
+
+def norm_scout(x):
+    """Скаут из старого сохранения (рейтинг и одна шкала звёзд) -> две шкалы."""
+    if "judge" not in x:
+        st = x.get("stars") or scout_stars(x.get("rating", 50))
+        x["judge"] = x["reach"] = int(st)
+    return x
+
+def scouts_of(s):
+    return [norm_scout(x) for x in (s.get("scouts") or [])]
 
 def scouting(s):
-    """Качество скаутинга 0..1: лучший скаут + немного за каждого следующего."""
-    sc = s.get("scouts") or []
+    """Качество скаутинга 0..1: чутьё лучшего скаута + немного за каждого следующего."""
+    sc = scouts_of(s)
     if not sc:
         return 0.0
-    best = max(x["rating"] for x in sc)
-    return clamp((best - 40) / 55.0 + 0.05 * (len(sc) - 1), 0.0, 1.0)
+    best = max(x["judge"] for x in sc)
+    return clamp((best - 1) / 4.0 * 0.9 + 0.05 * (len(sc) - 1), 0.0, 1.0)
 
 def pot_width(s):
     """Ширина вилки потенциала: без скаутов 10, с лучшими - 2."""
     return int(round(10 - 8 * scouting(s)))
 
+def scout_finds(scout, kind):
+    n = SCOUT_FIND[scout["reach"]]
+    return n if kind == "summer" else (n + 1) // 2
 class TransferWindow:
     """Трансферное окно тренера. Состояние - career.coach["window"] (сохраняется: окно можно закрыть и вернуться)."""
     def __init__(self, career):
@@ -96,7 +118,7 @@ class TransferWindow:
                        "returned": returned, "loans_ended": left,
                        "cands": self._candidates(kind), "refused": getattr(self, "refused", 0), "youth": self._youth_options(kind), "offers": self._big_offers(kind),
                        "loan_offers": self._loan_offers() if kind == "summer" else [],
-                       "scout_market": self._scout_market() if kind == "summer" else []}
+                       "scout_market": self._scout_market()}
         return self.w
 
     def _end_loans(self):
@@ -125,79 +147,129 @@ class TransferWindow:
         club = p.get("club")
         return bool(club and club in world.club_league and world.team_ovr(club) > team + 3 and rng.random() < 0.5)
 
+    # ---------- рынок: игроков находят скауты ----------
+    # Виды находок: starter - сильнее основы на своей позиции; rotation - замена, немного слабее основы (ротация, глубина
+    # состава); prospect - молодой (18-21) с запасом роста; veteran - опытный (30-33) уровня основы, но дешёвый;
+    # known - известный игрок мира, который усилит основу; gem - недооценённый молодой (◆); loan - аренда на сезон.
+    FIND_KINDS = ("starter", "rotation", "prospect", "veteran", "known")
+
     def _candidates(self, kind):
-        """Рынок: в основном игроки, которые усилят основу (чаще на слабые позиции схемы), по карману.
-        Известные игроки мира, которые откажутся, в список не попадают (кроме пары дорогих «мечт»); молодых талантов -
-        немного: арендованные и 1-2 «жемчужины» скаутов."""
+        """Рынок окна: каждый скаут приносит своих игроков (сколько - по охвату, насколько хороших - по чутью).
+        Без скаутов рынок пуст."""
+        self.refused = 0
+        out, self._taken = [], set()
+        for sc in scouts_of(self.s):
+            out += self._scout_search(sc, kind)
+        return out
+
+    def _scout_search(self, sc, kind):
+        """Находки одного скаута за окно."""
         c, s, world, rng = self.c, self.s, self.c.world, self.c.rng
         cid = s["club"]
+        if not hasattr(self, "_taken"):
+            self._taken = {cd["pid"] for cd in (self.w or {}).get("cands", []) if cd.get("pid")}
+        if not hasattr(self, "refused"):
+            self.refused = 0
         team = self.rating()
-        q = scouting(s)
-        total = (12 + round(8 * q)) if kind == "summer" else (6 + round(4 * q))     # хорошие скауты - шире рынок
+        j = sc["judge"]
         budget = max(0.05, s.get("budget", 0.0))
         cost = lambda o, a, p: price(o, a, p) * BUY_PREMIUM
         slot_val = self._slot_values()
-        need = lambda pos: slot_val.get(pos, team)                  # уровень основы на этой позиции
-        # известные игроки мира, которые усилят основу на своей позиции
-        pool = [p for p in stars_mod.all_players(c.stars) if p["club"] != cid and p["age"] <= 33 and p["ovr"] >= need(p["pos"]) + 1
-                and p["ovr"] <= team + 12 and p["club"] in world.club_league and p["club"] not in stars_mod.PROTECTED
-                and not p.get("loan_from")]
-        key = lambda p: -(min(8.0, p["ovr"] - need(p["pos"])) + 2 * p.get("real", False) - 0.7 * max(0, p["age"] - 29) + rng.random() * 3)
-        pool.sort(key=key)
-        n_known = total // 2 + 1
-        fit, dream, self.refused = [], [], 0
-        for p in pool:
-            affordable = cost(p["ovr"], p["age"], p["pot"]) <= budget * 1.1
-            if affordable and len(fit) < n_known - 2:
-                if self._refuses(p, team):
-                    self.refused += 1                               # отказался обсуждать - на рынке его нет
-                else:
-                    fit.append(p)
-            elif not affordable and len(dream) < 2:
-                dream.append(p)
-            if len(fit) >= n_known - 2 and len(dream) >= 2:
-                break
-        out = [self._cand(p["ovr"], p["age"], p["pot"], p["name"], p["nat"], p["pos"], p["club"], p["id"]) for p in fit]
-        for p in dream:                                             # «мечта»: дорого, и может отказаться
-            cd = self._cand(p["ovr"], p["age"], p["pot"], p["name"], p["nat"], p["pos"], p["club"], p["id"])
-            cd["refuse"] = self._refuses(p, team)
+        need = lambda pos: slot_val.get(pos, team - 4)                # уровень основы на этой позиции
+        weak = self._weak_positions()
+        thin = self._thin_positions()
+        positions = list(slot_val) or ["CM"]
+        out = []
+        n = scout_finds(sc, kind)
+        # чутьё: сильный скаут чаще приносит игроков в основу и известных игроков, слабый - замену и середнячков
+        weights = {"starter": 1.5 + 0.7 * j, "rotation": 3.2 - 0.3 * j, "prospect": 1.2 + 0.25 * j, "veteran": 1.0,
+                   "known": 0.35 * (j - 1)}
+        known = [p for p in stars_mod.all_players(c.stars) if p["club"] != cid and p["age"] <= 33 and p["ovr"] >= need(p["pos"]) + 1
+                 and p["ovr"] <= team + 4 + 2 * j and p["club"] in world.club_league and p["club"] not in stars_mod.PROTECTED
+                 and not p.get("loan_from") and p["id"] not in self._taken]
+        rng.shuffle(known)
+        known.sort(key=lambda p: -(min(8.0, p["ovr"] - need(p["pos"])) + 2 * p.get("real", False) + rng.random() * 3))
+        for _ in range(n):
+            k = rng.choices(list(weights), weights=list(weights.values()))[0]
+            cd = None
+            if k == "known":
+                while known and cd is None:
+                    p = known.pop(0)
+                    affordable = cost(p["ovr"], p["age"], p["pot"]) <= budget * 1.1
+                    if self._refuses(p, team):
+                        self.refused += 1                                 # отказался обсуждать - на рынке его нет
+                        continue
+                    cd = self._cand(p["ovr"], p["age"], p["pot"], p["name"], p["nat"], p["pos"], p["club"], p["id"])
+                    if not affordable:
+                        cd["dream"] = True                                # «мечта»: дорого
+                    self._taken.add(p["id"])
+                if cd is None:
+                    k = "starter"
+            if cd is None:
+                cd = self._gen_find(k, j, team, need, weak, thin, positions, budget, cost)
+            cd["kind"], cd["scout"] = k if not cd.get("gem") else "gem", sc["name"]
             out.append(cd)
-        # аренда: игроки клубов посильнее, которые сразу усилят основу, - на сезон за 10% стоимости
-        if kind == "summer":
+        # аренда: скаут с охватом 3+ находит игрока клуба посильнее, который сразу усилит основу (на сезон за 10% стоимости)
+        if kind == "summer" and sc["reach"] >= 3:
             lp = [p for p in stars_mod.all_players(c.stars) if p["club"] != cid and p["club"] in world.club_league and p["age"] <= 26
                   and need(p["pos"]) + 1 <= p["ovr"] <= team + 6 and world.team_ovr(p["club"]) > team + 2 and not p.get("loan_from")
-                  and p["club"] not in stars_mod.PROTECTED and p not in fit]
-            rng.shuffle(lp)
-            for p in lp[:2]:
+                  and p["club"] not in stars_mod.PROTECTED and p["id"] not in self._taken]
+            if lp:
+                p = rng.choice(lp)
+                self._taken.add(p["id"])
                 cd = self._cand(p["ovr"], p["age"], p["pot"], p["name"], p["nat"], p["pos"], p["club"], p["id"])
                 cd["loan"] = True; cd["price"] = round(max(0.02, price(p["ovr"], p["age"], p["pot"]) * LOAN_FEE), 2)
+                cd["kind"], cd["scout"] = "loan", sc["name"]
                 out.append(cd)
-        # «жемчужина»: недооценённый молодой талант почти уровня основы - находят хорошие скауты
-        if rng.random() < 0.15 + 0.5 * q:
-            for _ in range(1 + (q > 0.7)):
-                age = rng.randint(18, 21)
-                pos = rng.choice(list(slot_val)) if slot_val else "CM"
-                o = round(need(pos) - rng.uniform(0, 3), 1)
-                cd = self._cand(o, age, o + 3, self._gen_name(), self._gen_nat(), pos, None, None)
-                cd["pot"] = round(o + rng.uniform(7, 14), 1); cd["gem"] = True    # цена - как за обычного, потенциал - выше
-                out.append(cd)
-        # сгенерированные игроки, которые усилят основу: чаще на слабые позиции, возраст в основном 22-30, по карману
-        weak = self._weak_positions()
-        expensive = 0
-        while len(out) < total:
-            pos = rng.choice(weak) if weak and rng.random() < 0.75 else rng.choice(list(slot_val) or ["CM"])
-            base = need(pos)
-            age = rng.choices([rng.randint(19, 21), rng.randint(22, 26), rng.randint(27, 30), rng.randint(31, 33)], weights=[1, 4, 4, 1])[0]
-            o = base + rng.uniform(1.5, 5.5)
-            pot = o + (rng.uniform(2, 6) if age <= 21 else rng.uniform(0.5, 2.5) if age <= 24 else 0)
-            while cost(o, age, pot) > budget and o > base + 1.2:      # дорого - игрок попроще, но всё ещё сильнее основы
-                o -= 0.5; pot = max(o, pot - 0.5)
-            if cost(o, age, pot) > budget:
-                if expensive >= 2 and age < 31:                       # не по карману - опытный игрок того же уровня дешевле
-                    age = rng.randint(30, 32); pot = o
-                expensive += 1
-            out.append(self._cand(round(o, 1), age, pot, self._gen_name(), self._gen_nat(), pos, None, None))
         return out
+
+    def _gen_find(self, k, j, team, need, weak, thin, positions, budget, cost):
+        """Сгенерированная находка скаута вида k; j - чутьё скаута (1-5)."""
+        rng = self.c.rng
+        skill = (j - 3) * 0.7                                          # сильный скаут находит игроков получше
+        if k == "rotation":
+            pos = rng.choice(thin) if thin and rng.random() < 0.7 else rng.choice(positions)
+            age = rng.randint(21, 31)
+            o = need(pos) - rng.uniform(1.0, 6.0) + 0.5 * skill
+            pot = o + (rng.uniform(1, 4) if age <= 23 else 0)
+        elif k == "prospect":
+            pos = rng.choice(positions + list(squad_mod.ACADEMY_POS))
+            age = rng.randint(18, 21)
+            o = need(pos) - rng.uniform(4, 10) + skill
+            pot = o + rng.uniform(4, 9) + 0.6 * skill
+            if rng.random() < 0.06 * j:                               # «жемчужина»: цена как за обычного, потенциал выше
+                o = need(pos) - rng.uniform(0, 3)
+                cd = self._cand(o, age, o + 3, *self._gen_person(), pos, None, None)
+                cd["pot"] = round(o + rng.uniform(7, 13), 1); cd["gem"] = True
+                return cd
+        elif k == "veteran":
+            pos = rng.choice(weak) if weak and rng.random() < 0.5 else rng.choice(positions)
+            age = rng.randint(30, 33)
+            o = need(pos) + rng.uniform(-1.5, 3.0) + 0.5 * skill
+            pot = o
+        else:                                                          # starter
+            pos = rng.choice(weak) if weak and rng.random() < 0.7 else rng.choice(positions)
+            age = rng.choices([rng.randint(19, 21), rng.randint(22, 26), rng.randint(27, 30)], weights=[1, 4, 4])[0]
+            o = need(pos) + max(0.6, rng.uniform(0.5, 4.0) + skill)    # слабый скаут находит игроков чуть сильнее основы
+            pot = o + (rng.uniform(2, 6) if age <= 21 else rng.uniform(0.5, 2.5) if age <= 24 else 0)
+            while cost(o, age, pot) > budget and o > need(pos) + 1.0:   # дорого - игрок попроще, но всё ещё сильнее основы
+                o -= 0.5; pot = max(o, pot - 0.5)
+        o = clamp(o, 35, 94)
+        return self._cand(round(o, 1), age, max(o, pot), *self._gen_person(), pos, None, None)
+
+    def _gen_person(self):
+        """Имя и сборная сгенерированного игрока (имя - по стране)."""
+        nat = self._gen_nat()
+        return self._gen_name(nat), nat
+
+    def _thin_positions(self):
+        """Позиции схемы, где мало игроков (меньше, чем нужно схеме с заменами): туда нужна замена."""
+        players = squad_mod.squad(self.c)
+        need = squad_mod.template_for(self.formation())
+        cnt = {}
+        for p in players:
+            cnt[p["pos"]] = cnt.get(p["pos"], 0) + 1
+        return [pos for pos, n in need.items() if cnt.get(pos, 0) < n]
 
     def _gen_nat(self):
         return self.c.rng.choices(list(stars_mod.REGEN_NATS), weights=list(stars_mod.REGEN_NATS.values()))[0]
@@ -206,6 +278,11 @@ class TransferWindow:
         nat = nat or self._gen_nat()
         return stars_mod.gen_name(self.c.rng, nat, self.c.d.countries[nat]["conf"])
 
+    def role_of(self, cd):
+        """Кем будет новичок в вашей команде: xi (усилит основу), rot (ротация) или res (резерв)."""
+        if self.gain(cd) >= 0.05:
+            return "xi"
+        return "rot" if cd["ovr"] >= squad_mod.xi_avg(self.c, self.formation()) - squad_mod.ROT_GAP else "res"
     def _slot_values(self):
         """Уровень основы на каждой позиции схемы (OVR игрока на этом месте, у повторяющихся позиций - самый слабый)."""
         out = {}
@@ -231,8 +308,10 @@ class TransferWindow:
         nat = c.d.leagues[world.club_league[self.s["club"]]]["country"]
         team = self.rating()
         pos = rng.choice(list(squad_mod.TEMPLATE)[1:])
+        ovr, pot = team - rng.uniform(7, 11), team + rng.uniform(2, 9)
+        real, hype = squad_mod.maybe_bust(rng, pot, ovr)               # обещанный талант может и не раскрыться
         return [{"kind": "talent", "name": stars_mod.gen_name(rng, nat, c.d.countries[nat]["conf"]), "pos": pos, "age": 17,
-                 "ovr": round(team - rng.uniform(7, 11), 1), "pot": round(team + rng.uniform(2, 9), 1),
+                 "ovr": round(ovr, 1), "pot": round(real, 1), "pot_hype": hype,
                  "price": round(max(0.05, a * rng.uniform(0.04, 0.08)), 2), "done": False},
                 {"kind": "academy", "price": round(max(0.05, a * 0.12), 2), "bonus": 4.0, "seasons": 3, "done": False}]
 
@@ -293,16 +372,17 @@ class TransferWindow:
         return rng.choice(cands) if cands else None
 
     def _scout_market(self):
-        """Скауты, которых можно нанять этим летом: дешёвый, средний и сильный."""
+        """Скауты, которых можно нанять в это окно: дешёвый, «чутьё» (видит сильных, но приносит мало), «охват» (приносит
+        много, но середнячков), крепкий и (летом) сильный. Шкалы - 1-5 звёзд."""
         c, rng = self.c, self.c.rng
+        kinds = [(rng.randint(1, 2), rng.randint(1, 2)), (rng.randint(4, 5), rng.randint(1, 2)), (rng.randint(1, 2), rng.randint(4, 5)),
+                 (3, 3), (rng.randint(4, 5), rng.randint(4, 5))]
         out = []
-        for lo, hi in ((40, 58), (58, 76), (74, 95)):
-            r = round(rng.uniform(lo, hi))
+        for j, r in kinds:
             nat = rng.choices(list(stars_mod.REGEN_NATS), weights=list(stars_mod.REGEN_NATS.values()))[0]
-            out.append({"name": stars_mod.gen_name(rng, nat, c.d.countries[nat]["conf"]), "rating": r, "stars": scout_stars(r),
-                        "salary": scout_salary(r), "done": False})
+            out.append({"name": stars_mod.gen_name(rng, nat, c.d.countries[nat]["conf"]), "nat": nat, "judge": j, "reach": r,
+                        "salary": scout_salary(j, r), "done": False})
         return out
-
     # ---------- оценки для экрана ----------
     def gain(self, cd):
         """На сколько изменится сила основы, если купить (или арендовать) кандидата."""
@@ -406,29 +486,36 @@ class TransferWindow:
         if y["kind"] == "talent":
             p = stars_mod.add_other(c.stars, y["name"], c.d.leagues[c.world.club_league[cid]]["country"], y["pos"], 17, y["ovr"], y["pot"], cid)
             p["squad"] = True
+            if y.get("pot_hype"):
+                p["pot_hype"] = y["pot_hype"]
         else:
             s["academy_bonus"] = {"bonus": y["bonus"], "left": y["seasons"]}
         win["log"].append({"t": y["kind"], "name": y.get("name"), "fee": y["price"], "d": 0.0})
         return True
 
     def hire_scout(self, i):
-        s = self.s
-        sc = self.w["scout_market"][i]
+        """Нанять скаута: сразу же приносит своих игроков на рынок этого окна."""
+        s, win = self.s, self.w
+        sc = win["scout_market"][i]
         if sc["done"] or len(s.get("scouts") or []) >= MAX_SCOUTS or sc["salary"] > s["budget"] + 1e-9:
             return False
-        s.setdefault("scouts", []).append({k: sc[k] for k in ("name", "rating", "stars", "salary")})
+        new = {k: sc[k] for k in ("name", "nat", "judge", "reach", "salary")}
+        s.setdefault("scouts", []).append(new)
         s["budget"] = round(s["budget"] - sc["salary"], 2); s["fin"]["spent"] += sc["salary"]   # зарплата за этот сезон
         sc["done"] = True
-        self.w["log"].append({"t": "scout", "name": sc["name"], "fee": sc["salary"], "d": 0.0})
+        self.refused = win.get("refused", 0)
+        win["cands"] += self._scout_search(new, win["kind"])
+        win["refused"] = self.refused
+        win["log"].append({"t": "scout", "name": sc["name"], "fee": sc["salary"], "d": 0.0})
         return True
 
     def fire_scout(self, i):
+        """Уволить скаута: игроки, которых он уже нашёл, остаются на рынке до конца окна."""
         sc = self.s.get("scouts") or []
         if 0 <= i < len(sc):
             sc.pop(i)
             return True
         return False
-
     def close(self):
         """Окно закрыто: сделки переходят в запись сезона."""
         win = self.w

@@ -39,6 +39,23 @@ T = {
  "start.height_typ": ("обычно на позиции: {h} см", "typical for the position: {h} cm"),
  "start.phys_pick_pos": ("Выберите позицию: от неё зависит, что дают рост и ведущая нога.", "Pick a position: what height and foot give depends on it."),
  "foot.R": ("Правая", "Right"), "foot.L": ("Левая", "Left"), "foot.B": ("Обе", "Both"),
+ "start.mode": ("Режим игры", "Game mode"),
+ "start.mode_player": ("⚽ Карьера игрока", "⚽ Player career"), "start.mode_coach": ("📋 Карьера тренера", "📋 Coach career"),
+ "start.heading_coach": ("Создайте своего тренера", "Create your coach"),
+ "start.name_coach": ("Имя и фамилия тренера", "Coach's first and last name"),
+ "start.name_default_coach": ("Тренер", "Coach"),
+ "start.coach_age": ("2. Возраст начала тренерской карьеры", "2. Age at the start of the coaching career"),
+ "start.years": ("лет", "years"),
+ "start.coach_hint": ("Вы начинаете сразу тренером, без игровой карьеры: навык и репутация скромные, первые предложения - от самых скромных клубов "
+                      "вашей страны (если в ней нет своей лиги - от клубов соседней). Чем старше на старте, тем больше опыта, но тем меньше времени до пенсии (в 70 лет).",
+                      "You start straight away as a coach, with no playing career: your ability and reputation are modest and the first offers come "
+                      "from the most modest clubs in your country (or a neighbouring one if your country has no league). The older you start, the more experience you have, but the less time until retirement (at 70)."),
+ "start.coach_go": ("Начать тренерскую карьеру →", "Start coaching career →"),
+ "coach.reason.start_fresh": ("Вы начинаете тренерскую карьеру. Эти клубы готовы дать шанс новичку.",
+                              "You are starting your coaching career. These clubs are ready to give a newcomer a chance."),
+ "end.reason.coach_only": ("Карьера тренера без игрового прошлого", "Coaching career with no playing past"),
+ "end.sub_coach_only": ("{name} тренировал с {age} до {cage} лет", "{name} coached from age {age} to {cage}"),
+ "end.no_coach_seasons": ("Ни одного сезона во главе команды.", "Not a single season in charge of a team."),
  "foot_short.R": ("правая нога", "right-footed"), "foot_short.L": ("левая нога", "left-footed"), "foot_short.B": ("обе ноги", "two-footed"),
  "summary.physique": ("Нога и рост", "Foot and height"),
  # --- тренерская карьера
@@ -193,7 +210,7 @@ T = {
  "tw.full": ("Состав полон ({n}): чтобы купить, сначала продайте кого-нибудь", "Squad is full ({n}): sell someone before buying"),
  "tw.academy_new": ("Из академии в состав поднялись: {n}", "Promoted from the academy: {n}"),
  "tw.talent_line": ("{pos} · 17 лет · OVR {o} · потенциал {p}", "{pos} · age 17 · OVR {o} · potential {p}"),
- "tw.academy_line": ("3 сезона воспитанники академии будут заметно сильнее", "For 3 seasons academy graduates will be notably better"),
+ "tw.academy_line": ("3 сезона вдвое больше шансов, что из академии выйдет талант или звезда (большинство воспитанников - всё равно игроки уровня запаса)", "For 3 seasons twice the chance of a talent or a star from the academy (most graduates are still squad-level players)"),
  "tab.squad": ("Состав", "Squad"), "tab.seasons": ("Сезоны", "Seasons"),
  "pot.peak": ("на пике", "at peak"), "pot.decline": ("угасание", "declining"),
  "tw.filter": ("Позиции", "Positions"), "filter.all": ("Все позиции", "All positions"),
@@ -283,16 +300,40 @@ T = {
  "tw.scouting": ("скаутинг {q}% · вилка потенциала {w}", "scouting {q}% · potential range {w}"),
  "pot.scout_tip": ("Оценка скаутов: настоящий потенциал где-то в этой вилке (ширина {w}). Лучше скауты - уже вилка.",
                    "Scouts' estimate: the true potential lies somewhere in this range (width {w}). Better scouts - narrower range."),
- "sc.mine": ("Ваши скауты ({n} из {m})", "Your scouts ({n} of {m})"), "sc.none": ("Скаутов нет: потенциал игроков виден очень приблизительно",
-                                                                                 "No scouts: player potential is only a rough guess"),
- "sc.market": ("Свободные скауты этим летом", "Scouts available this summer"), "sc.stars": ("Уровень", "Level"),
+ "sc.mine": ("Ваши скауты ({n} из {m})", "Your scouts ({n} of {m})"), "sc.none": ("Скаутов нет: рынка нет, а потенциал игроков виден очень приблизительно",
+                                                                                 "No scouts: no market, and player potential is only a rough guess"),
+ "sc.market": ("Свободные скауты в это окно", "Scouts available this window"), "sc.stars": ("Уровень", "Level"),
  "sc.rating": ("Рейтинг", "Rating"), "sc.salary": ("Зарплата/сез.", "Salary/season"),
  "sc.hire": ("Нанять", "Hire"), "sc.hired": ("Нанят", "Hired"), "sc.fire": ("Уволить", "Dismiss"),
  "sc.summer_only": ("Новых скаутов можно нанять только летом", "New scouts can be hired only in summer"),
- "sc.hint": ("Скауты сужают вилку потенциала, расширяют рынок (до 20 игроков летом) и чаще находят недооценённых молодых (◆). "
-             "Главный - лучший скаут, каждый следующий добавляет немного. Зарплата списывается каждое лето.",
-             "Scouts narrow the potential range, widen the market (up to 20 players in summer) and find undervalued youngsters (◆) more often. "
-             "The best scout matters most, each extra one adds a little. Salaries are paid every summer."),
+ "sc.hint": ("Игроков на рынок приносят только скауты: без них покупать некого. Чутьё - насколько сильных игроков находит скаут "
+             "(в основу, известных, недооценённых молодых ◆) и насколько точно видна вилка потенциала (по лучшему скауту). "
+             "Охват - сколько игроков он приносит за окно (зимой - вдвое меньше), с охватом 3+ - ещё и аренду. "
+             "Нанятый скаут сразу приносит своих игроков. Скауты работают на клуб: при переходе в другой клуб они остаются в старом. "
+             "Примерно каждый четвёртый молодой талант не раскрывается: обычно это видно лишь к 21 году, а скаут с чутьём 4-5★ - сразу. "
+             "Зарплата списывается каждое лето.",
+             "Only scouts bring players to the market: without them there is no one to buy. Judgement - how good the players a scout finds "
+             "(starters, well-known players, undervalued youngsters ◆) and how precise the potential range is (by your best scout). "
+             "Reach - how many players he brings per window (half in winter); with reach 3+ also a loan. "
+             "A newly hired scout brings his finds at once. Scouts work for the club: when you move to another club they stay behind. "
+             "About one young talent in four never develops: usually that only shows by 21, but a scout with 4-5★ judgement sees it at once. "
+             "Salaries are paid every summer."),
+ "sc.judge": ("Чутьё", "Judgement"), "sc.reach": ("Охват", "Reach"), "sc.finds_col": ("Находит за окно", "Finds per window"),
+ "sc.judge_tip": ("Чутьё: насколько сильных игроков находит скаут и насколько точно видна вилка потенциала",
+                  "Judgement: how good the players he finds are and how precise the potential range is"),
+ "sc.reach_tip": ("Охват: сколько игроков скаут приносит на рынок за окно", "Reach: how many players he brings to the market per window"),
+ "col.find": ("Находка", "Find"),
+ "sc.finds": ("находит {n} игроков летом, {w} зимой", "finds {n} players in summer, {w} in winter"),
+ "tw.scouts_found": ("на рынке {n} (скаутов: {k})", "{n} on the market (scouts: {k})"),
+ "tw.no_scouts": ("Скаутов нет - предлагать игроков некому. Наймите скаута: он сразу принесёт игроков на рынок.",
+                  "No scouts - nobody to find players. Hire a scout: he brings players to the market at once."),
+ "tw.no_finds": ("Скауты в этот раз никого не нашли.", "Your scouts found nobody this time."),
+ "tw.to_scouts": ("К скаутам", "Go to scouts"),
+ "find.starter": ("в основу", "starter"), "find.rotation": ("замена", "squad player"), "find.prospect": ("перспектива", "prospect"),
+ "find.veteran": ("опыт", "veteran"), "find.known": ("известный", "well-known"), "find.gem": ("находка ◆", "gem ◆"),
+ "find.loan": ("аренда", "loan"), "find.by": ("нашёл {n}", "found by {n}"),
+ "mkrole.xi": ("основа", "starter"), "mkrole.rot": ("ротация", "rotation"), "mkrole.res": ("резерв", "reserve"),
+ "pitch.title": ("Расстановка", "Formation map"),
  "deal.loan_in": ("Аренда: {n} (OVR {o}) за {f}", "Loan in: {n} (OVR {o}) for {f}"),
  "deal.loan_out": ("Отдан в аренду: {n} (OVR {o}), {f}", "Loaned out: {n} (OVR {o}), {f}"),
  "deal.no_fee": ("без платы", "no fee"),

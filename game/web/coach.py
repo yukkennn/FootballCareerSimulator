@@ -4,11 +4,11 @@ from .. import i18n
 from ..i18n import tr
 from ..text import stars_text, trophy_name, stage, short_trophy, award_name, money
 from ..coach import pressure, DECAY, TACTICS, REL_LOVED, season_label
-from ..transfers import annual_budget, price, pot_width, scouting, MAX_SCOUTS
+from ..transfers import annual_budget, price, pot_width, scouting, scouts_of, scout_finds, MAX_SCOUTS
 from .. import squad as squad_mod
 from .. import stars as stars_mod
 from ..ui import theme
-from .parts import esc, btn, logo, club_card, kv
+from .parts import esc, btn, logo, club_card, kv, flag
 from .report import league_table_html, details_html
 
 POS_ORDER = ["GK", "CB", "LB", "RB", "CDM", "CM", "CAM", "LM", "RM", "LW", "RW", "CF", "ST"]
@@ -139,6 +139,41 @@ def select(onchange, options, current, label=None):
     lab = f'<span class="muted small">{esc(label)}</span>' if label else ""
     return f'<label class="sel">{lab}<select data-onchange="{onchange}">{opts}</select></label>'
 
+def short_name(name):
+    """Фамилия для карты поля: «Daniel Marín» -> «Marín», «Frenkie de Jong» -> «de Jong»."""
+    parts = name.split(" ", 1)
+    return parts[1] if len(parts) > 1 else name
+
+def pitch_html(c, d, f=None):
+    """Карта поля: основа в выбранной схеме (сверху - атака). У игрока - OVR на этом месте (не на своей позиции - ниже и
+    оранжевым), фамилия с флагом и позиция в схеме. Сменилась схема - игроки встают по-новому."""
+    f = f or c.coach.get("formation", squad_mod.DEFAULT_FORMATION)
+    coords = squad_mod.pitch_layout(f)
+    marks = []
+    for i, (slot, p, val) in enumerate(squad_mod.current_xi(c, f)):
+        x, y = coords[i]
+        style = f'left:{x:.1f}%;top:{100 - y:.1f}%'
+        if not p:
+            marks.append(f'<div class="pm empty" style="{style}"><b>—</b><span class="pm-s">{esc(slot)}</span></div>')
+            continue
+        off = p["pos"] != slot
+        tip = f'{p["name"]} · {p["pos"]} · OVR {p["ovr"]:.0f}' + (f' → {val:.0f} ({slot})' if off else "")
+        marks.append(f'<div class="pm{" off" if off else ""}" style="{style}" title="{esc(tip)}"><b>{val:.0f}</b>'
+                     f'<span class="pm-n">{flag(p.get("nat"), d)}{esc(short_name(p["name"]))}</span><span class="pm-s">{esc(slot)}</span></div>')
+    return ('<div class="pitch-wrap"><div class="pitch"><i class="pl-half"></i><i class="pl-circle"></i><i class="pl-box b"></i>'
+            f'<i class="pl-box t"></i>{"".join(marks)}</div><div class="muted small pitch-cap">{esc(formation_name(f))} · '
+            f'{esc(tr("sq.xi", o=f"{squad_mod.team_rating(c, f):.1f}"))}</div></div>')
+
+def kind_badge(cd):
+    """Ярлык находки скаута на рынке: в основу, замена, перспектива, опыт, известный, находка, аренда."""
+    k = cd.get("kind")
+    if not k:
+        return ""
+    return f'<span class="kb kb-{esc(k)}">{esc(tr("find." + k))}</span>'
+
+def scout_scale(n):
+    return '<span class="sc-st"><span class="gold">' + "★" * n + '</span><span class="muted">' + "☆" * (5 - n) + "</span></span>"
+
 def squad_events_html(events):
     groups = {}
     for e in events:
@@ -163,7 +198,7 @@ def best_coach_html(r, d):
     rows = []
     for i, x in enumerate(bc["top"], 1):
         club = d.clubs[x["club"]]["name"] if x["club"] in d.clubs else ""
-        rows.append(f'<tr class="{"me" if x["me"] else ""}"><td>{i}</td><td>{esc(x["name"])}<div class="muted small">{esc(club)}</div></td>'
+        rows.append(f'<tr class="{"me" if x["me"] else ""}"><td>{i}</td><td>{flag(x.get("nat"), d)}{esc(x["name"])}<div class="muted small">{esc(club)}</div></td>'
                     f'<td>{x["pts"]:.1f}</td></tr>')
     extra = f'<div class="cap">{esc(tr("bc.my_rank", r=bc["rank"]))}</div>' if bc.get("rank") and bc["rank"] > 5 else ""
     return (f'<div class="blk"><div class="bh">{esc(tr("bc.title"))}</div><table class="tbl bdo"><tbody>{"".join(rows)}</tbody></table>{extra}</div>')
@@ -257,7 +292,7 @@ class CoachScreens:
                     stt, stc = tr("sq.offer", club=d.clubs[off["club"]]["name"], fee=eur(off["fee"])), theme.GOLD
                 fit = p.get("fit", 100.0)
                 fit_col = theme.ACCENT if fit >= 85 else theme.GOLD if fit >= 70 else theme.RED
-                name = esc(p["name"]) + (" ★" if p.get("real") else "")
+                name = flag(p.get("nat"), d) + esc(p["name"]) + (" ★" if p.get("real") else "")
                 buttons = ""
                 if sell:
                     if p.get("loan_from") and p["loan_from"] != cid:
@@ -285,7 +320,7 @@ class CoachScreens:
         out.append(f'<div class="d-only twrap"><table class="tbl wide squad"><thead><tr>{th}</tr></thead><tbody>{"".join(trows)}</tbody></table></div>')
         return "".join(out)
 
-    def lineup_html(self):
+    def lineup_html(self, pitch=False):
         c = self.career
         s = c.coach
         f = s.get("formation", squad_mod.DEFAULT_FORMATION)
@@ -306,11 +341,11 @@ class CoachScreens:
         rl = squad_mod.roles(c, f)
         cnt = tr("role.counts", x=sum(1 for v in rl.values() if v == "xi"), r=sum(1 for v in rl.values() if v == "rot"),
                  s=sum(1 for v in rl.values() if v == "res"))
-        return (f'<div class="panel"><div class="h2">{esc(tr("lineup.title", f=formation_name(f)))}</div>'
+        return (f'<div class="xi-cols">{pitch_html(c, self.d, f) if pitch else ""}<div class="panel"><div class="h2">{esc(tr("lineup.title", f=formation_name(f)))}</div>'
                 f'<label class="check"><input type="checkbox" data-onchange="lineup_auto"{"" if manual else " checked"}> {esc(tr("lineup.auto"))}</label>'
                 f'{"".join(rows)}<div class="b">{esc(tr("sq.xi", o=f"{squad_mod.team_rating(c, f):.1f}"))}</div><div class="small">{esc(cnt)}</div>'
                 f'<div class="muted small">{esc(tr("lineup.hint"))}</div><div class="muted small">{esc(tr("role.hint"))}</div>'
-                f'<div class="muted small">{esc(tr("rot.hint"))}</div></div>')
+                f'<div class="muted small">{esc(tr("rot.hint"))}</div></div></div>')
 
     def coach_seasons_html(self):
         c, d = self.career, self.d
@@ -410,7 +445,7 @@ class CoachScreens:
         rank, n, kind = cc.expected(cid)
         head = (f'<div class="panel club-h">{logo(cl, 56)}<div><div class="h2">{esc(cl["name"])}</div>'
                 f'<div class="muted small">{esc(tr("coach.header_sub", league=lg["name"], country=d.country_name(lg["country"], i18n.LANG), stars=stars_text(w.stars(cid)), ovr=round(w.team_ovr(cid))))}</div>'
-                f'<div class="gold small">{esc(c.name)} · {esc(tr("career.age", n=c.player.age))}</div></div></div>')
+                f'<div class="gold small">{flag(c.nat, d)}{esc(c.name)} · {esc(tr("career.age", n=c.player.age))}</div></div></div>')
         info = kv([(tr("coach.info_rating"), f"{s['rating']:.0f}"), (tr("coach.info_rep"), f"{s['rep']:.0f}"),
                    (tr("coach.budget"), eur(s.get("budget", 0.0))), (tr("coach.info_contract"), tr("coach.years_left", n=s["contract_left"])),
                    (tr("coach.info_project"), tr("coach.project." + s["project"])),
@@ -418,7 +453,7 @@ class CoachScreens:
         anger = (f'<div class="panel"><div class="h2">{esc(tr("coach.anger"))}</div>{meter(s["anger"])}'
                  f'<div class="muted small">{esc(tr("coach.anger_hint"))} · {esc(tr("coach.patience", p=patience_text(pressure(w.score[cid], s["project"]))))}</div></div>')
         tactic = self.ctx.get("tactic") or s.get("tactic", "balanced")
-        setup = (f'<div class="panel">{self.formation_select("c_formation")}{self.rotation_select("c_rotation")}'
+        setup = (f'<div class="panel">{self.formation_select("c_formation")}{pitch_html(c, d)}{self.rotation_select("c_rotation")}'
                  f'{self.tactic_html(tr("tactic.title"), tactic)}</div>')
         tab = self.ctx.get("tab") or "squad"
         tabs = chips("ctab", [("squad", tr("tab.squad")), ("lineup", tr("tab.lineup")), ("seasons", tr("tab.seasons"))], tab)
@@ -498,7 +533,7 @@ class CoachScreens:
         tabs = chips("tw_tab", [("market", tr("tw.tab_market")), ("squad", tr("tw.squad") + f" ({len(players)})"), ("lineup", tr("tab.lineup")),
                                 ("loans", tr("tw.tab_loans") + (f" ({n_lo})" if n_lo else "")),
                                 ("scouts", tr("tw.tab_scouts") + f" ({len(s.get('scouts') or [])})")], tab)
-        content = {"market": self.market_html, "squad": lambda: self.squad_html(sell=True), "lineup": self.lineup_html,
+        content = {"market": self.market_html, "squad": lambda: self.squad_html(sell=True), "lineup": lambda: self.lineup_html(pitch=True),
                    "loans": self.loans_html, "scouts": self.scouts_html}[tab]()
         body = head + notes_html + tabs + content + f'<p class="muted small">{esc(tr("tw.hint"))}</p>'
         title = tr("tw." + win["kind"], y=c.year if win["kind"] == "summer" else c.year + 1)
@@ -523,8 +558,15 @@ class CoachScreens:
         cur_sort = next((k for k, col, _ in SORTS if sort and sort[0] == col), "")
         filters = chips("tw_filter", [("", tr("filter.all"))] + [(ln, tr("line." + ln)) for ln in squad_mod.LINES], filt)
         sort_sel = select("tw_sort", [("", tr("web.sort_default"))] + [(k, tr("web.sort_" + k)) for k, _, _ in SORTS], cur_sort, tr("web.sort"))
-        out = [f'<div class="muted small">{esc(tr("tw.scouting", q=f"{100 * scouting(s):.0f}", w=pw))}</div>',
-               f'<div class="mk-tools">{filters}{sort_sel}</div>']
+        scouts = scouts_of(s)
+        out = [f'<div class="muted small">{esc(tr("tw.scouting", q=f"{100 * scouting(s):.0f}", w=pw))} · '
+               f'{esc(tr("tw.scouts_found", n=len(win["cands"]), k=len(scouts)))}</div>']
+        if not win["cands"]:
+            msg = tr("tw.no_scouts") if not scouts else tr("tw.no_finds")
+            out.append(f'<div class="panel empty-mk"><div class="b">{esc(msg)}</div>'
+                       + btn(esc(tr("tw.to_scouts")), "tw_tab", "scouts", "sm btn-primary") + "</div>")
+        else:
+            out.append(f'<div class="mk-tools">{filters}{sort_sel}</div>')
         cards, trows = [], []
         for i in idx:
             cd = win["cands"][i]
@@ -535,32 +577,36 @@ class CoachScreens:
             g = gains[i]
             ok = not cd["done"] and not cd.get("refuse") and cd["price"] <= s["budget"] + 1e-9 and not full
             ncls = "award b" if cd.get("pid") else "ok b" if cd.get("gem") else "b"
-            name = esc(cd["name"]) + (" ★" if real else "") + (" ◆" if cd.get("gem") else "")
-            eff = f'<span class="ok">+{g:.1f}</span>' if g >= 0.05 else '<span class="muted">—</span>'
+            name = flag(cd.get("nat"), d) + esc(cd["name"]) + (" ★" if real else "") + (" ◆" if cd.get("gem") else "")
+            role = "xi" if g >= 0.05 else tw.role_of(cd) if not cd["done"] else ""
+            eff = (f'<span class="ok">+{g:.1f}</span>' if g >= 0.05 else
+                   f'<span class="{"" if role == "rot" else "muted"}">{esc(tr("mkrole." + role))}</span>' if role else '<span class="muted">—</span>')
+            badge = kind_badge(cd) + (f' <span class="muted small">{esc(tr("find.by", n=cd["scout"]))}</span>' if cd.get("scout") else "")
             if cd.get("refuse") and not cd["done"]:
                 b = f'<div class="muted small">{esc(tr("tw.refuse"))}: {esc(tr("tw.refuse_tip"))}</div>'
             else:
                 buy_txt = tr("tw.loan_take") if cd.get("loan") else tr("tw.buy")
                 txt = tr("tw.bought") if cd["done"] else buy_txt if ok else (tr("tw.no_money") if cd["price"] > s["budget"] else buy_txt)
                 b = btn(esc(txt), "tw_buy", str(i), "sm" + (" btn-primary" if ok else ""), "" if ok else "disabled")
-            cards.append(f'<div class="pl"><b class="ppos">{esc(cd["pos"])}</b><div class="pl-m"><div class="{ncls}">{name}</div>'
+            cards.append(f'<div class="pl"><b class="ppos">{esc(cd["pos"])}</b><div class="pl-m"><div class="{ncls}">{name}</div><div>{badge}</div>'
                          f'<div class="muted small">{cd["age"]} · {esc(tr("col.pot"))} {pot_html(cd, pw)} · {esc(club)}</div>'
                          f'<div class="small"><span class="gold">{esc(eur(cd["price"]))}</span> · {esc(tr("col.effect"))} {eff}</div>{b}</div>'
                          f'<b class="povr">{cd["ovr"]:.0f}</b></div>')
-            trows.append(f'<tr><td class="l {ncls}">{name}</td><td>{esc(cd["pos"])}</td><td>{cd["age"]}</td><td class="b">{cd["ovr"]:.0f}</td>'
+            trows.append(f'<tr><td class="l {ncls}">{name}<div>{badge}</div></td><td>{esc(cd["pos"])}</td><td>{cd["age"]}</td><td class="b">{cd["ovr"]:.0f}</td>'
                          f'<td>{pot_html(cd, pw)}</td><td class="l muted">{esc(club)}</td><td class="gold">{esc(eur(cd["price"]))}</td>'
                          f'<td>{eff}</td><td class="l">{b}</td></tr>')
         th = "".join(f'<th{" class=l" if k in ("player", "club") else ""}>{esc(tr("col." + k))}</th>'
                      for k in ("player", "pos", "age", "ovr", "pot", "club", "price", "effect")) + "<th></th>"
-        out.append(f'<div class="m-only mk-cards">{"".join(cards)}</div>'
-                   f'<div class="d-only twrap"><table class="tbl wide"><thead><tr>{th}</tr></thead><tbody>{"".join(trows)}</tbody></table></div>')
+        if cards:
+            out.append(f'<div class="m-only mk-cards">{"".join(cards)}</div>'
+                       f'<div class="d-only twrap"><table class="tbl wide"><thead><tr>{th}</tr></thead><tbody>{"".join(trows)}</tbody></table></div>')
         if win["youth"]:
             out.append(f'<div class="h2 mt">{esc(tr("tw.youth"))}</div>')
             for i, y in enumerate(win["youth"]):
                 ok = not y["done"] and y["price"] <= s["budget"] + 1e-9 and not (y["kind"] == "talent" and full)
                 if y["kind"] == "talent":
-                    yp = {"age": 17, "ovr": y["ovr"], "pot": y["pot"], "name": y["name"]}
-                    info = (f'<div class="b">{esc(tr("tw.youth_talent", name=y["name"]))}</div>'
+                    yp = {"age": 17, "ovr": y["ovr"], "pot": y["pot"], "name": y["name"], "pot_hype": y.get("pot_hype")}
+                    info = (f'<div class="b">{flag(d.leagues[c.world.club_league[s["club"]]]["country"], d)}{esc(tr("tw.youth_talent", name=y["name"]))}</div>'
                             f'<div class="muted small">{esc(y["pos"])} · 17 · OVR {y["ovr"]:.0f} · {esc(tr("col.pot"))} {pot_html(yp, pw)}</div>')
                 else:
                     info = f'<div class="b">{esc(tr("tw.academy"))}</div><div class="muted small">{esc(tr("tw.academy_line"))}</div>'
@@ -582,7 +628,7 @@ class CoachScreens:
                 continue
             ok = not o["done"] and p["club"] == cid
             txt = tr("tw.loan_done") if o["done"] else tr("tw.loan_accept")
-            rows.append(f'<div class="pl"><b class="ppos">{esc(p["pos"])}</b><div class="pl-m"><div class="b">{esc(p["name"])}</div>'
+            rows.append(f'<div class="pl"><b class="ppos">{esc(p["pos"])}</b><div class="pl-m"><div class="b">{flag(p.get("nat"), d)}{esc(p["name"])}</div>'
                         f'<div class="muted small">{p["age"]} · {esc(tr("col.pot"))} {pot_html(p, pw)} · {esc(d.clubs[o["club"]]["name"])}</div>'
                         f'<div class="gold small">{esc(eur(o["fee"]))}</div>'
                         + btn(esc(txt), "tw_loan_offer", str(i), "sm" + (" btn-primary" if ok else ""), "" if ok else "disabled")
@@ -599,15 +645,18 @@ class CoachScreens:
         return "".join(out)
 
     def scouts_html(self):
-        s = self.career.coach
+        s, d = self.career.coach, self.d
         win = s["window"]
-        mine = s.get("scouts") or []
+        mine = scouts_of(s)
         def rows(items, label, enabled, act):
             out = []
             for i, x in enumerate(items):
                 ok = enabled(x)
-                out.append(f'<div class="pl"><div class="pl-m"><div class="b">{esc(x["name"])} <span class="gold">{"★" * x["stars"]}</span></div>'
-                           f'<div class="muted small">{esc(tr("sc.rating"))} {x["rating"]} · {esc(tr("sc.salary"))} {esc(eur(x["salary"]))}</div>'
+                finds = scout_finds(x, "summer")
+                out.append(f'<div class="pl sc-row"><div class="pl-m"><div class="b">{flag(x.get("nat"), d)}{esc(x["name"])}</div>'
+                           f'<div class="sc-scales"><span class="muted">{esc(tr("sc.judge"))}</span>{scout_scale(x["judge"])}'
+                           f'<span class="muted">{esc(tr("sc.reach"))}</span>{scout_scale(x["reach"])}</div>'
+                           f'<div class="muted small">{esc(tr("sc.finds", n=finds, w=(finds + 1) // 2))} · {esc(tr("sc.salary"))} {esc(eur(x["salary"]))}</div>'
                            + btn(esc(label(x)), act, str(i), "sm", "" if ok else "disabled") + "</div></div>")
             return '<div class="blk">' + "".join(out) + "</div>"
         out = [f'<div class="h2">{esc(tr("sc.mine", n=len(mine), m=MAX_SCOUTS))}</div>']
@@ -618,11 +667,8 @@ class CoachScreens:
             out.append(f'<div class="h2 mt">{esc(tr("sc.market"))}</div>')
             out.append(rows(market, lambda x: tr("sc.hired") if x["done"] else tr("sc.hire"),
                             lambda x: not x["done"] and not full and x["salary"] <= s["budget"] + 1e-9, "tw_hire"))
-        elif win["kind"] == "winter":
-            out.append(f'<p class="muted small">{esc(tr("sc.summer_only"))}</p>')
         out.append(f'<p class="muted small">{esc(tr("sc.hint"))}</p>')
         return "".join(out)
-
     def _tw(self):
         return self.career.coaching().window()
 
@@ -682,7 +728,7 @@ class CoachScreens:
         if not mid["fired"]:
             tactic = self.ctx.get("tactic") or s.get("tactic", "balanced")
             top += (f'<div class="panel">{self.tactic_html(tr("mid.second_half"), tactic)}{self.formation_select("m_formation")}'
-                    f'{self.rotation_select("m_rotation")}</div>')
+                    f'{pitch_html(c, d)}{self.rotation_select("m_rotation")}</div>')
             ev = squad_events_html(mid.get("squad_events") or [])
             if ev:
                 left += f'<div class="blk"><div class="bh">{esc(tr("sqev.title"))}</div><div class="pad lines">{ev}</div></div>'

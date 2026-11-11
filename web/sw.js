@@ -37,7 +37,7 @@ self.addEventListener("fetch", (e) => {
       .catch(() => caches.match("index.html", { cacheName: CACHE })));
     return;
   }
-  const runtime = url.hostname === "cdn.jsdelivr.net" || url.pathname.includes("/assets/logos/");
+  const runtime = url.hostname === "cdn.jsdelivr.net" || url.pathname.includes("/assets/logos/") || url.pathname.includes("/assets/flags/");
   e.respondWith(caches.match(req, { ignoreVary: true }).then((hit) => hit || fetch(req).then((r) => {
     if (runtime && (r.ok || r.type === "opaque")) { const copy = r.clone(); caches.open("runtime").then((c) => c.put(req, copy)); }
     return r;

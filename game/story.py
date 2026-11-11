@@ -249,9 +249,14 @@ def coach_facts(c, d, i):
     L = []
     add = L.append
     add(f"{T('Сезон', 'Season')}: {r['season']}")
-    add(f"{T('Герой', 'Hero')}: {c.name}, {r['age']} {T('лет', 'years old')}, "
-        + T(f"главный тренер (бывший футболист, позиция {c.pos}, завершил карьеру игрока в {c.player_retire_age} лет)",
-            f"head coach (a former {c.pos}, retired as a player at {c.player_retire_age})"))
+    if c.coach_only:
+        add(f"{T('Герой', 'Hero')}: {c.name}, {r['age']} {T('лет', 'years old')}, "
+            + T(f"главный тренер (профессионально в футбол не играл, стал тренером в {c.player_retire_age} лет)",
+                f"head coach (never played professionally, became a coach at {c.player_retire_age})"))
+    else:
+        add(f"{T('Герой', 'Hero')}: {c.name}, {r['age']} {T('лет', 'years old')}, "
+            + T(f"главный тренер (бывший футболист, позиция {c.pos}, завершил карьеру игрока в {c.player_retire_age} лет)",
+                f"head coach (a former {c.pos}, retired as a player at {c.player_retire_age})"))
     where = ", ".join(x for x in (cl.get("city"), cl.get("stadium") and f"{T('стадион', 'stadium')} {cl['stadium']}") if x)
     add(f"{T('Клуб', 'Club')}: {cl['name']}" + (f" ({where})" if where else "") + f", {r['league_name']} ({d.country_name(r['league_country'], i18n.LANG)})")
     add(f"{T('Задача руководства', 'Board target')}: {kind_text(r['kind'])} ({T('место', 'place')} {r['target']}); "
@@ -301,7 +306,11 @@ def career_so_far(c, d, key):
     kind, i, rec = record(c, key)
     prev = c.seasons[:i] if kind == "p" else c.seasons
     if not prev:
-        return T("Это первый сезон карьеры.", "This is the first season of the career.")
+        cs = c.coach["seasons"][:i] if kind == "c" else []
+        if not cs:
+            return T("Это первый сезон карьеры.", "This is the first season of the career.")
+        return T("Тренерская карьера до этого сезона: ", "Coaching career so far: ") + "; ".join(
+            f"{x['season']} {club_name(d, x['club'])} {x['rank']}/{x['n']}" for x in cs[-8:])
     clubs = []
     for s in prev:
         n = club_name(d, s["club"])

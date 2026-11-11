@@ -16,6 +16,8 @@ def summary_text(c, d):
     rep = c.report(); t = rep["totals"]
     gk = c.pos == "GK"
     L = [pages.end_sub(c, d), tr("end.reason." + (c.retire_reason or "choice")), ""]
+    if c.coach_only:                                     # тренер без игровой карьеры: только тренерские итоги
+        return "\n".join(L + coach_summary_lines(c, d))
     L += [f"{tr('end.games')}: {t['games']}", f"{tr('end.goals')}: {t['goals']}", f"{tr('end.assists')}: {t['assists']}"]
     if gk: L.append(f"{tr('end.cs')}: {t['cs']}")
     L += [f"{tr('end.caps')}: {t['caps']}", f"{tr('end.intl_goals')}: {t['intl_goals']}", f"{tr('end.peak')}: {tr('end.peak_val', o=rep['peak_ovr'], a=rep['peak_age'])}", ""]
@@ -29,15 +31,7 @@ def summary_text(c, d):
     L += ["", tr("end.tab.honours") + ":"]
     L += [f"  ◆ {t['season']}  {trophy_name(t)}" for t in c.trophies] + [f"  ★ {a['season']}  {award_name(a['code'], a.get('rank'))}" for a in c.awards]
     if c.coach and c.coach.get("seasons"):
-        sm = c.coaching().summary()
-        L += ["", tr("end.tab.coach") + ":",
-              f"  {tr('end.coach_seasons')}: {sm['seasons']} | {tr('end.coach_record')}: {sm['w']}-{sm['d']}-{sm['l']} ({sm['pct']}%) | "
-              f"{tr('end.coach_titles')}: {sm['titles']} | {tr('end.coach_fired')}: {sm['fired']}"]
-        for r in c.coach["seasons"]:
-            tro = ", ".join(trophy_name(t) for t in r["trophies"])
-            L.append(f"  {r['season']}  {d.clubs[r['club']]['name']:<26} {r['rank']}/{r['n']} ({tr('col.target')} {r['target']})  "
-                     f"{r['w']}-{r['d']}-{r['l']}  {r['anger_before']:.0f}->{r['anger_after']:.0f}  {tro}"
-                     + (f"  [{tr('verdict.' + r['verdict'])}]" if r.get("verdict") else ""))
+        L += [""] + coach_summary_lines(c, d)
     L += ["", tr("end.tab.seasons") + ":"]
     for s in c.seasons:
         L.append(f"  {s['season']}  {s['age']:>2}  {d.clubs[s['club']]['name']:<26} {s['rank']}/{s['n']}  {s['games']:>3}/{s['goals']:>3}/{s['cs'] if gk else s['assists']:>3}  OVR {s['ovr']}")
@@ -47,6 +41,21 @@ def summary_text(c, d):
             if e["kind"] != "friendly" or e["games"]:
                 L.append(f"        {nat_comp_name(e, d):<40} {e['games']:>3}/{e['goals']:>3}/{e['assists']:>3}  {nat_result(e, d)}")
     return "\n".join(L)
+
+def coach_summary_lines(c, d):
+    """Тренерская часть выгрузки итогов (общая для версии для компьютера и веб-версии)."""
+    if not (c.coach and c.coach.get("seasons")):
+        return [tr("end.tab.coach") + ": " + tr("end.none")]
+    sm = c.coaching().summary()
+    L = [tr("end.tab.coach") + ":",
+         f"  {tr('end.coach_seasons')}: {sm['seasons']} | {tr('end.coach_record')}: {sm['w']}-{sm['d']}-{sm['l']} ({sm['pct']}%) | "
+         f"{tr('end.coach_titles')}: {sm['titles']} | {tr('end.coach_fired')}: {sm['fired']}"]
+    for r in c.coach["seasons"]:
+        tro = ", ".join(trophy_name(t) for t in r["trophies"])
+        L.append(f"  {r['season']}  {d.clubs[r['club']]['name']:<26} {r['rank']}/{r['n']} ({tr('col.target')} {r['target']})  "
+                 f"{r['w']}-{r['d']}-{r['l']}  {r['anger_before']:.0f}->{r['anger_after']:.0f}  {tro}"
+                 + (f"  [{tr('verdict.' + r['verdict'])}]" if r.get("verdict") else ""))
+    return L
 
 class LoadDialog(QDialog):
     def __init__(self, data, parent=None):
@@ -110,7 +119,8 @@ class MainWindow(QMainWindow):
     # --- экраны
     def show_start(self):
         p = pages.StartPage(self.d)
-        p.proceed.connect(self.on_start); p.load_clicked.connect(self.on_load); p.lang_changed.connect(self.on_lang)
+        p.proceed.connect(self.on_start); p.coach_proceed.connect(self.on_coach_start)
+        p.load_clicked.connect(self.on_load); p.lang_changed.connect(self.on_lang)
         p.settings_clicked.connect(self.open_settings)
         self._set(p)
 
@@ -120,6 +130,11 @@ class MainWindow(QMainWindow):
     def on_start(self, name, nat, pos, foot, height):
         self.career = Career(self.d, name, nat, pos, 1, lang=i18n.LANG, foot=foot, height=height)    # предложения клубов после каждого сезона
         self.show_summary()
+
+    def on_coach_start(self, name, nat, age):
+        """Карьера сразу тренером: без академии и игровых сезонов - прямо к предложениям клубов."""
+        self.career = Career.new_coach(self.d, name, nat, age, lang=i18n.LANG)
+        saves.save(self.career); self.show_coach_offers()
 
     def show_summary(self):
         p = pages.SummaryPage(self.career, self.d)

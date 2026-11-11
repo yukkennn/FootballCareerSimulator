@@ -75,6 +75,13 @@ def run(lang="ru", shots=False):
             assert isinstance(w.page, coach_pages.TransferWindowPage)               # летнее трансферное окно
             win = w.career.coach["window"]; b0 = w.career.coach["budget"]
             if k == 0:                                                             # сортировка и фильтр рынка
+                # без скаутов рынка нет (скауты работают на клуб: в новом клубе их нет); нанятый скаут сразу приносит игроков
+                assert not w.career.coach.get("scouts") and not win["cands"]
+                mk = win["scout_market"]
+                w.page.action.emit("hire", min(range(len(mk)), key=lambda j: mk[j]["salary"]))   # самый дешёвый: находит 2-3 игроков
+                assert len(w.career.coach["window"]["cands"]) >= 2
+                w.page.action.emit("fire", 0); assert not w.career.coach["scouts"]
+                win = w.career.coach["window"]; b0 = w.career.coach["budget"]
                 mt = w.page.mt
                 ovr = lambda: [int(mt.item(r, 3).text()) for r in range(mt.rowCount())]
                 w.page._sort_clicked(3); assert ovr() == sorted(ovr(), reverse=True)
@@ -83,15 +90,16 @@ def run(lang="ru", shots=False):
                 w.page.filter.setCurrentIndex(2)                                   # только защитники
                 assert all(squad_mod.LINE[mt.item(r, 1).text()] == "DEF" for r in range(mt.rowCount()))
                 w.page.filter.setCurrentIndex(0)
-                assert len(win["cands"]) >= 12
-                # скаут: нанимаем самого дешёвого, вилка потенциала сужается
+                assert len(win["cands"]) >= 2                                      # находки уволенного скаута остаются до конца окна
+                # ещё один скаут (из тех, кого не нанимали): вилка потенциала сужается или остаётся
                 from game import transfers as tr_mod
                 w0 = tr_mod.pot_width(w.career.coach)
-                w.page.action.emit("hire", 0)
-                assert len(w.career.coach["scouts"]) == 1 and tr_mod.pot_width(w.career.coach) <= w0
-                w.page.ltabs.setCurrentIndex(4); snap("9a_transfer_scouts")
-                w.page.action.emit("fire", 0); assert not w.career.coach["scouts"]
-                w.page.action.emit("hire", 2 if w.career.coach["budget"] > 3 else 0)
+                w.page.ltabs.setCurrentIndex(4)
+                free = [j for j, x in enumerate(mk) if not x["done"] and x["salary"] <= w.career.coach["budget"]]
+                if free:
+                    w.page.action.emit("hire", min(free, key=lambda j: mk[j]["salary"]))
+                    assert len(w.career.coach["scouts"]) == 1 and tr_mod.pot_width(w.career.coach) <= w0
+                snap("9a_transfer_scouts")
                 assert w.page.ltabs.currentIndex() == 4                          # вкладка помнится после перестройки экрана
                 w.page.ltabs.setCurrentIndex(0)
                 win = w.career.coach["window"]; b0 = w.career.coach["budget"]

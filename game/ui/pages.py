@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (QWidget, QFrame, QLabel, QLineEdit, QListWidget, 
 from .. import i18n
 from ..i18n import tr
 from ..career import market_value
+from ..coach import COACH_START_MIN, COACH_START_MAX, COACH_START_DEFAULT
 from ..positions import POSITIONS, OUT_ATTRS, TYPICAL_HEIGHT, HEIGHT_MIN, HEIGHT_MAX, LEFT_SIDE, RIGHT_SIDE
 from ..stars import gen_name
 from .. import stars as stars_mod
@@ -49,15 +50,24 @@ def youth_league_name(s):
 # ======================================================================================= старт
 class StartPage(QWidget):
     proceed = Signal(str, str, str, str, int)          # имя, страна, позиция, ведущая нога, рост
+    coach_proceed = Signal(str, str, int)              # карьера сразу тренером: имя, страна, возраст
     load_clicked = Signal()
     lang_changed = Signal(str)
     settings_clicked = Signal()
 
     def __init__(self, data):
         super().__init__(); self.setObjectName("page")
-        self.d, self.nat, self.pos = data, None, None
+        self.d, self.nat, self.pos, self.mode = data, None, None, "player"
         root = QVBoxLayout(self); root.setContentsMargins(32, 24, 32, 24); root.setSpacing(16)
-        top = QHBoxLayout(); top.addWidget(label(tr("start.heading"), "title")); top.addStretch()
+        self.heading = label(tr("start.heading"), "title")
+        top = QHBoxLayout(); top.addWidget(self.heading); top.addSpacing(24)
+        # выбор режима: карьера игрока (академия с 15 лет) или сразу тренерская карьера
+        self.mode_group = QButtonGroup(self); self.mode_group.setExclusive(True)
+        for m in ("player", "coach"):
+            b = QPushButton(tr("start.mode_" + m)); b.setCheckable(True); b.setChecked(m == "player"); b.setProperty("mode", m)
+            b.setToolTip(tr("start.mode")); b.clicked.connect(lambda _=False, m=m: self._set_mode(m))
+            self.mode_group.addButton(b); top.addWidget(b)
+        top.addStretch()
         top.addWidget(label(tr("start.lang"), "muted"))
         self.lang = QComboBox(); self.lang.addItem("Русский", "ru"); self.lang.addItem("English", "en")
         self.lang.setCurrentIndex(0 if i18n.LANG == "ru" else 1)
@@ -69,7 +79,7 @@ class StartPage(QWidget):
         body = QHBoxLayout(); body.setSpacing(20); root.addLayout(body, 1)
 
         left = panel(); ll = QVBoxLayout(left); ll.setContentsMargins(18, 16, 18, 16); ll.setSpacing(8)
-        ll.addWidget(label(tr("start.name"), "muted"))
+        self.name_label = label(tr("start.name"), "muted"); ll.addWidget(self.name_label)
         nrow = QHBoxLayout(); nrow.setSpacing(8)
         self.first = QLineEdit(); self.first.setPlaceholderText(tr("start.first")); nrow.addWidget(self.first, 1)
         self.last = QLineEdit(); self.last.setPlaceholderText(tr("start.last")); nrow.addWidget(self.last, 1)
@@ -90,7 +100,9 @@ class StartPage(QWidget):
         self.sel_label = label(tr("start.selected", c=tr("start.none")), "muted"); ll.addWidget(self.sel_label)
         left.setMinimumWidth(360); body.addWidget(left, 4)
 
-        right = panel(); rl = QVBoxLayout(right); rl.setContentsMargins(18, 16, 18, 16); rl.setSpacing(10)
+        right = panel(); outer = QVBoxLayout(right); outer.setContentsMargins(18, 16, 18, 16); outer.setSpacing(10)
+        self.player_box = QWidget(); rl = QVBoxLayout(self.player_box); rl.setContentsMargins(0, 0, 0, 0); rl.setSpacing(10)
+        outer.addWidget(self.player_box)
         rl.addWidget(label(tr("start.position"), "h2"))
         self.pos_group = QButtonGroup(self); self.pos_group.setExclusive(True)
         for gkey, plist in POS_GROUPS:
@@ -122,10 +134,29 @@ class StartPage(QWidget):
         self._height_touched = False                 # рост, изменённый вручную, больше не подстраивается под позицию
         self.height.valueChanged.connect(lambda _: setattr(self, "_height_touched", True))
         self._upd_phys()
-        rl.addStretch()
+        # --- карьера тренера: возраст начала
+        self.coach_box = QWidget(); cl = QVBoxLayout(self.coach_box); cl.setContentsMargins(0, 0, 0, 0); cl.setSpacing(10)
+        cl.addWidget(label(tr("start.coach_age"), "h2"))
+        arow = QHBoxLayout()
+        self.coach_age = QSpinBox(); self.coach_age.setRange(COACH_START_MIN, COACH_START_MAX); self.coach_age.setValue(COACH_START_DEFAULT)
+        self.coach_age.setSuffix(" " + tr("start.years")); self.coach_age.setMinimumWidth(110); arow.addWidget(self.coach_age); arow.addStretch()
+        cl.addLayout(arow)
+        cl.addWidget(label(tr("start.coach_hint"), "muted", True))
+        self.coach_box.setVisible(False); outer.addWidget(self.coach_box)
+        outer.addStretch()
         self.btn_next = QPushButton(tr("start.next")); self.btn_next.setObjectName("primary"); self.btn_next.setEnabled(False)
-        self.btn_next.clicked.connect(self._go); rl.addWidget(self.btn_next, 0, Qt.AlignRight)
+        self.btn_next.clicked.connect(self._go); outer.addWidget(self.btn_next, 0, Qt.AlignRight)
         body.addWidget(right, 7)
+
+    def _set_mode(self, mode):
+        """Переключение «карьера игрока» / «карьера тренера»: имя и страна общие, справа - позиция и физика или возраст тренера."""
+        self.mode = mode
+        coach = mode == "coach"
+        self.player_box.setVisible(not coach); self.coach_box.setVisible(coach)
+        self.heading.setText(tr("start.heading_coach" if coach else "start.heading"))
+        self.name_label.setText(tr("start.name_coach" if coach else "start.name"))
+        self.btn_next.setText(tr("start.coach_go" if coach else "start.next"))
+        self._upd()
 
     def _filter(self, text):
         t = text.strip().lower()
@@ -171,7 +202,7 @@ class StartPage(QWidget):
         self.phys_hint.setText(" ".join(notes))
 
     def _upd(self):
-        self.btn_next.setEnabled(bool(self.nat and self.pos))
+        self.btn_next.setEnabled(bool(self.nat and (self.pos or self.mode == "coach")))
 
     def _random_name(self):
         """Имя и фамилия, типичные для выбранной страны (те же списки, что у молодых звёзд мира)."""
@@ -180,9 +211,12 @@ class StartPage(QWidget):
         self.first.setText(first); self.last.setText(last)
 
     def player_name(self):
-        return " ".join(x for x in (self.first.text().strip(), self.last.text().strip()) if x) or tr("start.name_default")
+        return " ".join(x for x in (self.first.text().strip(), self.last.text().strip()) if x) or \
+            tr("start.name_default_coach" if self.mode == "coach" else "start.name_default")
 
     def _go(self):
+        if self.mode == "coach":
+            self.coach_proceed.emit(self.player_name(), self.nat, self.coach_age.value()); return
         self.proceed.emit(self.player_name(), self.nat, self.pos, self.foot(), self.height.value())
 
 # ======================================================================================= сводка
@@ -690,13 +724,39 @@ class EndPage(QWidget):
     def __init__(self, career, data):
         super().__init__(); self.setObjectName("page")
         c, d = career, data
-        rep = c.report(); cc = d.clubs[rep["coach_club"]]
+        rep = c.report(); cc = d.clubs.get(rep["coach_club"])
         root = QVBoxLayout(self); root.setContentsMargins(32, 24, 32, 24); root.setSpacing(10)
-        head = QHBoxLayout(); head.addWidget(logo_label(cc, 72))
+        head = QHBoxLayout()
+        if cc:
+            head.addWidget(logo_label(cc, 72))
         col = QVBoxLayout(); col.addWidget(label(tr("end.title"), "title"))
         col.addWidget(label(end_sub(c, d), "h2", True))
         col.addWidget(label(tr("end.reason." + (c.retire_reason or "choice")), "muted")); head.addLayout(col, 1); root.addLayout(head)
         tabs = QTabWidget(); root.addWidget(tabs, 1)
+        if c.coach_only:                                       # тренер без игровой карьеры: только тренерские вкладки
+            self._coach_only_tabs(tabs, c, d)
+        else:
+            self._player_tabs(tabs, c, d, rep)
+        row = QHBoxLayout()
+        b = QPushButton(tr("end.export")); b.clicked.connect(self.export.emit); row.addWidget(b)
+        dz = QPushButton(tr("ai.diaries")); dz.clicked.connect(lambda: self.diary.emit("")); row.addWidget(dz); row.addStretch()
+        if c.coach is None:                                    # игрок завершил карьеру без тренерства: можно стать тренером и сейчас
+            bc = QPushButton(tr("end.become_coach")); bc.clicked.connect(self.become_coach.emit); row.addWidget(bc)
+        n = QPushButton(tr("end.new")); n.setObjectName("primary"); n.clicked.connect(self.new_career.emit); row.addWidget(n)
+        q = QPushButton(tr("end.quit")); q.clicked.connect(self.quit_game.emit); row.addWidget(q)
+        root.addLayout(row)
+
+    def _coach_only_tabs(self, tabs, c, d):
+        if not c.coach.get("seasons"):
+            w = QWidget(); v = QVBoxLayout(w); v.setContentsMargins(24, 20, 24, 20)
+            v.addWidget(label(tr("end.no_coach_seasons"), "muted")); v.addStretch()
+            tabs.addTab(w, tr("end.tab.coach")); return
+        from .coach_pages import coach_summary_widget, coach_seasons_table
+        tabs.addTab(coach_summary_widget(c, d), tr("end.tab.coach"))
+        tabs.addTab(coach_seasons_table(c, d), tr("end.tab.coach_seasons"))
+        tabs.addTab(self._honours(c, d), tr("end.tab.honours"))
+
+    def _player_tabs(self, tabs, c, d, rep):
         tabs.addTab(self._summary(c, d, rep), tr("end.tab.summary"))
         tabs.addTab(self._seasons(c, d), tr("end.tab.seasons"))
         tabs.addTab(self._comps(c, rep), tr("end.tab.comps"))
@@ -710,14 +770,6 @@ class EndPage(QWidget):
             tabs.addTab(coach_summary_widget(c, d), tr("end.tab.coach"))
             tabs.addTab(coach_seasons_table(c, d), tr("end.tab.coach_seasons"))
             tabs.setCurrentIndex(tabs.count() - 2)
-        row = QHBoxLayout()
-        b = QPushButton(tr("end.export")); b.clicked.connect(self.export.emit); row.addWidget(b)
-        dz = QPushButton(tr("ai.diaries")); dz.clicked.connect(lambda: self.diary.emit("")); row.addWidget(dz); row.addStretch()
-        if c.coach is None:                                    # игрок завершил карьеру без тренерства: можно стать тренером и сейчас
-            bc = QPushButton(tr("end.become_coach")); bc.clicked.connect(self.become_coach.emit); row.addWidget(bc)
-        n = QPushButton(tr("end.new")); n.setObjectName("primary"); n.clicked.connect(self.new_career.emit); row.addWidget(n)
-        q = QPushButton(tr("end.quit")); q.clicked.connect(self.quit_game.emit); row.addWidget(q)
-        root.addLayout(row)
 
     def _summary(self, c, d, rep):
         t = rep["totals"]; w = QWidget(); g = QGridLayout(w); g.setContentsMargins(24, 20, 24, 20); g.setVerticalSpacing(10); g.setHorizontalSpacing(30)
@@ -803,6 +855,8 @@ def club_stint_text(x, d):
 
 def end_sub(c, d):
     """«Имя завершил карьеру в N лет»; если был тренером - и возраст завершения тренерской карьеры."""
+    if c.coach_only:
+        return tr("end.sub_coach_only", name=c.name, age=c.player_retire_age, cage=c.player.age)
     if c.coach and c.coach.get("seasons"):
         return tr("end.sub_coach", name=c.name, age=c.player_retire_age, cage=c.player.age)
     return tr("end.sub_young", name=c.name, age=c.player_retire_age)

@@ -9,6 +9,7 @@ import json, random, time, traceback
 from .. import i18n, saves
 from ..i18n import tr
 from ..career import Career, market_value
+from ..coach import COACH_START_MIN, COACH_START_MAX, COACH_START_DEFAULT
 from ..data import GameData
 from ..positions import TYPICAL_HEIGHT, HEIGHT_MIN, HEIGHT_MAX, LEFT_SIDE, RIGHT_SIDE
 from ..stars import gen_name
@@ -16,7 +17,7 @@ from .. import stars as stars_mod
 from ..text import (money, trophy_name, stars_text, short_trophy, lang_name, club_result, nat_comp_name, nat_result, award_name,
                     season_award_names, chronicle_text)
 from ..ui import theme
-from .parts import esc, btn, logo, player_card, ovr_chart, club_card, kv
+from .parts import esc, btn, logo, player_card, ovr_chart, club_card, kv, flag
 from .report import season_html
 from .coach import CoachScreens
 from .. import story as story_mod
@@ -37,6 +38,8 @@ def club_stint_text(x, d):
     return f"{d.clubs[x['club']]['name']} ({x['y0']}–{x['y1']})" if "y0" in x else f"{d.clubs[x['club']]['name']} ({x['from'][:4]}–{x['to'][:4]})"
 
 def end_sub(c):
+    if c.coach_only:
+        return tr("end.sub_coach_only", name=c.name, age=c.player_retire_age, cage=c.player.age)
     if c.coach and c.coach.get("seasons"):
         return tr("end.sub_coach", name=c.name, age=c.player_retire_age, cage=c.player.age)
     return tr("end.sub_young", name=c.name, age=c.player_retire_age)
@@ -46,6 +49,8 @@ def summary_text(c, d):
     rep = c.report(); t = rep["totals"]
     gk = c.pos == "GK"
     L = [end_sub(c), tr("end.reason." + (c.retire_reason or "choice")), ""]
+    if c.coach_only:                                  # тренер без игровой карьеры: только тренерские итоги
+        return "\n".join(L + coach_summary_lines(c, d))
     L += [f"{tr('end.games')}: {t['games']}", f"{tr('end.goals')}: {t['goals']}", f"{tr('end.assists')}: {t['assists']}"]
     if gk: L.append(f"{tr('end.cs')}: {t['cs']}")
     L += [f"{tr('end.caps')}: {t['caps']}", f"{tr('end.intl_goals')}: {t['intl_goals']}", f"{tr('end.peak')}: {tr('end.peak_val', o=rep['peak_ovr'], a=rep['peak_age'])}", ""]
@@ -59,15 +64,7 @@ def summary_text(c, d):
     L += ["", tr("end.tab.honours") + ":"]
     L += [f"  ◆ {t['season']}  {trophy_name(t)}" for t in c.trophies] + [f"  ★ {a['season']}  {award_name(a['code'], a.get('rank'))}" for a in c.awards]
     if c.coach and c.coach.get("seasons"):
-        sm = c.coaching().summary()
-        L += ["", tr("end.tab.coach") + ":",
-              f"  {tr('end.coach_seasons')}: {sm['seasons']} | {tr('end.coach_record')}: {sm['w']}-{sm['d']}-{sm['l']} ({sm['pct']}%) | "
-              f"{tr('end.coach_titles')}: {sm['titles']} | {tr('end.coach_fired')}: {sm['fired']}"]
-        for r in c.coach["seasons"]:
-            tro = ", ".join(trophy_name(t) for t in r["trophies"])
-            L.append(f"  {r['season']}  {d.clubs[r['club']]['name']:<26} {r['rank']}/{r['n']} ({tr('col.target')} {r['target']})  "
-                     f"{r['w']}-{r['d']}-{r['l']}  {r['anger_before']:.0f}->{r['anger_after']:.0f}  {tro}"
-                     + (f"  [{tr('verdict.' + r['verdict'])}]" if r.get("verdict") else ""))
+        L += [""] + coach_summary_lines(c, d)
     L += ["", tr("end.tab.seasons") + ":"]
     for s in c.seasons:
         L.append(f"  {s['season']}  {s['age']:>2}  {d.clubs[s['club']]['name']:<26} {s['rank']}/{s['n']}  {s['games']:>3}/{s['goals']:>3}/{s['cs'] if gk else s['assists']:>3}  OVR {s['ovr']}")
@@ -77,6 +74,21 @@ def summary_text(c, d):
             if e["kind"] != "friendly" or e["games"]:
                 L.append(f"        {nat_comp_name(e, d):<40} {e['games']:>3}/{e['goals']:>3}/{e['assists']:>3}  {nat_result(e, d)}")
     return "\n".join(L)
+
+def coach_summary_lines(c, d):
+    """Тренерская часть выгрузки итогов (как в game/ui/main_window.py)."""
+    if not (c.coach and c.coach.get("seasons")):
+        return [tr("end.tab.coach") + ": " + tr("end.none")]
+    sm = c.coaching().summary()
+    L = [tr("end.tab.coach") + ":",
+         f"  {tr('end.coach_seasons')}: {sm['seasons']} | {tr('end.coach_record')}: {sm['w']}-{sm['d']}-{sm['l']} ({sm['pct']}%) | "
+         f"{tr('end.coach_titles')}: {sm['titles']} | {tr('end.coach_fired')}: {sm['fired']}"]
+    for r in c.coach["seasons"]:
+        tro = ", ".join(trophy_name(t) for t in r["trophies"])
+        L.append(f"  {r['season']}  {d.clubs[r['club']]['name']:<26} {r['rank']}/{r['n']} ({tr('col.target')} {r['target']})  "
+                 f"{r['w']}-{r['d']}-{r['l']}  {r['anger_before']:.0f}->{r['anger_after']:.0f}  {tro}"
+                 + (f"  [{tr('verdict.' + r['verdict'])}]" if r.get("verdict") else ""))
+    return L
 
 REPO_URL = "https://github.com/yukkennn/FootballCareerSimulator"
 LICENSE_URL = "https://creativecommons.org/licenses/by-nc/4.0/"
@@ -112,7 +124,7 @@ class WebApp(CoachScreens):
         self.career = None
         self.view, self.ctx = "start", {}
         self.modal = None
-        self.form = {"first": "", "last": "", "nat": "", "pos": "", "foot": "R", "height": 180}
+        self.form = {"first": "", "last": "", "nat": "", "pos": "", "foot": "R", "height": 180, "mode": "player", "age": COACH_START_DEFAULT}
         self.last_form = {}
         self._out = {}
         self._writing = set()             # сезоны, дневник которых сейчас пишет нейросеть
@@ -166,6 +178,8 @@ class WebApp(CoachScreens):
                     self.form[k] = f[k]
             if f.get("height"):
                 self.form["height"] = int(f["height"])
+            if f.get("age"):
+                self.form["age"] = max(COACH_START_MIN, min(COACH_START_MAX, int(f["age"])))
 
     def go(self, view, **ctx):
         self.view, self.ctx, self.modal = view, ctx, None
@@ -178,7 +192,12 @@ class WebApp(CoachScreens):
         d, f, lang = self.d, self.form, i18n.LANG
         langs = "".join(f'<button class="chip{" on" if lang == k else ""}" data-act="lang" data-arg="{k}">{k.upper()}</button>' for k in ("ru", "en"))
         right = f'<div class="langs">{langs}{btn("⚙", "settings", kind="ghost", extra=f'aria-label="{esc(tr("web.settings"))}"')}</div>'
-        name = (f'<div class="panel a-name"><div class="muted small">{esc(tr("start.name"))}</div><div class="row">'
+        coach = f["mode"] == "coach"
+        # выбор режима: карьера игрока (академия с 15 лет) или сразу тренерская карьера
+        modes = "".join(f'<button class="chip{" on" if f["mode"] == m else ""}" data-act="mode" data-arg="{m}">{esc(tr("start.mode_" + m))}</button>'
+                        for m in ("player", "coach"))
+        mode = f'<div class="panel a-mode"><div class="muted small">{esc(tr("start.mode"))}</div><div class="tabs">{modes}</div></div>'
+        name = (f'<div class="panel a-name"><div class="muted small">{esc(tr("start.name_coach" if coach else "start.name"))}</div><div class="row">'
                 f'<input name="first" value="{esc(f["first"])}" placeholder="{esc(tr("start.first"))}" autocomplete="off">'
                 f'<input name="last" value="{esc(f["last"])}" placeholder="{esc(tr("start.last"))}" autocomplete="off">'
                 f'<button class="btn icon" data-partial="random_name" title="{esc(tr("start.random_name_tip"))}" aria-label="{esc(tr("start.random_name"))}">🎲</button></div></div>')
@@ -207,8 +226,17 @@ class WebApp(CoachScreens):
                 f'<div class="ph-height"><div class="h2">{esc(tr("start.height"))}: <span id="hval">{f["height"]}</span> {esc(tr("start.cm"))}</div>'
                 f'<input type="range" name="height" min="{HEIGHT_MIN}" max="{HEIGHT_MAX}" value="{f["height"]}" data-partial="phys" data-live="#hval">'
                 f'<div class="muted small" id="height_typ">{esc(typ)}</div></div><div class="hint" id="phys_hint">{esc(hint)}</div></div>')
+        if coach:
+            age = (f'<div class="panel a-pos"><div class="h2">{esc(tr("start.coach_age"))}: <span id="aval">{f["age"]}</span> {esc(tr("start.years"))}</div>'
+                   f'<input type="range" name="age" min="{COACH_START_MIN}" max="{COACH_START_MAX}" value="{f["age"]}" data-live="#aval">'
+                   f'<div class="hint">{esc(tr("start.coach_hint"))}</div></div>')
+            footer = btn(esc(tr("start.load")), "show_load") + btn(esc(tr("start.coach_go")), "start", kind="primary")
+            return screen(esc(tr("start.heading_coach")), mode + name + country + age + copyright_html(), footer, right=right)
         footer = btn(esc(tr("start.load")), "show_load") + btn(esc(tr("start.next")), "start", kind="primary")
-        return screen(esc(tr("start.heading")), name + country + position + phys + copyright_html(), footer, right=right)
+        return screen(esc(tr("start.heading")), mode + name + country + position + phys + copyright_html(), footer, right=right)
+
+    def a_mode(self, mode):
+        self.form["mode"] = "coach" if mode == "coach" else "player"
 
     def _sel_text(self):
         nat = self.form["nat"]
@@ -262,6 +290,10 @@ class WebApp(CoachScreens):
         f = self.form
         if not f["nat"]:
             self._out["toast"] = tr("web.pick_country"); return
+        if f["mode"] == "coach":                      # сразу тренер: без академии - прямо к предложениям клубов
+            name = " ".join(x for x in (f["first"].strip(), f["last"].strip()) if x) or tr("start.name_default_coach")
+            self.career = Career.new_coach(self.d, name, f["nat"], int(f["age"]), lang=i18n.LANG)
+            self.save(); self.go("coach_offers"); return
         if not f["pos"]:
             self._out["toast"] = tr("web.pick_pos"); return
         name = " ".join(x for x in (f["first"].strip(), f["last"].strip()) if x) or tr("start.name_default")
@@ -279,7 +311,7 @@ class WebApp(CoachScreens):
                 (tr("summary.position"), pos_text(c.pos)),
                 (tr("summary.physique"), f"{tr('foot_short.' + c.player.foot)} · {c.player.height} {tr('start.cm')}"),
                 (tr("summary.age"), tr("summary.age_val", n=15)), (tr("summary.start"), "2026/27")]
-        body = (f'<div class="a-card">{player_card(c.player, d.country_name(c.nat, i18n.LANG))}</div><div class="a-info">{kv(rows)}'
+        body = (f'<div class="a-card">{player_card(c.player, d.country_name(c.nat, i18n.LANG), flag(c.nat, d))}</div><div class="a-info">{kv(rows)}'
                 f'<p class="muted small">{esc(tr("summary.pot"))}</p><p class="muted small">{esc(tr("summary.rule"))}</p></div>')
         footer = btn(esc(tr("summary.reroll")), "reroll") + btn(esc(tr("summary.go")), "to_academy", kind="primary")
         return screen(esc(tr("summary.title")), body, footer, left=btn("‹", "home", kind="ghost", extra=f'aria-label="{esc(tr("summary.back"))}"'))
@@ -367,7 +399,7 @@ class WebApp(CoachScreens):
         n_aw = sum(1 for x in c.awards if x["code"] != "ballon_top30")
         totals = f'<div class="panel muted small">{esc(tr("career.totals", g=g, a=go, s=a, t=len(c.trophies), w=n_aw))}</div>'
         body = (head.replace('class="panel club-h"', 'class="panel club-h a-head"', 1)
-                + f'<div class="a-left">{player_card(pl, d.country_name(c.nat, i18n.LANG))}{ovr_chart(pts, tr("chart.title"))}</div>'
+                + f'<div class="a-left">{player_card(pl, d.country_name(c.nat, i18n.LANG), flag(c.nat, d))}{ovr_chart(pts, tr("chart.title"))}</div>'
                 + f'<div class="a-seasons"><div class="h2 mt m-only">{esc(tr("web.seasons"))}</div>{self.season_rows("career")}{totals}'
                 + f'<p class="muted small">{esc(tr("career.autosave"))}</p></div>')
         play = tr("career.play_academy") if youth else tr(f"career.play_{c.freq if not c.parent_id else 1}")
@@ -583,18 +615,24 @@ class WebApp(CoachScreens):
 
     def v_end(self):
         c, d = self.career, self.d
-        rep = c.report(); cc = d.clubs[rep["coach_club"]]
+        rep = c.report(); cc = d.clubs.get(rep["coach_club"])
         tab = self.ctx.get("tab") or "summary"
-        tabs = [("summary", tr("end.tab.summary")), ("seasons", tr("end.tab.seasons")), ("comps", tr("end.tab.comps")),
-                ("transfers", tr("end.tab.transfers")), ("honours", tr("end.tab.honours"))]
-        if any(s.get("chronicle") for s in c.seasons):
-            tabs.append(("chronicle", tr("end.tab.chronicle")))
-        if c.coach and c.coach.get("seasons"):
-            tabs = [("coach", tr("end.tab.coach")), ("coach_seasons", tr("end.tab.coach_seasons"))] + tabs
-        elif tab.startswith("coach"):
-            tab = "summary"
+        has_coach = bool(c.coach and c.coach.get("seasons"))
+        if c.coach_only:                              # тренер без игровой карьеры: только тренерские вкладки
+            tabs = [("coach", tr("end.tab.coach")), ("coach_seasons", tr("end.tab.coach_seasons")), ("honours", tr("end.tab.honours"))] if has_coach else []
+            if tab not in dict(tabs):
+                tab = "coach" if has_coach else "none"
+        else:
+            tabs = [("summary", tr("end.tab.summary")), ("seasons", tr("end.tab.seasons")), ("comps", tr("end.tab.comps")),
+                    ("transfers", tr("end.tab.transfers")), ("honours", tr("end.tab.honours"))]
+            if any(s.get("chronicle") for s in c.seasons):
+                tabs.append(("chronicle", tr("end.tab.chronicle")))
+            if has_coach:
+                tabs = [("coach", tr("end.tab.coach")), ("coach_seasons", tr("end.tab.coach_seasons"))] + tabs
+            elif tab.startswith("coach"):
+                tab = "summary"
         chips = "".join(f'<button class="chip{" on" if k == tab else ""}" data-act="tab" data-arg="{k}">{esc(t)}</button>' for k, t in tabs)
-        head = (f'<div class="panel club-h">{logo(cc, 64)}<div><div class="h2">{esc(end_sub(c))}</div>'
+        head = (f'<div class="panel club-h">{logo(cc, 64) if cc else ""}<div><div class="h2">{esc(end_sub(c))}</div>'
                 f'<div class="muted small">{esc(tr("end.reason." + (c.retire_reason or "choice")))}</div></div></div>')
         body = head + f'<div class="tabs">{chips}</div>' + getattr(self, "end_" + tab)(rep)
         footer = btn(esc(tr("web.export")), "export_text")
@@ -605,6 +643,9 @@ class WebApp(CoachScreens):
 
     def a_tab(self, tab):
         self.ctx["tab"] = tab
+
+    def end_none(self, rep):
+        return f'<div class="panel">{esc(tr("end.no_coach_seasons"))}</div>'
 
     def end_summary(self, rep):
         c, d = self.career, self.d
@@ -666,6 +707,13 @@ class WebApp(CoachScreens):
             club = d.clubs[a["club"]]["name"] if a.get("club") in d.clubs else ""
             items.append((a["season"], 1, f'<div class="li awardbg"><span class="muted">{esc(a["season"])}</span> <b class="award">★ {esc(award_name(a["code"], a.get("rank")))}</b>'
                                           f'<div class="muted small">{esc(club)}</div></div>'))
+        if c.coach_only:                              # у тренера без игровой карьеры здесь его тренерские трофеи и награды
+            for t in c.coach.get("trophies", []):
+                items.append((t["season"], 2, f'<div class="li"><span class="muted">{esc(t["season"])}</span> <span class="gold">◆ {esc(trophy_name(t))}</span>'
+                                              f'<div class="muted small">{esc(tr("hon.coach"))} · {esc(d.clubs[t["club"]]["name"])}</div></div>'))
+            for a in c.coach.get("awards", []):
+                items.append((a["season"], 3, f'<div class="li awardbg"><span class="muted">{esc(a["season"])}</span> <b class="award">★ {esc(award_name(a["code"]))}</b>'
+                                              f'<div class="muted small">{esc(tr("hon.coach_award"))} · {esc(d.clubs[a["club"]]["name"])}</div></div>'))
         items.sort(key=lambda x: (x[0], x[1]))
         return '<div class="panel list">' + ("".join(x[2] for x in items) or esc(tr("end.none"))) + "</div>"
 

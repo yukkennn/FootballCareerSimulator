@@ -32,13 +32,22 @@ def logo(club, size=48):
             img = f'<img src="{esc(src)}" alt="" loading="lazy" onerror="this.remove()">'
     return f'<span class="logo" style="--s:{size}px;--h:{hue}">{esc(ini)}{img}</span>'
 
+def flag(nat, d):
+    """Флаг сборной (assets/flags/<iso2>.svg, см. tools/fetch_flags.py); подсказка - название страны. Нет страны - пусто."""
+    from .. import i18n
+    if not nat or nat not in d.countries:
+        return ""
+    iso = d.countries[nat]["iso2"].lower()
+    return (f'<img class="flag" src="assets/flags/{esc(iso)}.svg" alt="{esc(nat)}" title="{esc(d.country_name(nat, i18n.LANG))}" '
+            f'loading="lazy" onerror="this.remove()">')
+
 def tier_color(ovr):
     if ovr >= 90: return "#7de3ff"
     if ovr >= 75: return theme.GOLD
     if ovr >= 65: return "#c3ccd9"
     return "#cd8b4e"
 
-def player_card(pl, sub=""):
+def player_card(pl, sub="", flag_html=""):
     ovr = pl.ovr()
     rows = []
     for n, v in zip(attr_names(pl.pos), pl.attrs()):
@@ -47,7 +56,7 @@ def player_card(pl, sub=""):
                     f'<b>{v}</b></div>')
     return (f'<div class="pcard" style="--tc:{tier_color(ovr)}">'
             f'<div class="pc-top"><div><div class="pc-ovr">{ovr}</div><div class="pc-pos">{esc(pl.pos)}</div></div>'
-            f'<div class="pc-sub">{esc(sub)}<br><span>{pl.height} {tr("start.cm")} · {esc(tr("foot_short." + pl.foot))}</span></div></div>'
+            f'<div class="pc-sub">{flag_html}{esc(sub)}<br><span>{pl.height} {tr("start.cm")} · {esc(tr("foot_short." + pl.foot))}</span></div></div>'
             f'<div class="pc-name">{esc(pl.name)}</div><div class="pc-attrs">{"".join(rows)}</div></div>')
 
 def ovr_chart(pts, title):

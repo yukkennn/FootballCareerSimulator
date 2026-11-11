@@ -25,6 +25,7 @@ QPushButton#danger {{ background: #3a2226; border-color: #6b3037; }}
 QPushButton#danger:hover {{ background: #4a2a2f; border-color: {RED}; }}
 QPushButton[posbtn="true"] {{ min-width: 120px; min-height: 62px; padding: 4px 6px; font-size: 13px; }}
 QPushButton[posbtn="true"]:checked {{ background: {ACCENT}; color: #08120c; border-color: {ACCENT}; font-weight: 700; }}
+QPushButton[mode="player"]:checked, QPushButton[mode="coach"]:checked {{ background: {ACCENT}; color: #08120c; border-color: {ACCENT}; font-weight: 700; }}
 QLineEdit {{ background: {PANEL2}; border: 1px solid #334053; border-radius: 8px; padding: 8px 10px; }}
 QLineEdit:focus {{ border-color: {ACCENT}; }}
 QSpinBox {{ background: {PANEL2}; border: 1px solid #334053; border-radius: 8px; padding: 6px 10px; color: {TEXT}; }}

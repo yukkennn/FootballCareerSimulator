@@ -35,6 +35,7 @@ def main():
         for p, rel in game_files():
             z.write(p, rel.as_posix())
     shutil.copytree(ROOT / "assets" / "logos", OUT / "assets" / "logos")
+    shutil.copytree(ROOT / "assets" / "flags", OUT / "assets" / "flags")
     icon = Image.open(ROOT / "assets" / "icon.png").convert("RGBA")
     for size in (180, 192, 512):
         bg = Image.new("RGBA", (size, size), "#10141a")              # без прозрачности: на iPhone прозрачный фон иконки становится чёрным

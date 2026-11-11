@@ -12,7 +12,7 @@ from ..coach import pressure, DECAY, TACTICS, REL_LOVED
 from ..transfers import annual_budget, price
 from .. import squad as squad_mod
 from . import theme
-from .widgets import ClubCard, logo_label
+from .widgets import ClubCard, logo_label, flag_icon, flag_label, PitchWidget
 from .pages import label, panel, scroll, SortTable, cell, details_html, league_table_html
 
 def kind_text(kind):
@@ -117,7 +117,7 @@ class CoachPage(QWidget):
         col.addWidget(label(tr("coach.header_sub", league=lg["name"], country=d.country_name(lg["country"], i18n.LANG),
                                stars=stars_text(w.stars(cid)), ovr=round(w.team_ovr(cid))), "muted"))
         hl.addLayout(col, 1)
-        hl.addWidget(label(f"{c.name}  ·  {tr('career.age', n=c.player.age)}", "gold"))
+        hl.addWidget(flag_label(c.nat, d)); hl.addWidget(label(f"{c.name}  ·  {tr('career.age', n=c.player.age)}", "gold"))
         root.addWidget(head)
         body = QHBoxLayout(); body.setSpacing(14); root.addLayout(body, 1)
         # --- слева: тренер, руководство, тактика, рекорды
@@ -177,7 +177,11 @@ class CoachPage(QWidget):
         _clear(self.squad_lay)
         self.squad_lay.addWidget(label(tr("sq.xi", o=f"{squad_mod.team_rating(c, f):.1f}") + "   ·   " +
                                        tr("sq.counts", n=len(players), g=lc["GK"], d=lc["DEF"], m=lc["MID"], a=lc["ATT"]), "muted"))
-        self.squad_lay.addWidget(squad_table(c, self.d, f), 1)
+        row = QHBoxLayout(); row.setSpacing(10)
+        pv = QVBoxLayout(); pv.addWidget(PitchWidget(c, self.d, f, 250)); pv.addStretch(); row.addLayout(pv)
+        row.addWidget(squad_table(c, self.d, f), 1)
+        host = QWidget(); host.setLayout(row); row.setContentsMargins(0, 0, 0, 0)
+        self.squad_lay.addWidget(host, 1)
         _clear(self.lineup_lay)
         self.lineup_lay.addWidget(lineup_tab(c, self._fill_squad))
 
@@ -277,7 +281,10 @@ class MidSeasonPage(QWidget):
 
     def _fill_lineup(self):
         _clear(self.lineup_lay)
-        self.lineup_lay.addWidget(lineup_panel(self.c, self._fill_lineup, hint=False))
+        box = QWidget(); hb = QHBoxLayout(box); hb.setContentsMargins(0, 0, 0, 0); hb.setSpacing(10)
+        pv = QVBoxLayout(); pv.addWidget(PitchWidget(self.c, self.c.d, None, 240)); pv.addStretch(); hb.addLayout(pv)
+        hb.addWidget(lineup_panel(self.c, self._fill_lineup, hint=False))
+        self.lineup_lay.addWidget(box)
 
 # ======================================================================================= трансферное окно
 def eur(x):
@@ -431,7 +438,7 @@ def squad_table(c, d, formation, sell=None, loan=None):
     tw = c.coaching().window() if sell else None
     cols = [tr("col.pos"), tr("col.player"), tr("col.age"), tr("col.ovr"), tr("col.pot"), tr("col.fit"), tr("col.value"),
             tr("col.role")] + ([""] if sell else [])
-    t = _compact_table(cols, [48, 0, 50, 46, 82, 60, 92, 300 if sell else 250] + ([196] if sell else []))
+    t = _compact_table(cols, [48, 0, 50, 46, 82, 60, 92, 300 if sell else 200] + ([196] if sell else []))
     t.horizontalHeaderItem(7).setToolTip(tr("role.hint"))
     for ln in squad_mod.LINES:
         group = [p for p in players if squad_mod.LINE[p["pos"]] == ln]
@@ -455,7 +462,11 @@ def squad_table(c, d, formation, sell=None, loan=None):
                 stt, stc = tr("sq.offer", club=d.clubs[off["club"]]["name"], fee=eur(off["fee"])), theme.GOLD
             name = p["name"] + ("  ★" if p.get("real") else "")
             t.setItem(r, 0, _item(p["pos"], Qt.AlignCenter, color=col, bold=starter))
-            t.setItem(r, 1, _item(name, color=col, bold=starter, tip=p["name"]))
+            it = _item(name, color=col, bold=starter, tip=f"{p['name']} · {d.country_name(p['nat'], i18n.LANG)}" if p.get("nat") in d.countries else p["name"])
+            ic = flag_icon(p.get("nat"), d)
+            if ic:
+                it.setIcon(ic)
+            t.setItem(r, 1, it)
             t.setItem(r, 2, _item(p["age"], Qt.AlignCenter, color=col))
             t.setItem(r, 3, _item(f"{p['ovr']:.0f}", Qt.AlignCenter, color=col, bold=starter))
             t.setItem(r, 4, pot_item(p, pw))
@@ -492,7 +503,8 @@ def _clear(lay):
 def lineup_tab(c, on_change):
     """Вкладка «Основа»: слева выбор игроков по позициям, справа - сила основы и пояснение ролей."""
     host = QWidget(); h = QHBoxLayout(host); h.setContentsMargins(0, 0, 0, 0); h.setSpacing(24)
-    h.addWidget(lineup_panel(c, on_change, 480))
+    h.addWidget(lineup_panel(c, on_change, 440))
+    pv = QVBoxLayout(); pv.addWidget(PitchWidget(c, c.d, None, 280)); pv.addStretch(); h.addLayout(pv)
     side = QVBoxLayout(); side.setSpacing(8)
     f = c.coach.get("formation", squad_mod.DEFAULT_FORMATION)
     side.addWidget(label(tr("sq.xi", o=f"{squad_mod.team_rating(c, f):.1f}"), "h2"))
@@ -591,6 +603,8 @@ class RotationPicker(QWidget):
         self.box.currentIndexChanged.connect(lambda: self.changed.emit(self.box.currentData()))
         h.addWidget(self.box); h.addStretch()
 
+FIND_COLORS = {"starter": theme.ACCENT, "known": theme.GOLD, "gem": "#7de3ff", "prospect": "#b7a6ff", "loan": "#e59b5a"}
+
 class TransferWindowPage(QWidget):
     """Трансферное окно: рынок и молодёжь (слева), весь состав с продажами (справа), бюджет и сила основы сверху."""
     buy = Signal(int); sell = Signal(str); youth = Signal(int); done = Signal(); formation = Signal(str)
@@ -634,7 +648,9 @@ class TransferWindowPage(QWidget):
         self.ltabs = QTabWidget()
         mhost = QWidget(); left = QVBoxLayout(mhost); left.setContentsMargins(10, 8, 10, 8); left.setSpacing(6)
         mh = QHBoxLayout(); mh.setSpacing(12); mh.addWidget(label(tr("tw.market"), "h2"))
-        mh.addWidget(label(tr("tw.scouting", q=f"{100 * scouting(s):.0f}", w=self.pw), "muted")); mh.addStretch()
+        from ..transfers import scouts_of
+        mh.addWidget(label(tr("tw.scouting", q=f"{100 * scouting(s):.0f}", w=self.pw) + " · " +
+                           tr("tw.scouts_found", n=len(win["cands"]), k=len(scouts_of(s))), "muted")); mh.addStretch()
         mh.addWidget(label(tr("tw.filter"), "muted"))
         self.filter = QComboBox(); self.filter.addItem(tr("filter.all"), "")
         for ln in squad_mod.LINES:
@@ -642,23 +658,28 @@ class TransferWindowPage(QWidget):
         self.filter.setCurrentIndex(max(0, self.filter.findData(win.get("filter", ""))))
         self.filter.currentIndexChanged.connect(self._filter_changed); mh.addWidget(self.filter)
         left.addLayout(mh)
-        widths = [0, 60, 60, 54, 100, 260, 110, 80, 150]
+        widths = [0, 54, 50, 50, 90, 210, 100, 86, 120, 140]
         self.mt = _compact_table([tr("col.player"), tr("col.pos"), tr("col.age"), tr("col.ovr"), tr("col.pot"), tr("col.club"), tr("col.price"),
-                                  tr("col.effect"), ""], widths)
+                                  tr("col.effect"), tr("col.find"), ""], widths)
         self.mt.setToolTip(tr("tw.sort_hint"))
         h = self.mt.horizontalHeader(); h.setSectionsClickable(True); h.sectionClicked.connect(self._sort_clicked)
         self.gains = {i: (tw.gain(cd) if not cd["done"] else 0.0) for i, cd in enumerate(win["cands"])}
         self._fill_market()
+        if not win["cands"]:                                     # без скаутов рынка нет: подсказка и переход к скаутам
+            eb = QHBoxLayout()
+            eb.addWidget(label(tr("tw.no_scouts") if not scouts_of(s) else tr("tw.no_finds"), "h2", True), 1)
+            gb = QPushButton(tr("tw.to_scouts")); gb.setObjectName("primary"); gb.clicked.connect(lambda: self.ltabs.setCurrentIndex(4))
+            eb.addWidget(gb); left.addLayout(eb)
         left.addWidget(self.mt, 1)
         if win["youth"]:
             left.addWidget(label(tr("tw.youth"), "h2"))
-            yt = _compact_table([""] * 9, widths)
+            yt = _compact_table([""] * 10, widths)
             full = tw.squad_full()
             for i, y in enumerate(win["youth"]):
                 r = yt.rowCount(); yt.insertRow(r)
                 ok = not y["done"] and y["price"] <= s["budget"] + 1e-9 and not (y["kind"] == "talent" and full)
                 if y["kind"] == "talent":
-                    yp = {"age": 17, "ovr": y["ovr"], "pot": y["pot"], "name": y["name"]}
+                    yp = {"age": 17, "ovr": y["ovr"], "pot": y["pot"], "name": y["name"], "pot_hype": y.get("pot_hype")}
                     yt.setItem(r, 0, _item(tr("tw.youth_talent", name=y["name"]), bold=True))
                     yt.setItem(r, 1, _item(y["pos"], Qt.AlignCenter)); yt.setItem(r, 2, _item(17, Qt.AlignCenter))
                     yt.setItem(r, 3, _item(f"{y['ovr']:.0f}", Qt.AlignCenter, bold=True)); yt.setItem(r, 4, pot_item(yp, self.pw))
@@ -667,7 +688,7 @@ class TransferWindowPage(QWidget):
                     yt.setItem(r, 0, _item(tr("tw.academy"), bold=True))
                     yt.setItem(r, 1, _item(tr("tw.academy_line"), color=theme.MUTED)); yt.setSpan(r, 1, 1, 5)
                 yt.setItem(r, 6, _item(eur(y["price"]), Qt.AlignRight, color=theme.GOLD))
-                yt.setCellWidget(r, 8, _cell_box(_small_button(tr("tw.bought") if y["done"] else tr("tw.buy"), ok,
+                yt.setCellWidget(r, 9, _cell_box(_small_button(tr("tw.bought") if y["done"] else tr("tw.buy"), ok,
                                                                lambda _=False, i=i: self.youth.emit(i))))
             yt.horizontalHeader().setVisible(False); _fit_rows(yt)
             left.addWidget(yt)
@@ -732,22 +753,31 @@ class TransferWindowPage(QWidget):
         return host
 
     def _scouts_tab(self):
-        """Скауты: нанятые (уволить) и свободные этим летом (нанять). Звёзды - по рейтингу скаута."""
-        from ..transfers import MAX_SCOUTS
-        s, win = self.c.coach, self.win
+        """Скауты: нанятые (уволить) и свободные в это окно (нанять). Две шкалы по 1-5 звёзд: чутьё и охват."""
+        from ..transfers import MAX_SCOUTS, scouts_of, scout_finds
+        s, win, d = self.c.coach, self.win, self.d
         host = QWidget(); v = QVBoxLayout(host); v.setContentsMargins(10, 8, 10, 8); v.setSpacing(6)
-        v.addWidget(label(tr("sc.mine", n=len(s.get("scouts") or []), m=MAX_SCOUTS), "h2"))
+        mine = scouts_of(s)
+        v.addWidget(label(tr("sc.mine", n=len(mine), m=MAX_SCOUTS), "h2"))
+        scale = lambda n: "★" * n + "☆" * (5 - n)
         def table(rows, btn, enabled, sig):
-            t = _compact_table([tr("sc.name"), tr("sc.stars"), tr("sc.rating"), tr("sc.salary"), ""], [0, 140, 100, 150, 130])
+            t = _compact_table([tr("sc.name"), tr("sc.judge"), tr("sc.reach"), tr("sc.finds_col"), tr("sc.salary"), ""],
+                               [0, 110, 110, 230, 130, 130])
             for i, x in enumerate(rows):
                 r = t.rowCount(); t.insertRow(r)
-                t.setItem(r, 0, _item(x["name"], bold=True))
-                t.setItem(r, 1, _item("★" * x["stars"], Qt.AlignCenter, color=theme.GOLD))
-                t.setItem(r, 2, _item(x["rating"], Qt.AlignCenter)); t.setItem(r, 3, _item(eur(x["salary"]), Qt.AlignRight, color=theme.MUTED))
-                t.setCellWidget(r, 4, _cell_box(_small_button(btn(x), enabled(x), lambda _=False, i=i: self.action.emit(sig, i))))
+                it = _item(x["name"], bold=True)
+                ic = flag_icon(x.get("nat"), d)
+                if ic:
+                    it.setIcon(ic)
+                t.setItem(r, 0, it)
+                t.setItem(r, 1, _item(scale(x["judge"]), Qt.AlignCenter, color=theme.GOLD, tip=tr("sc.judge_tip")))
+                t.setItem(r, 2, _item(scale(x["reach"]), Qt.AlignCenter, color=theme.GOLD, tip=tr("sc.reach_tip")))
+                n = scout_finds(x, "summer")
+                t.setItem(r, 3, _item(tr("sc.finds", n=n, w=(n + 1) // 2), Qt.AlignCenter, color=theme.MUTED))
+                t.setItem(r, 4, _item(eur(x["salary"]), Qt.AlignRight, color=theme.MUTED))
+                t.setCellWidget(r, 5, _cell_box(_small_button(btn(x), enabled(x), lambda _=False, i=i: self.action.emit(sig, i))))
             _fit_rows(t)
             return t
-        mine = s.get("scouts") or []
         if mine:
             v.addWidget(table(mine, lambda x: tr("sc.fire"), lambda x: True, "fire"))
         else:
@@ -758,22 +788,19 @@ class TransferWindowPage(QWidget):
             full = len(mine) >= MAX_SCOUTS
             v.addWidget(table(market, lambda x: tr("sc.hired") if x["done"] else tr("sc.hire"),
                               lambda x: not x["done"] and not full and x["salary"] <= s["budget"] + 1e-9, "hire"))
-        elif win["kind"] == "winter":
-            v.addWidget(label(tr("sc.summer_only"), "muted", True))
         v.addWidget(label(tr("sc.hint"), "muted", True)); v.addStretch()
         return host
-
     POS_ORDER = ["GK", "CB", "LB", "RB", "CDM", "CM", "CAM", "LM", "RM", "LW", "RW", "CF", "ST"]
 
     def _market_key(self, col, i):
         cd, d = self.win["cands"][i], self.d
         return [lambda: cd["name"].lower(), lambda: self.POS_ORDER.index(cd["pos"]), lambda: cd["age"], lambda: cd["ovr"],
                 lambda: pot_key(cd, self.pw), lambda: (d.clubs[cd["club"]]["name"] if cd.get("club") else "").lower(),
-                lambda: cd["price"], lambda: self.gains[i]][col]()
+                lambda: cd["price"], lambda: self.gains[i], lambda: cd.get("kind") or ""][col]()
 
     def _sort_clicked(self, col):
         """Щелчок по заголовку: от большего -> от меньшего -> исходный порядок (состояние в окне, переживает перестройку экрана)."""
-        if col >= 8:
+        if col >= 9:
             return
         cur = self.win.get("sort")
         self.win["sort"] = [col, 1] if not cur or cur[0] != col else ([col, 2] if cur[1] == 1 else None)
@@ -806,22 +833,31 @@ class TransferWindowPage(QWidget):
             ok = not cd["done"] and not cd.get("refuse") and cd["price"] <= s["budget"] + 1e-9 and not full
             colr = theme.AWARD if cd.get("pid") else theme.ACCENT if cd.get("gem") else None
             name = cd["name"] + ("  ★" if real else "") + ("  ◆" if cd.get("gem") else "")
-            mt.setItem(r, 0, _item(name, color=colr, bold=bool(cd.get("pid")) or cd.get("gem", False),
-                                   tip=tr("tw.gem_tip") if cd.get("gem") else None))
+            it = _item(name, color=colr, bold=bool(cd.get("pid")) or cd.get("gem", False),
+                       tip=tr("tw.gem_tip") if cd.get("gem") else (d.country_name(cd["nat"], i18n.LANG) if cd.get("nat") in d.countries else None))
+            ic = flag_icon(cd.get("nat"), d)
+            if ic:
+                it.setIcon(ic)
+            mt.setItem(r, 0, it)
             mt.setItem(r, 1, _item(cd["pos"], Qt.AlignCenter)); mt.setItem(r, 2, _item(cd["age"], Qt.AlignCenter))
             mt.setItem(r, 3, _item(f"{cd['ovr']:.0f}", Qt.AlignCenter, bold=True))
             mt.setItem(r, 4, pot_item(cd, self.pw))
             mt.setItem(r, 5, _item(club, color=theme.MUTED, tip=tr("tw.loan_tip") if cd.get("loan") else None))
             mt.setItem(r, 6, _item(eur(cd["price"]), Qt.AlignRight, color=theme.GOLD))
-            mt.setItem(r, 7, _item(f"+{g:.1f}" if g >= 0.05 else "—", Qt.AlignCenter, color=theme.ACCENT if g >= 0.05 else theme.MUTED,
+            role = "xi" if g >= 0.05 else self.tw.role_of(cd) if not cd["done"] else ""
+            mt.setItem(r, 7, _item(f"+{g:.1f}" if g >= 0.05 else tr("mkrole." + role) if role else "—", Qt.AlignCenter,
+                                   color=theme.ACCENT if g >= 0.05 else theme.TEXT if role == "rot" else theme.MUTED,
                                    tip=tr("tw.effect_plus", v=f"{g:.1f}") if g >= 0.05 else tr("tw.effect_none")))
+            k = cd.get("kind")
+            mt.setItem(r, 8, _item(tr("find." + k) if k else "", Qt.AlignCenter, color=FIND_COLORS.get(k, theme.MUTED),
+                                   tip=tr("find.by", n=cd["scout"]) if cd.get("scout") else None))
             if cd.get("refuse") and not cd["done"]:
                 b = _small_button(tr("tw.refuse"), False, lambda: None); b.setToolTip(tr("tw.refuse_tip"))
-                mt.setCellWidget(r, 8, _cell_box(b))
+                mt.setCellWidget(r, 9, _cell_box(b))
                 continue
             buy_txt = tr("tw.loan_take") if cd.get("loan") else tr("tw.buy")
             btn = tr("tw.bought") if cd["done"] else buy_txt if ok else (tr("tw.no_money") if cd["price"] > s["budget"] else buy_txt)
-            mt.setCellWidget(r, 8, _cell_box(_small_button(btn, ok, lambda _=False, i=i: self.buy.emit(i))))
+            mt.setCellWidget(r, 9, _cell_box(_small_button(btn, ok, lambda _=False, i=i: self.buy.emit(i))))
 
 def stars_find(c, pid):
     from .. import stars as stars_mod

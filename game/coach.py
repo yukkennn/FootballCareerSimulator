@@ -17,6 +17,7 @@ from . import squad as squad_mod
 from . import coaches as coaches_mod
 
 COACH_RETIRE_AGE = 70
+COACH_START_MIN, COACH_START_MAX, COACH_START_DEFAULT = 25, 65, 35   # возраст старта карьеры сразу тренером
 FIRE_AT = 100.0
 DECAY = 0.6            # за сезон от прошлого раздражения остаётся 60% (руководство постепенно забывает обиды)
 MID_WEIGHT = 0.6       # в середине сезона руководство оценивает таблицу с весом 0.6 (полсезона - ещё не приговор)
@@ -109,6 +110,23 @@ class CoachCareer:
         c.coach["offers"] = cc.make_offers("start")
         return cc
 
+    @staticmethod
+    def start_fresh(career):
+        """Карьера сразу тренером, без игрового прошлого: скромные навык и репутация - начинать приходится с небольших клубов.
+        Чем старше на старте, тем больше опыта (работа ассистентом, в академиях), но потолок ниже, чем у звезды-игрока."""
+        c, rng = career, career.rng
+        exp = c.player.age - COACH_START_MIN
+        rating = clamp(38 + exp * 0.4 + rng.gauss(0, 4), 30, 60)
+        rep = clamp(8 + exp * 0.35 + rng.gauss(0, 3), 3, 28)
+        c.coach = {"rating": round(rating, 1), "rep": round(rep, 1), "club": None, "contract_left": 0, "project": "normal",
+                   "anger": 0.0, "tactic": "balanced", "relations": {}, "seasons": [], "spells": [], "trophies": [], "awards": [],
+                   "offers": [], "offer_reason": "start_fresh", "start_age": c.player.age, "start_year": c.year, "end_reason": None,
+                   "can_stay": False}
+        c.status = "coach_offers"
+        cc = CoachCareer(c)
+        c.coach["offers"] = cc.make_offers("start")
+        return cc
+
     # ---------- задача клуба ----------
     def expected(self, cid):
         """-> (ожидаемое место, число клубов, вид задачи). Ожидаемое место = 1 + сумма вероятностей оказаться ниже каждого соперника
@@ -179,6 +197,8 @@ class CoachCareer:
                 wgt *= 0.5
             wgt *= math.exp(rel / 35.0)
             cands.append((cid, wgt))
+        if reason == "start" and c.coach_only:
+            cands = self._home_first(cands)
         k = rng.randint(2, 3) if reason == "fired" else rng.randint(3, 5)
         offers, pool = [], cands[:]
         while pool and len(offers) < k:
@@ -187,6 +207,20 @@ class CoachCareer:
             offers.append(self._offer(cid))
         offers.sort(key=lambda o: -w.score[o["club"]])
         return offers
+
+    def _home_first(self, cands):
+        """Первая работа тренера без игровой карьеры - в своей стране: только её клубы (из них чаще те, что ближе к репутации,
+        то есть самые скромные). Если в стране меньше 3 клубов (или нет лиги) - добавляются клубы страны, где играют её клубы,
+        и запасной страны академий (data/academy_fallback.csv), как для академии игрока."""
+        d, nat = self.c.d, self.c.nat
+        home = [x for x in cands if d.clubs[x[0]]["country"] == nat]
+        if len(home) >= 3:
+            return home
+        near = {d.countries[nat].get("fallback"), d.league_host.get(nat)} - {None}
+        w = self.c.world
+        extra = [x for x in cands if x not in home and (d.clubs[x[0]]["country"] in near
+                                                         or d.leagues[w.club_league[x[0]]]["country"] in near)]
+        return home + extra if len(home) + len(extra) >= 3 else cands
 
     def _offer(self, cid):
         w, rng = self.c.world, self.c.rng
@@ -209,7 +243,9 @@ class CoachCareer:
             s["spells"].append({"club": o["club"], "from": c.year, "to": None, "seasons": 0, "project": o["project"], "end": None})
             # новый клуб - свой бюджет на этот сезон и полный состав
             s.update(budget=annual_budget(c.world, o["club"]), budget_year=c.year, fin={"spent": 0.0, "income": 0.0},
-                     window=None, season_moves=[], prize=0.0, academy_bonus=None)
+                     window=None, season_moves=[], prize=0.0, academy_bonus=None,
+                     scouts=[])                                        # скауты работают на клуб: остаются в старом
+
             squad_mod.build(c, o["club"]); s["squad_club"] = o["club"]
             s["formation"] = squad_mod.club_formation(o["club"])           # начинаем со схемы, под которую собран состав
             s["lineup_mode"], s["lineup"] = "auto", {}

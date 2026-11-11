@@ -70,6 +70,31 @@ def template_for(f, rng=None, extra=3):
             out[pos] = out.get(pos, 0) + 1
     return out
 
+# ---------- расстановка на поле (для карты): высота линии по позиции (0 - своя линия ворот, 100 - чужая) ----------
+PITCH_Y = {"GK": 6, "CB": 24, "LB": 30, "RB": 30, "CDM": 42, "CM": 53, "LM": 58, "RM": 58, "CAM": 68, "LW": 79, "RW": 79,
+           "CF": 82, "ST": 88}
+_SIDE = {"LB": -1, "LM": -1, "LW": -1, "RB": 1, "RM": 1, "RW": 1}
+
+def pitch_layout(f):
+    """Координаты 11 мест схемы на поле: [(x, y)] в процентах; x - слева направо, y - от своих ворот к чужим.
+    Фланговые позиции - у бровок, центральные одной линии - равномерно по центру."""
+    slots = FORMATIONS.get(f, FORMATIONS[DEFAULT_FORMATION])[0]
+    out = [None] * 11
+    rows = {}
+    for i, pos in enumerate(slots):
+        rows.setdefault(PITCH_Y[pos], []).append(i)
+    for y, idx in rows.items():
+        centre = [i for i in idx if slots[i] not in _SIDE]
+        for i in idx:
+            if slots[i] in _SIDE:
+                wide = 12 if slots[i] in ("LB", "RB") else 10
+                out[i] = (50 + _SIDE[slots[i]] * (50 - wide), y)
+        n = len(centre)
+        gap = 0 if n <= 1 else min(26.0, 64.0 / (n - 1))
+        for k, i in enumerate(centre):
+            out[i] = (50 + (k - (n - 1) / 2) * gap, y)
+    return out
+
 def formation_parts(f):
     """'4-3-3 att' -> ('4-3-3', 'att'); без стиля - ('4-3-3', 'bal')."""
     base, _, style = f.partition(" ")
@@ -324,11 +349,23 @@ def _scout_off(p):
     """Где внутри вилки лежит настоящий потенциал (0..1) - постоянно для игрока, но игрок этого не знает."""
     return (zlib.crc32(str(p.get("id") or p.get("name") or "").encode()) % 1000) / 1000.0
 
+HYPE_AGE = 21          # до этого возраста не раскрывшийся воспитанник выглядит как обещанный (pot_hype); потом правда видна всем
+SHARP_EYE = 4          # вилка уже 4 (скаут с чутьём 4-5★) - скауты сразу видят, что игрок не раскроется
+
+def seen_pot(p, width=None):
+    """Потенциал, который видит тренер: у молодого «не раскрывшегося» (pot_hype) - обещанный, пока ему меньше HYPE_AGE
+    и нет скаута с острым чутьём (узкая вилка)."""
+    if p.get("pot_hype") and p["age"] < HYPE_AGE and (width is None or width > SHARP_EYE):
+        return p["pot_hype"]
+    return p["pot"]
+
 def pot_state(p, width=None):
     """-> ("range", (от, до)) | ("peak", None) | ("decline", None): растёт / на пике / угасание (с 31 года рейтинг падает).
     width - ширина вилки по оценке скаутов (тренер): настоящий потенциал где-то внутри неё; у 24-28 вилка вдвое уже."""
     if p["age"] >= 31:
         return "decline", None
+    if p.get("pot_hype"):
+        p = dict(p, pot=seen_pot(p, width))
     if width is None:
         r = pot_range(p)
         return ("range", r) if r else ("peak", None)
@@ -382,8 +419,31 @@ def build(c, cid):
 
 ACADEMY_POS = {"GK": 2, "CB": 4, "LB": 2, "RB": 2, "CDM": 2, "CM": 4, "CAM": 2, "LM": 2, "RM": 2, "LW": 2, "RW": 2, "CF": 1, "ST": 3}
 
+# ---------- академия: потенциал - лотерея, часть воспитанников не раскрывается ----------
+YOUTH_TALENT_P, YOUTH_STAR_P = 0.10, 0.02    # доля талантов (потенциал +0..+6 к уровню команды) и звёзд (+6..+12)
+BUST_P = 0.28                                # столько молодых не раскрываются: настоящий потенциал ниже обещанного на 3-8
+
+def youth_potential(rng, team, invest=False):
+    """Потенциал воспитанника относительно силы команды: большинство - чуть ниже уровня основы, ~10% таланты, ~2% звёзды.
+    Вложения в академию удваивают шанс на таланта и звезду, но не прибавляют всем подряд. -> (потенциал, вид)."""
+    k = 2.0 if invest else 1.0
+    u = rng.random()
+    if u < YOUTH_STAR_P * k:
+        return team + rng.uniform(6, 12), "star"
+    if u < (YOUTH_STAR_P + YOUTH_TALENT_P) * k:
+        return team + rng.uniform(0, 6), "talent"
+    return team - rng.uniform(0, 8), "normal"
+
+def maybe_bust(rng, pot, ovr):
+    """Не раскроется ли молодой: -> (настоящий потенциал, обещанный или None). Обещанный виден, пока игроку меньше HYPE_AGE."""
+    if rng.random() < BUST_P:
+        real = max(ovr + 1.0, pot - rng.uniform(3, 8))
+        return round(real, 1), round(pot, 1)
+    return round(pot, 1), None
+
 def academy_fill(c, quality_bonus=0.0):
-    """Летний выпуск академии: 1-2 воспитанника любых позиций (чаще - позиций своей схемы), а если в составе мало игроков
+    """Летний выпуск академии (потенциал - youth_potential, часть не раскрывается - maybe_bust; quality_bonus > 0 - действуют
+    вложения в академию): 1-2 воспитанника любых позиций (чаще - позиций своей схемы), а если в составе мало игроков
     или для схемы не хватает игроков на позицию - ещё и на эти места. -> список новых."""
     cid, rng = c.coach["club"], c.rng
     players = squad(c)
@@ -405,9 +465,12 @@ def academy_fill(c, quality_bonus=0.0):
         else:
             pos = rng.choices(list(weights), weights=list(weights.values()))[0]
             regular -= 1
-        ovr = team - rng.uniform(6, 11) + quality_bonus
-        pot = ovr + rng.uniform(4, 14) + quality_bonus
-        p = _gen_player(c, cid, pos, ovr, rng.randint(17, 19), pot)
+        pot, _kind = youth_potential(rng, team, invest=quality_bonus > 0)
+        ovr = min(team - rng.uniform(6, 11), pot - rng.uniform(3, 6))
+        real, hype = maybe_bust(rng, pot, ovr)
+        p = _gen_player(c, cid, pos, ovr, rng.randint(17, 19), real)
         p["academy"] = True
+        if hype:
+            p["pot_hype"] = hype
         new.append(p)
     return new

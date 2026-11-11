@@ -57,7 +57,25 @@ class Career:
         self._chron_pending = []             # события летописи между сезонами (переход, капитанство) -> в следующий сезон
         self.coach = None                    # тренерская карьера после завершения игровой (game/coach.py)
         self._coach_pending = None           # сезон тренера между половинами (только в памяти, сохраняется по итогам сезона)
+        self.mode = "player"                 # "player" - карьера игрока (потом можно стать тренером); "coach" - сразу тренер, без игровой карьеры
         self.academy_ids = self._academy_options()
+
+    @classmethod
+    def new_coach(cls, data, name, nat, age, seed=None, lang="ru"):
+        """Карьера сразу тренером (выбор на стартовом экране): без игровой карьеры, с возраста age."""
+        from .coach import CoachCareer, COACH_START_MIN, COACH_START_MAX
+        c = cls(data, name, nat, "CM", 1, seed=seed, lang=lang)
+        c.mode = "coach"
+        c.academy_ids = []
+        c.player.age = int(clamp(age, COACH_START_MIN, COACH_START_MAX))
+        c.retire_reason = "coach_only"
+        c.status = "retired"
+        CoachCareer.start_fresh(c)
+        return c
+
+    @property
+    def coach_only(self):
+        return self.mode == "coach"
 
     # ---------- старт ----------
     def reroll(self):
@@ -527,7 +545,7 @@ class Career:
         """Последний клуб: игровой, а если игрок стал тренером - клуб, где он тренирует (или тренировал последним)."""
         if self.coach and self.coach.get("spells"):
             return self.coach["spells"][-1]["club"]
-        return self.parent_id or self.club_id
+        return self.parent_id or self.club_id     # None: тренер без игровой карьеры, ещё не принявший ни одного клуба
 
     @property
     def player_retire_age(self):
@@ -710,7 +728,7 @@ class Career:
                 "academy_ids": self.academy_ids, "offers": self.offers, "offer_reason": self.offer_reason,
                 "seasons_in_period": self.seasons_in_period, "seasons_at_club": self.seasons_at_club, "last_share": self.last_share,
                 "serious_inj": self.serious_inj, "retire_reason": self.retire_reason, "can_stay": self.can_stay, "created": self.created,
-                "coach": self.coach, "captain": self.captain, "captain_seasons": self.captain_seasons, "chron_pending": self._chron_pending,
+                "coach": self.coach, "mode": self.mode, "captain": self.captain, "captain_seasons": self.captain_seasons, "chron_pending": self._chron_pending,
                 "rng": [st[0], list(st[1]), st[2]]}
 
     @classmethod
@@ -722,6 +740,7 @@ class Career:
                   "last_share", "serious_inj", "retire_reason", "can_stay", "created"):
             setattr(c, k, data[k])
         c.coach = data.get("coach")
+        c.mode = data.get("mode", "player")
         c._coach_pending = None
         c.captain, c.captain_seasons = data.get("captain", False), data.get("captain_seasons", 0)
         c._chron_pending = data.get("chron_pending", [])
