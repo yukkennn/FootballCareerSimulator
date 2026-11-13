@@ -375,3 +375,9 @@ details.panel[open] > .panel { border: 0; padding: 8px 0 0; }
   .sq-cols .pitch-wrap { position: sticky; top: 8px; }
   .xi-cols:has(.pitch-wrap) { display: grid; grid-template-columns: minmax(260px, 360px) 1fr; align-items: start; gap: 14px; }
 }
+
+/* ============ нарисованные иконки на кнопках (game/icons.py) ============ */
+.ic { width: 1.15em; height: 1.15em; vertical-align: -0.2em; margin-right: .45em; flex: none; }
+.btn-ghost .ic, .btn.icon .ic { margin-right: 0; width: 24px; height: 24px; vertical-align: middle; }
+.chip .ic { width: 1.1em; height: 1.1em; }
+.ic-sm { width: 1em; height: 1em; margin-right: .2em; vertical-align: -0.15em; }

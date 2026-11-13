@@ -8,6 +8,7 @@ from ..transfers import annual_budget, price, pot_width, scouting, scouts_of, sc
 from .. import squad as squad_mod
 from .. import stars as stars_mod
 from ..ui import theme
+from ..icons import svg
 from .parts import esc, btn, logo, club_card, kv, flag
 from .report import league_table_html, details_html
 
@@ -465,7 +466,7 @@ class CoachScreens:
             content = self.coach_seasons_html() + self.records_html(4)
         body = (head.replace('class="panel club-h"', 'class="panel club-h a-head"', 1) + f'<div class="a-left">{info}{anger}{setup}</div>'
                 + f'<div class="a-right">{tabs}{content}<p class="muted small">{esc(tr("career.autosave"))}</p></div>')
-        footer = btn(esc(tr("coach.retire")), "coach_retire", kind="danger") + btn(esc(tr("coach.play_half")), "coach_play", kind="primary")
+        footer = btn(esc(tr("coach.retire")), "coach_retire", kind="danger") + btn(svg("play") + esc(tr("coach.play_half")), "coach_play", kind="primary")
         return self.screen(esc(cl["name"]), body, footer, left=self.menu_btn())
 
     def a_ctab(self, tab):
@@ -741,7 +742,7 @@ class CoachScreens:
         footer = ""
         if not mid["fired"]:
             footer += btn(esc(tr("tw.winter_btn")), "mid_winter")
-        footer += btn(esc(tr("mid.continue_fired") if mid["fired"] else tr("mid.continue")), "mid_done", kind="primary", extra="data-busy")
+        footer += btn(("" if mid["fired"] else svg("play")) + esc(tr("mid.continue_fired") if mid["fired"] else tr("mid.continue")), "mid_done", kind="primary", extra="data-busy")
         return self.screen(esc(tr("mid.title", s=season_label(c.year))), body, footer)
 
     def a_m_formation(self, f):

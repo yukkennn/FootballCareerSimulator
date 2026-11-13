@@ -12,6 +12,7 @@ from ..coach import pressure, DECAY, TACTICS, REL_LOVED
 from ..transfers import annual_budget, price
 from .. import squad as squad_mod
 from . import theme
+from ..icons import qicon
 from .widgets import ClubCard, logo_label, flag_icon, flag_label, PitchWidget
 from .pages import label, panel, scroll, SortTable, cell, details_html, league_table_html
 
@@ -164,9 +165,9 @@ class CoachPage(QWidget):
         bar = QHBoxLayout()
         b = QPushButton(tr("career.menu")); b.clicked.connect(self.menu.emit); bar.addWidget(b)
         r = QPushButton(tr("coach.retire")); r.setObjectName("danger"); r.clicked.connect(self.retire.emit); bar.addWidget(r)
-        dz = QPushButton(tr("ai.diaries")); dz.clicked.connect(lambda: self.diary.emit("")); bar.addWidget(dz)
+        dz = QPushButton(tr("ai.diaries")); dz.setIcon(qicon("book", theme.TEXT)); dz.clicked.connect(lambda: self.diary.emit("")); bar.addWidget(dz)
         bar.addStretch(); bar.addWidget(label(tr("career.autosave"), "muted"))
-        p = QPushButton(tr("coach.play_half")); p.setObjectName("primary"); p.clicked.connect(lambda: self.play.emit(self.tactic.value()))
+        p = QPushButton(tr("coach.play_half")); p.setIcon(qicon("play", "#08120c")); p.setObjectName("primary"); p.clicked.connect(lambda: self.play.emit(self.tactic.value()))
         bar.addWidget(p)
         root.addLayout(bar)
 
@@ -276,6 +277,8 @@ class MidSeasonPage(QWidget):
             wb = QPushButton(tr("tw.winter_btn")); wb.clicked.connect(lambda: self.winter.emit(self.tactic.value())); row.addWidget(wb)
         row.addStretch()
         btn = QPushButton(tr("mid.continue_fired") if mid["fired"] else tr("mid.continue")); btn.setObjectName("primary")
+        if not mid["fired"]:
+            btn.setIcon(qicon("play", "#08120c"))
         btn.clicked.connect(lambda: self.done.emit(self.tactic.value() if self.tactic else ""))
         row.addWidget(btn); root.addLayout(row)
 
@@ -949,7 +952,7 @@ class CoachReportPage(QWidget):
         view.setHtml(coach_season_html(career, data, rec))
         row = QHBoxLayout()
         key = f"c:{len(career.coach['seasons']) - 1}"
-        dz = QPushButton(f"{tr('web.diary_btn')} {rec['season']}"); dz.clicked.connect(lambda: self.diary.emit(key)); row.addWidget(dz)
+        dz = QPushButton(f"{tr('web.diary_btn')} {rec['season']}"); dz.setIcon(qicon("book", theme.TEXT)); dz.clicked.connect(lambda: self.diary.emit(key)); row.addWidget(dz)
         row.addStretch()
         btn = QPushButton(tr("report.continue")); btn.setObjectName("primary"); btn.clicked.connect(self.done.emit); row.addWidget(btn)
         root.addLayout(row)

@@ -16,6 +16,7 @@ from .. import stars as stars_mod
 from ..text import (money, trophy_name, stage, stars_text, event_text, short_trophy, intl_line, lang_name, club_result, nat_comp_name,
                     nat_result, group_line, award_name, season_award_names, score_text, chronicle_text)
 from . import theme
+from ..icons import qicon
 from .widgets import PlayerCard, OvrChart, ClubCard, logo_label, club_pixmap, flag_icon
 
 POS_GROUPS = [("gk", ["GK"]), ("def", ["CB", "LB", "RB"]), ("mid", ["CDM", "CM", "CAM", "LM", "RM"]), ("att", ["LW", "RW", "CF", "ST"])]
@@ -64,7 +65,7 @@ class StartPage(QWidget):
         # выбор режима: карьера игрока (академия с 15 лет) или сразу тренерская карьера
         self.mode_group = QButtonGroup(self); self.mode_group.setExclusive(True)
         for m in ("player", "coach"):
-            b = QPushButton(tr("start.mode_" + m)); b.setCheckable(True); b.setChecked(m == "player"); b.setProperty("mode", m)
+            b = QPushButton(tr("start.mode_" + m)); b.setIcon(qicon("ball" if m == "player" else "board", theme.TEXT, "#08120c")); b.setCheckable(True); b.setChecked(m == "player"); b.setProperty("mode", m)
             b.setToolTip(tr("start.mode")); b.clicked.connect(lambda _=False, m=m: self._set_mode(m))
             self.mode_group.addButton(b); top.addWidget(b)
         top.addStretch()
@@ -74,7 +75,7 @@ class StartPage(QWidget):
         self.lang.currentIndexChanged.connect(lambda: self.lang_changed.emit(self.lang.currentData()))
         top.addWidget(self.lang)
         self.btn_load = QPushButton(tr("start.load")); self.btn_load.clicked.connect(self.load_clicked.emit); top.addWidget(self.btn_load)
-        st = QPushButton("⚙ " + tr("web.settings")); st.clicked.connect(self.settings_clicked.emit); top.addWidget(st)
+        st = QPushButton(tr("web.settings")); st.setIcon(qicon("gear", theme.TEXT)); st.clicked.connect(self.settings_clicked.emit); top.addWidget(st)
         root.addLayout(top)
         body = QHBoxLayout(); body.setSpacing(20); root.addLayout(body, 1)
 
@@ -83,7 +84,7 @@ class StartPage(QWidget):
         nrow = QHBoxLayout(); nrow.setSpacing(8)
         self.first = QLineEdit(); self.first.setPlaceholderText(tr("start.first")); nrow.addWidget(self.first, 1)
         self.last = QLineEdit(); self.last.setPlaceholderText(tr("start.last")); nrow.addWidget(self.last, 1)
-        self.btn_rand = QPushButton("🎲"); self.btn_rand.setToolTip(tr("start.random_name_tip")); self.btn_rand.clicked.connect(self._random_name)
+        self.btn_rand = QPushButton(); self.btn_rand.setIcon(qicon("dice", theme.TEXT)); self.btn_rand.setToolTip(tr("start.random_name_tip")); self.btn_rand.clicked.connect(self._random_name)
         nrow.addWidget(self.btn_rand); ll.addLayout(nrow)
         ll.addWidget(label(tr("start.country"), "h2"))
         self.search = QLineEdit(); self.search.setPlaceholderText(tr("start.search")); self.search.setClearButtonEnabled(True)
@@ -301,11 +302,11 @@ class CareerPage(QWidget):
         body.addWidget(self.table, 1)
         bar = QHBoxLayout(); b = QPushButton(tr("career.menu")); b.clicked.connect(self.menu.emit); bar.addWidget(b)
         r = QPushButton(tr("career.retire")); r.setObjectName("danger"); r.clicked.connect(self.retire.emit); bar.addWidget(r)
-        dz = QPushButton(tr("ai.diaries")); dz.clicked.connect(lambda: self.diary.emit("")); bar.addWidget(dz)
+        dz = QPushButton(tr("ai.diaries")); dz.setIcon(qicon("book", theme.TEXT)); dz.clicked.connect(lambda: self.diary.emit("")); bar.addWidget(dz)
         self.table.cellDoubleClicked.connect(lambda row, _col: self.diary.emit(f"p:{row}"))
         self.totals = label("", "muted"); bar.addWidget(self.totals); bar.addStretch()
         bar.addWidget(label(tr("career.autosave"), "muted"))
-        self.btn = QPushButton(); self.btn.setObjectName("primary"); self.btn.clicked.connect(self.play.emit); bar.addWidget(self.btn)
+        self.btn = QPushButton(); self.btn.setIcon(qicon("play", "#08120c")); self.btn.setObjectName("primary"); self.btn.clicked.connect(self.play.emit); bar.addWidget(self.btn)
         root.addLayout(bar)
         self.refresh()
 
@@ -482,7 +483,7 @@ class ReportPage(QWidget):
         for s in recs:
             key = f"p:{next(i for i, x in enumerate(career.seasons) if x is s)}"
             if s.get("comps"):
-                b = QPushButton(f"{tr('web.diary_btn')} {s['season']}"); b.clicked.connect(lambda _=False, k=key: self.diary.emit(k)); row.addWidget(b)
+                b = QPushButton(f"{tr('web.diary_btn')} {s['season']}"); b.setIcon(qicon("book", theme.TEXT)); b.clicked.connect(lambda _=False, k=key: self.diary.emit(k)); row.addWidget(b)
         row.addStretch()
         btn = QPushButton(tr("report.continue")); btn.setObjectName("primary"); btn.clicked.connect(self.done.emit); row.addWidget(btn)
         root.addLayout(row)
@@ -742,7 +743,7 @@ class EndPage(QWidget):
             self._player_tabs(tabs, c, d, rep)
         row = QHBoxLayout()
         b = QPushButton(tr("end.export")); b.clicked.connect(self.export.emit); row.addWidget(b)
-        dz = QPushButton(tr("ai.diaries")); dz.clicked.connect(lambda: self.diary.emit("")); row.addWidget(dz); row.addStretch()
+        dz = QPushButton(tr("ai.diaries")); dz.setIcon(qicon("book", theme.TEXT)); dz.clicked.connect(lambda: self.diary.emit("")); row.addWidget(dz); row.addStretch()
         if c.coach is None:                                    # игрок завершил карьеру без тренерства: можно стать тренером и сейчас
             bc = QPushButton(tr("end.become_coach")); bc.clicked.connect(self.become_coach.emit); row.addWidget(bc)
         n = QPushButton(tr("end.new")); n.setObjectName("primary"); n.clicked.connect(self.new_career.emit); row.addWidget(n)

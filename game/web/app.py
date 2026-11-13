@@ -17,6 +17,7 @@ from .. import stars as stars_mod
 from ..text import (money, trophy_name, stars_text, short_trophy, lang_name, club_result, nat_comp_name, nat_result, award_name,
                     season_award_names, chronicle_text)
 from ..ui import theme
+from ..icons import svg
 from .parts import esc, btn, logo, player_card, ovr_chart, club_card, kv, flag
 from .report import season_html
 from .coach import CoachScreens
@@ -137,7 +138,7 @@ class WebApp(CoachScreens):
         return tr(key)
 
     def menu_btn(self):
-        return btn("☰", "home", kind="ghost", extra=f'aria-label="{esc(tr("career.menu"))}"')
+        return btn(svg("menu"), "home", kind="ghost", extra=f'aria-label="{esc(tr("career.menu"))}"')
 
     # ------------------------------------------------------------------ вход из JS
     def render(self):
@@ -191,16 +192,16 @@ class WebApp(CoachScreens):
     def v_start(self):
         d, f, lang = self.d, self.form, i18n.LANG
         langs = "".join(f'<button class="chip{" on" if lang == k else ""}" data-act="lang" data-arg="{k}">{k.upper()}</button>' for k in ("ru", "en"))
-        right = f'<div class="langs">{langs}{btn("⚙", "settings", kind="ghost", extra=f'aria-label="{esc(tr("web.settings"))}"')}</div>'
+        right = f'<div class="langs">{langs}{btn(svg("gear"), "settings", kind="ghost", extra=f'aria-label="{esc(tr("web.settings"))}"')}</div>'
         coach = f["mode"] == "coach"
         # выбор режима: карьера игрока (академия с 15 лет) или сразу тренерская карьера
-        modes = "".join(f'<button class="chip{" on" if f["mode"] == m else ""}" data-act="mode" data-arg="{m}">{esc(tr("start.mode_" + m))}</button>'
+        modes = "".join(f'<button class="chip{" on" if f["mode"] == m else ""}" data-act="mode" data-arg="{m}">{svg("ball" if m == "player" else "board")}{esc(tr("start.mode_" + m))}</button>'
                         for m in ("player", "coach"))
         mode = f'<div class="panel a-mode"><div class="muted small">{esc(tr("start.mode"))}</div><div class="tabs">{modes}</div></div>'
         name = (f'<div class="panel a-name"><div class="muted small">{esc(tr("start.name_coach" if coach else "start.name"))}</div><div class="row">'
                 f'<input name="first" value="{esc(f["first"])}" placeholder="{esc(tr("start.first"))}" autocomplete="off">'
                 f'<input name="last" value="{esc(f["last"])}" placeholder="{esc(tr("start.last"))}" autocomplete="off">'
-                f'<button class="btn icon" data-partial="random_name" title="{esc(tr("start.random_name_tip"))}" aria-label="{esc(tr("start.random_name"))}">🎲</button></div></div>')
+                f'<button class="btn icon" data-partial="random_name" title="{esc(tr("start.random_name_tip"))}" aria-label="{esc(tr("start.random_name"))}">{svg("dice")}</button></div></div>')
         items = []
         for c in sorted(d.countries.values(), key=lambda c: c["name_ru" if lang == "ru" else "name_en"]):
             code = c["code"]
@@ -349,7 +350,7 @@ class WebApp(CoachScreens):
             aws = ", ".join(season_award_names(s))
             stat = f"{s['games']} · {s['goals']} · {s['cs'] if gk else s['assists']}"
             intl = s["intl"]
-            nat = f" · 🏳 {intl['caps']}/{intl['goals']}" if intl and intl.get("called") else ""
+            nat = f" · {svg('flag', 'ic-sm')}{intl['caps']}/{intl['goals']}" if intl and intl.get("called") else ""
             badges = (f'<div class="gold small">◆ {esc(tro)}</div>' if tro else "") + (f'<div class="award small">★ {esc(aws)}</div>' if aws else "")
             out.append(f'<button class="srow" data-act="season" data-arg="{i}|{back}">{logo(cl, 36)}<div class="sr-main">'
                        f'<div><b>{esc(s["season"])}</b> <span class="muted">· {s["age"]}</span> · {esc(cl["name"])}'
@@ -403,8 +404,8 @@ class WebApp(CoachScreens):
                 + f'<div class="a-seasons"><div class="h2 mt m-only">{esc(tr("web.seasons"))}</div>{self.season_rows("career")}{totals}'
                 + f'<p class="muted small">{esc(tr("career.autosave"))}</p></div>')
         play = tr("career.play_academy") if youth else tr(f"career.play_{c.freq if not c.parent_id else 1}")
-        footer = btn(esc(tr("career.retire")), "retire", kind="danger") + btn(esc(play), "play", kind="primary", extra="data-busy")
-        return screen(esc(pl.name), body, footer, left=btn("☰", "home", kind="ghost", extra=f'aria-label="{esc(tr("career.menu"))}"'))
+        footer = btn(esc(tr("career.retire")), "retire", kind="danger") + btn(svg("play") + esc(play), "play", kind="primary", extra="data-busy")
+        return screen(esc(pl.name), body, footer, left=btn(svg("menu"), "home", kind="ghost", extra=f'aria-label="{esc(tr("career.menu"))}"'))
 
     def a_season(self, arg):
         i, back = arg.split("|")
@@ -421,7 +422,7 @@ class WebApp(CoachScreens):
         kind, _, s = story_mod.record(self.career, key)
         if kind == "p" and s.get("youth") and not s.get("comps"):
             return ""
-        return btn(esc(tr("web.diary_btn")), "story", key, "diary")
+        return btn(svg("book") + esc(tr("web.diary_btn")), "story", key, "diary")
 
     def a_story(self, key):
         self._story_return = (self.view, dict(self.ctx))
