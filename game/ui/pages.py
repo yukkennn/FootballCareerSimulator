@@ -16,7 +16,7 @@ from .. import stars as stars_mod
 from ..text import (money, trophy_name, stage, stars_text, event_text, short_trophy, intl_line, lang_name, club_result, nat_comp_name,
                     nat_result, group_line, award_name, season_award_names, score_text, chronicle_text)
 from . import theme
-from .widgets import PlayerCard, OvrChart, ClubCard, logo_label, club_pixmap
+from .widgets import PlayerCard, OvrChart, ClubCard, logo_label, club_pixmap, flag_icon
 
 POS_GROUPS = [("gk", ["GK"]), ("def", ["CB", "LB", "RB"]), ("mid", ["CDM", "CM", "CAM", "LM", "RM"]), ("att", ["LW", "RW", "CF", "ST"])]
 
@@ -93,6 +93,9 @@ class StartPage(QWidget):
         for c in sorted(data.countries.values(), key=lambda c: c["name_ru" if lang == "ru" else "name_en"]):
             it = QListWidgetItem(f"{c['name_ru' if lang == 'ru' else 'name_en']}   ·   {c['code']}   ·   {stars_text(data.nat_stars(c['code']))}")
             it.setData(Qt.UserRole, c["code"])
+            ic = flag_icon(c["code"], data)
+            if ic:
+                it.setIcon(ic)
             it.setData(Qt.UserRole + 1, f"{c['name_ru']} {c['name_en']} {c['code']}".lower())
             it.setToolTip(tr("start.nat_stars", s=f"{stars_text(data.nat_stars(c['code']))}  (OVR {data.nat_ovr(c['code']):.0f})"))
             self.list.addItem(it)

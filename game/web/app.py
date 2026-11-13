@@ -208,7 +208,7 @@ class WebApp(CoachScreens):
             search = f"{c['name_ru']} {c['name_en']} {code}".lower()
             chk = " checked" if f["nat"] == code else ""
             items.append(f'<label class="opt" data-search="{esc(search)}"><input type="radio" name="nat" value="{code}" data-partial="phys"{chk}>'
-                         f'<span>{esc(nm)}</span><span class="muted small">{code}</span><span class="gold small">{stars_text(d.nat_stars(code))}</span></label>')
+                         f'<span>{flag(code, d)}{esc(nm)}</span><span class="muted small">{code}</span><span class="gold small">{stars_text(d.nat_stars(code))}</span></label>')
         country = (f'<div class="panel a-country"><div class="h2">{esc(tr("start.country"))}</div>'
                    f'<input type="search" data-filter="#natlist" placeholder="{esc(tr("start.search"))}" autocomplete="off">'
                    f'<div class="optlist" id="natlist">{"".join(items)}</div><div class="muted small" id="sel_label">{esc(self._sel_text())}</div></div>')
