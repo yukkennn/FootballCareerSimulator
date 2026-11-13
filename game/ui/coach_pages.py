@@ -629,6 +629,14 @@ class TransferWindowPage(QWidget):
         il.addWidget(label(tr("tw.target", t=kind_text(kind), r=rank), "muted"))
         fp = FormationPicker(c, s.get("formation", squad_mod.DEFAULT_FORMATION)); fp.changed.connect(self.formation.emit); il.addWidget(fp)
         il.addStretch(); root.addWidget(info)
+        # ротация и тактика на половину сезона после окна: состав изменился - можно перестроить игру (запоминаются сразу)
+        setup = panel(); sl = QHBoxLayout(setup); sl.setContentsMargins(14, 8, 14, 8); sl.setSpacing(28)
+        rp = RotationPicker(s.get("rotation", "none"))
+        rp.changed.connect(lambda r: (s.__setitem__("rotation", r), squad_mod.apply_to_world(c)))
+        sl.addWidget(rp, 0, Qt.AlignTop)
+        tp = TacticPicker(s.get("tactic", "balanced"), s["rating"], tr("tactic.title") if win["kind"] == "summer" else tr("mid.second_half"))
+        tp.group.buttonToggled.connect(lambda *_: s.__setitem__("tactic", tp.value()))
+        sl.addWidget(tp, 1); root.addWidget(setup)
         notes = []
         if win.get("academy"):
             notes.append(tr("tw.academy_new", n=", ".join(f"{a['name']} ({a['pos']}, {a['ovr']:.0f})" for a in win["academy"])))

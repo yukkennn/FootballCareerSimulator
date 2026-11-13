@@ -381,3 +381,5 @@ details.panel[open] > .panel { border: 0; padding: 8px 0 0; }
 .btn-ghost .ic, .btn.icon .ic { margin-right: 0; width: 24px; height: 24px; vertical-align: middle; }
 .chip .ic { width: 1.1em; height: 1.1em; }
 .ic-sm { width: 1em; height: 1em; margin-right: .2em; vertical-align: -0.15em; }
+@media (min-width: 1000px) { .tw-setup { display: grid; grid-template-columns: 260px 1fr; grid-template-rows: auto auto auto; column-gap: 28px; align-items: start; }
+  .tw-setup > .sel { grid-row: 1 / 4; } }

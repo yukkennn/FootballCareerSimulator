@@ -393,6 +393,8 @@ class CoachScreens:
     def p_tactic(self):
         t = self.last_form.get("tactic") or "balanced"
         self.ctx["tactic"] = t
+        if self.view == "transfer":                    # в трансферном окне выбор сразу запоминается (и для зимы)
+            self.career.coach["tactic"] = t
         return {"html": {"#tactic_hint": esc(self._tactic_hint(t))}}
 
     def formation_select(self, act):
@@ -514,6 +516,10 @@ class CoachScreens:
         tl = tr("tw.team_change", a=f"{start:.1f}", b=f"{team:.1f}") if abs(team - start) > 0.05 else tr("tw.team", o=f"{team:.1f}")
         head = (f'<div class="panel"><div class="h2 gold">{esc(tr("tw.budget", b=eur(s["budget"])))}</div><div class="b">{esc(tl)}</div>'
                 f'<div class="muted small">{esc(tr("tw.target", t=kind_text(kind), r=rank))}</div>{self.formation_select("tw_formation")}</div>')
+        # ротация и тактика на половину сезона, которая начнётся после окна: состав изменился - можно перестроить игру
+        half = tr("tactic.title") if win["kind"] == "summer" else tr("mid.second_half")
+        setup = (f'<div class="panel tw-setup">{self.rotation_select("tw_rotation")}'
+                 f'{self.tactic_html(half, self.ctx.get("tactic") or s.get("tactic", "balanced"))}</div>')
         notes = []
         if win.get("academy"):
             notes.append(tr("tw.academy_new", n=", ".join(f"{a['name']} ({a['pos']}, {a['ovr']:.0f})" for a in win["academy"])))
@@ -536,7 +542,7 @@ class CoachScreens:
                                 ("scouts", tr("tw.tab_scouts") + f" ({len(s.get('scouts') or [])})")], tab)
         content = {"market": self.market_html, "squad": lambda: self.squad_html(sell=True), "lineup": lambda: self.lineup_html(pitch=True),
                    "loans": self.loans_html, "scouts": self.scouts_html}[tab]()
-        body = head + notes_html + tabs + content + f'<p class="muted small">{esc(tr("tw.hint"))}</p>'
+        body = head + setup + notes_html + tabs + content + f'<p class="muted small">{esc(tr("tw.hint"))}</p>'
         title = tr("tw." + win["kind"], y=c.year if win["kind"] == "summer" else c.year + 1)
         return self.screen(esc(title), body, btn(esc(tr("tw.done")), "tw_done", kind="primary", extra="data-busy"))
 
@@ -686,6 +692,10 @@ class CoachScreens:
     def a_tw_formation(self, f):
         self.career.coach["formation"] = f
 
+    def a_tw_rotation(self, r):
+        self.career.coach["rotation"] = r
+        squad_mod.apply_to_world(self.career)
+
     def a_tw_buy(self, i):
         self._tw().buy(int(i))
 
@@ -708,6 +718,7 @@ class CoachScreens:
         self._tw().fire_scout(int(i))
 
     def a_tw_done(self, _):
+        self.career.coach["tactic"] = self._tactic_from_form()
         if self.ctx.get("then") == "first_half":
             mid = self.career.coaching().begin_season(self.career.coach["tactic"])
             self.go("mid", mid=mid)
