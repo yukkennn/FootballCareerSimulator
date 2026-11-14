@@ -41,11 +41,17 @@ SCOUT_FIND = {1: 2, 2: 3, 3: 4, 4: 6, 5: 8}     # сколько игроков 
 def scout_stars(rating):
     return 5 if rating >= 85 else 4 if rating >= 75 else 3 if rating >= 65 else 2 if rating >= 55 else 1
 
-def scout_salary(judge, reach=None):
-    """Зарплата скаута за сезон, млн €: чутьё стоит дороже охвата. 1/1 - 0.04, 3/3 - 0.25, 5/5 - 1.6."""
+SCOUT_SHARE = 0.008          # доля годового бюджета клуба: скаут 1★/1★ - 0.8%, 3★/3★ - ~2.3%, 5★/5★ - ~6.9%
+SCOUT_FLOOR = 0.02           # но не меньше этой суммы (млн €) за 1★/1★: в маленьком клубе хороший скаут - заметная статья
+
+def scout_salary(judge, reach=None, budget=None):
+    """Зарплата скаута за сезон, млн €. Зависит от бюджета клуба: хороший скаут в богатом клубе и стоит больше
+    (иначе богатому клубу выгодно всегда держать трёх лучших). Чутьё дороже охвата. Без бюджета - по минимальной шкале."""
     if reach is None:                                       # старый вызов: по рейтингу
         judge = reach = scout_stars(judge)
-    return round(0.04 * 1.8 ** (judge - 1) * 1.4 ** (reach - 1), 2)
+    floor = SCOUT_FLOOR * 1.5 ** (judge - 1) * 1.25 ** (reach - 1)        # 1/1 - 0.02, 3/3 - 0.07, 5/5 - 0.25
+    share = SCOUT_SHARE * 1.45 ** (judge - 1) * 1.18 ** (reach - 1)
+    return round(max(floor, share * (budget or 0.0)), 2)
 
 def norm_scout(x):
     """Скаут из старого сохранения (рейтинг и одна шкала звёзд) -> две шкалы."""
@@ -375,13 +381,14 @@ class TransferWindow:
         """Скауты, которых можно нанять в это окно: дешёвый, «чутьё» (видит сильных, но приносит мало), «охват» (приносит
         много, но середнячков), крепкий и (летом) сильный. Шкалы - 1-5 звёзд."""
         c, rng = self.c, self.c.rng
+        budget = annual_budget(c.world, self.s["club"])
         kinds = [(rng.randint(1, 2), rng.randint(1, 2)), (rng.randint(4, 5), rng.randint(1, 2)), (rng.randint(1, 2), rng.randint(4, 5)),
                  (3, 3), (rng.randint(4, 5), rng.randint(4, 5))]
         out = []
         for j, r in kinds:
             nat = rng.choices(list(stars_mod.REGEN_NATS), weights=list(stars_mod.REGEN_NATS.values()))[0]
             out.append({"name": stars_mod.gen_name(rng, nat, c.d.countries[nat]["conf"]), "nat": nat, "judge": j, "reach": r,
-                        "salary": scout_salary(j, r), "done": False})
+                        "salary": scout_salary(j, r, budget), "done": False})
         return out
     # ---------- оценки для экрана ----------
     def gain(self, cd):

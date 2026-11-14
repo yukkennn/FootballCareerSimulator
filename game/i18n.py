@@ -311,13 +311,13 @@ T = {
              "Охват - сколько игроков он приносит за окно (зимой - вдвое меньше), с охватом 3+ - ещё и аренду. "
              "Нанятый скаут сразу приносит своих игроков. Скауты работают на клуб: при переходе в другой клуб они остаются в старом. "
              "Примерно каждый четвёртый молодой талант не раскрывается: обычно это видно лишь к 21 году, а скаут с чутьём 4-5★ - сразу. "
-             "Зарплата списывается каждое лето.",
+             "Зарплата зависит от бюджета клуба (чем богаче клуб, тем дороже хороший скаут) и списывается каждое лето.",
              "Only scouts bring players to the market: without them there is no one to buy. Judgement - how good the players a scout finds "
              "(starters, well-known players, undervalued youngsters ◆) and how precise the potential range is (by your best scout). "
              "Reach - how many players he brings per window (half in winter); with reach 3+ also a loan. "
              "A newly hired scout brings his finds at once. Scouts work for the club: when you move to another club they stay behind. "
              "About one young talent in four never develops: usually that only shows by 21, but a scout with 4-5★ judgement sees it at once. "
-             "Salaries are paid every summer."),
+             "Salaries depend on the club budget (the richer the club, the more a good scout costs) and are paid every summer."),
  "sc.judge": ("Чутьё", "Judgement"), "sc.reach": ("Охват", "Reach"), "sc.finds_col": ("Находит за окно", "Finds per window"),
  "sc.judge_tip": ("Чутьё: насколько сильных игроков находит скаут и насколько точно видна вилка потенциала",
                   "Judgement: how good the players he finds are and how precise the potential range is"),
