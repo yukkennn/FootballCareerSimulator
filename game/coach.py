@@ -12,7 +12,7 @@
 import math
 from .player import clamp
 from . import stars as stars_mod
-from .transfers import annual_budget, TransferWindow
+from .transfers import annual_budget, club_growth, TransferWindow, GROWTH_MAX
 from . import squad as squad_mod
 from . import coaches as coaches_mod
 
@@ -242,20 +242,21 @@ class CoachCareer:
             s.update(club=o["club"], contract_left=o["years"], project=o["project"], anger=round(max(0.0, -self.rel(o["club"])) * 0.5, 1))
             s["spells"].append({"club": o["club"], "from": c.year, "to": None, "seasons": 0, "project": o["project"], "end": None})
             # новый клуб - свой бюджет на этот сезон и полный состав
-            s.update(budget=annual_budget(c.world, o["club"]), budget_year=c.year, fin={"spent": 0.0, "income": 0.0},
+            s.update(budget=annual_budget(c.world, o["club"], club_growth(s, o["club"])), budget_year=c.year, fin={"spent": 0.0, "income": 0.0},
                      window=None, season_moves=[], prize=0.0, academy_bonus=None,
                      scouts=[])                                        # скауты работают на клуб: остаются в старом
 
             squad_mod.build(c, o["club"]); s["squad_club"] = o["club"]
             s["formation"] = squad_mod.club_formation(o["club"])           # начинаем со схемы, под которую собран состав
             s["lineup_mode"], s["lineup"] = "auto", {}
+            s.setdefault("rotation", "some")                               # умеренная ротация - разумный выбор по умолчанию
             s["euro"] = self._euro_guess(o["club"])
         s["offers"], s["offer_reason"], s["can_stay"] = [], None, False
         c.status = "coaching"
 
     # ---------- сезон: первая половина ----------
     def _boost(self):
-        return clamp((self.s["rating"] - 60.0) * 0.08, -2.0, 2.5)          # навык тренера: до ~+1 OVR команды
+        return clamp((self.s["rating"] - 60.0) * 0.25, -1.5, 7.5)          # навык тренера: от -0.6 до +3 OVR команды
 
     def window(self):
         return TransferWindow(self.c)
@@ -383,7 +384,13 @@ class CoachCareer:
             # --- навык, репутация, награда
             over = (exp_rank - rank) / max(1, n_real - 1)                      # > 0 - выше задачи
             tro = len(rec["trophies"])
-            s["rating"] = round(clamp(s["rating"] + (0.4 if c.player.age < 55 else 0.0) + 2.0 * over + 0.3 * tro + rng.gauss(0, 0.6), 25, 92), 1)
+            learn = (0.5 + max(0.0, 65.0 - s["rating"]) * 0.05) if c.player.age < 55 else 0.0   # новичок учится быстрее
+            s["rating"] = round(clamp(s["rating"] + learn + 3.0 * over + 0.4 * tro + rng.gauss(0, 0.6), 25, 92), 1)
+            # клуб растёт вместе с успехами: выше задачи и еврокубки - больше денег (рост бюджета, см. transfers.club_growth)
+            g = s.setdefault("growth", {})
+            gv = g.get(cid, 0.0)
+            gv = gv + 0.6 * over + (0.15 if league["tier"] == 1 and rank <= 4 else 0.0) if over > 0 else gv * 0.85 + 0.3 * over
+            g[cid] = round(clamp(gv, 0.0, GROWTH_MAX), 3)
             lf = w.league_strength(league["country"]) / 100.0
             s["rep"] = round(clamp(0.85 * s["rep"] + 0.15 * score + 10 * over * lf + tro * 2.5 * lf
                                    + (8 if any(t["cat"] == "euro" for t in rec["trophies"]) else 0), 0, 100), 1)

@@ -266,10 +266,12 @@ T = {
  "sc.name": ("Скаут", "Scout"),
  "rot.title": ("Ротация", "Rotation"), "rot.none": ("Только основа", "Starters only"), "rot.some": ("Умеренная", "Moderate"),
  "rot.heavy": ("Сильная", "Heavy"),
- "rot.hint": ("Сколько играют запасные. Больше ротации - основа меньше устаёт и реже травмируется, запасные довольны и растут, "
-              "но часть матчей играет второй состав (сила команды немного ниже).",
-              "How much the bench plays. More rotation - starters tire less and get injured less, the bench stays happy and develops, "
-              "but the second string plays some matches (team strength slightly lower)."),
+ "rot.hint": ("Сколько играют запасные. Без ротации основа к концу полсезона устаёт (играет слабее) и вдвое чаще травмируется. "
+              "Умеренная - обычно лучший выбор; сильная нужна при прессинге (он выматывает). В матчах с ротацией отдыхает половина "
+              "основы: если её некем заменить, основные играют уставшими - для ротации нужно 22-25 игроков, по двое на позицию.",
+              "How much the bench plays. Without rotation the starters tire by the end of each half (play worse) and get injured twice "
+              "as often. Moderate is usually best; heavy is needed with pressing (it wears players out). In rotated matches half of "
+              "the XI rests: with no one to replace them, starters play tired - rotation needs 22-25 players, two per position."),
  "sqev.title": ("Состав за сезон", "Squad this season"), "sqev.injury": ("Травмы", "Injuries"), "sqev.ban": ("Дисквалификации", "Suspensions"),
  "sqev.unhappy": ("Недовольны без игры и просят трансфер (играют на 2 слабее)", "Unhappy without minutes, want a transfer (play 2 worse)"),
  "sqev.no_minutes": ("Молодые почти без игры (растут медленнее)", "Youngsters with hardly any minutes (develop slower)"),

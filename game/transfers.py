@@ -21,13 +21,20 @@ BUY_PREMIUM = 1.15           # покупка дороже рыночной ст
 LOAN_FEE = 0.1               # аренда игрока на сезон - 10% его стоимости
 MAX_SCOUTS = 3
 
-def annual_budget(world, cid):
+GROWTH_MAX = 1.5             # клуб, который годами выступает выше ожиданий, может увеличить бюджет в 2.5 раза (еврокубки, спонсоры)
+
+def club_growth(s, cid):
+    """Рост клуба при тренере: доля прибавки к бюджету (0..GROWTH_MAX). Копится за сезоны выше задачи, тает за провалы."""
+    return (s.get("growth") or {}).get(cid, 0.0)
+
+def annual_budget(world, cid, growth=0.0):
     """Трансферный бюджет клуба на сезон, млн €. Зависит от финансового масштаба клуба (исходная сила из базы, 70%) и лишь
-    частично от нынешней силы (30%): покупки не делают клуб богаче, иначе сильный клуб покупал бы всё больше и больше."""
+    частично от нынешней силы (30%): покупки не делают клуб богаче, иначе сильный клуб покупал бы всё больше и больше.
+    growth - рост клуба при нынешнем тренере (успехи сезон за сезоном): бюджет больше на эту долю."""
     d = world.d
     score = 0.7 * d.clubs[cid]["score"] + 0.3 * world.score[cid]
     ls = world.league_strength(world.league_of(cid)["country"])
-    return round(max(0.05, 0.12 * math.exp(clamp(score, -30, 110) / 12.0) * (0.3 + 0.7 * ls / 100.0)), 2)
+    return round(max(0.05, 0.12 * math.exp(clamp(score, -30, 110) / 12.0) * (0.3 + 0.7 * ls / 100.0)) * (1.0 + growth), 2)
 
 def price(ovr, age, pot):
     return round(market_value(ovr, age, pot), 2)
@@ -105,7 +112,7 @@ class TransferWindow:
         academy, returned, left = [], [], []
         if kind == "summer" and s.get("budget_year") != c.year:
             salaries = sum(x["salary"] for x in s.get("scouts") or [])
-            s["budget"] = round(s.get("budget", 0.0) + annual_budget(world, cid) + s.pop("prize", 0.0) - salaries, 2)
+            s["budget"] = round(s.get("budget", 0.0) + annual_budget(world, cid, club_growth(s, cid)) + s.pop("prize", 0.0) - salaries, 2)
             if salaries:
                 s["fin"]["spent"] += salaries
             s["budget_year"] = c.year
@@ -257,6 +264,10 @@ class TransferWindow:
             pos = rng.choice(weak) if weak and rng.random() < 0.7 else rng.choice(positions)
             age = rng.choices([rng.randint(19, 21), rng.randint(22, 26), rng.randint(27, 30)], weights=[1, 4, 4])[0]
             o = need(pos) + max(0.6, rng.uniform(0.5, 4.0) + skill)    # слабый скаут находит игроков чуть сильнее основы
+            if rng.random() < 0.08 * j:                                # крупное усиление: если клубу по карману (чем лучше
+                big = need(pos) + rng.uniform(4.0, 9.0)                # чутьё, тем чаще), игрок намного сильнее основы
+                if cost(big, age, big) <= budget:
+                    o = big
             pot = o + (rng.uniform(2, 6) if age <= 21 else rng.uniform(0.5, 2.5) if age <= 24 else 0)
             while cost(o, age, pot) > budget and o > need(pos) + 1.0:   # дорого - игрок попроще, но всё ещё сильнее основы
                 o -= 0.5; pot = max(o, pot - 0.5)

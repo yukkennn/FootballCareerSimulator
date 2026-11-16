@@ -125,9 +125,20 @@ def available(p):
     """Игрок может играть: не травмирован и не дисквалифицирован."""
     return not p.get("inj")
 
-def fatigue_pen(p):
-    """Штраф к OVR за усталость: с формы ниже 85 - 0.12 за каждый пункт (форма 60 -> -3)."""
-    return max(0.0, 85.0 - p.get("fit", 100.0)) * 0.12
+FATIGUE_FROM = 81.0    # с формы ниже этой - штраф к OVR в матчах (умеренная ротация без прессинга до неё почти не доходит)
+ROT_MIX = 0.5          # в матчах с ротацией меняется примерно половина основы (а не все одиннадцать)
+NO_REST_PEN = 6.0      # основной, которого некем заменить в матче с ротацией: играет без отдыха, на столько слабее
+
+def fatigue_pen(p, fit=None):
+    """Штраф к OVR за усталость: с формы ниже 81 - 0.12 за каждый пункт (форма 60 -> -2.5)."""
+    return max(0.0, FATIGUE_FROM - (p.get("fit", 100.0) if fit is None else fit)) * 0.12
+
+def half_loss(c, press=None):
+    """Сколько формы теряет игрок основы за половину сезона: прессинг тяжелее, ротация даёт отдых."""
+    s = c.coach
+    r = ROTATION.get(s.get("rotation", "none"), 0.0)
+    press = s.get("tactic") == "press" if press is None else press
+    return (FIT_LOSS + FIT_LOSS_PRESS * press) * (1 - 1.5 * r)
 
 def eff(p):
     """OVR игрока в матчах: с учётом усталости и недовольства (недовольный играет на 2 слабее)."""
@@ -178,8 +189,8 @@ def play_half(c, press=False):
             continue
         if role[p["id"]] == "xi":
             p["min"] = p.get("min", 0.0) + 0.5 * (1 - r)
-            p["fit"] = clamp(p["fit"] - (FIT_LOSS + FIT_LOSS_PRESS * press) * (1 - 1.5 * r), 30.0, 100.0)
-            inj_p = 0.03 + max(0.0, 70.0 - p["fit"]) * 0.003
+            p["fit"] = clamp(p["fit"] - half_loss(c, press), 30.0, 100.0)
+            inj_p = 0.03 + max(0.0, 75.0 - p["fit"]) * 0.004           # уставшие травмируются чаще
             knock_p = 0.12
         else:
             share = max(ROT_MIN, 1.5 * bench_share) if role[p["id"]] == "rot" else 0.6 * bench_share
@@ -318,10 +329,17 @@ def team_rating(c, formation=None, players=None):
         return xi_rating(players, f)
     xi = current_xi(c, f)
     base = sum(v for _, _, v in xi) / 11.0
+    # усталость основы по ходу ближайшей половины сезона: в среднем форма опустится на половину потери за полсезона
+    loss = half_loss(c)
+    base -= sum(fatigue_pen(p, p.get("fit", 100.0) - loss / 2) - fatigue_pen(p) for _, p, _ in xi if p) / 11.0
     r = ROTATION.get(c.coach.get("rotation", "none"), 0.0)
-    if r > 0:                                                 # ротация: часть минут играет второй состав
+    if r > 0:            # ротация: в части матчей половина основы отдыхает, вместо неё - лучшие запасные на эти места
         used = {p["id"] for _, p, _ in xi if p}
-        base = (1 - r) * base + r * xi_rating([p for p in squad(c) if p["id"] not in used], f)
+        xi2 = best_xi([p for p in squad(c) if p["id"] not in used], f)
+        # некого поставить на место (или запасной там намного слабее) - играет основной, но без отдыха (уставший):
+        # маленькому составу ротация дорого стоит
+        second = sum(max(v2 if p2 else 0.0, v1 - NO_REST_PEN) for (_, _, v1), (_, p2, v2) in zip(xi, xi2)) / 11.0
+        base = (1 - r) * base + r * ((1 - ROT_MIX) * base + ROT_MIX * second)
     return round(base, 2)
 
 def apply_to_world(c):
