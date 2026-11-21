@@ -249,6 +249,7 @@ class CoachCareer:
             squad_mod.build(c, o["club"]); s["squad_club"] = o["club"]
             s["formation"] = squad_mod.club_formation(o["club"])           # начинаем со схемы, под которую собран состав
             s["lineup_mode"], s["lineup"] = "auto", {}
+            coaches_mod.take_club(c)                                        # прежний тренер клуба уходит
             s.setdefault("rotation", "some")                               # умеренная ротация - разумный выбор по умолчанию
             s["euro"] = self._euro_guess(o["club"])
         s["offers"], s["offer_reason"], s["can_stay"] = [], None, False

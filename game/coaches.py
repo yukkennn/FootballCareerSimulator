@@ -68,6 +68,12 @@ def init(c):
     c.coach["rivals"] = out
     _staff(c)
 
+def take_club(c):
+    """Тренер-игрок возглавил клуб: прежний тренер этого клуба сразу остаётся без работы (а клуб, откуда ушёл игрок,
+    получит нового тренера в конце сезона)."""
+    if "rivals" in c.coach:
+        _staff(c)
+
 def _staff(c):
     """У каждого топ-клуба - свой тренер; тренеры без клуба занимают свободные места своего уровня."""
     rng = c.rng
@@ -94,9 +100,10 @@ def season(c, res, exp, me_pts):
     if "rivals" not in c.coach:
         init(c)
     rows = []
+    mine = c.coach.get("club")
     for r in c.coach["rivals"]:
         cid = r["club"]
-        if not cid or cid not in w.club_league:
+        if not cid or cid not in w.club_league or cid == mine:     # в клубе тренера-игрока другого тренера нет
             continue
         rows.append({"name": r["name"], "nat": r["nat"], "club": cid, "pts": round(points(c, res, cid, exp.get(cid), r["skill"]), 1), "me": False})
     rows.append({"name": c.name, "nat": c.nat, "club": c.coach["club"], "pts": round(me_pts, 1), "me": True})
@@ -118,7 +125,9 @@ def expectations(c, cc):
     """Ожидаемые места клубов тренеров мира (до начала сезона)."""
     if "rivals" not in c.coach:
         init(c)
-    return {r["club"]: cc.expected(r["club"])[0] for r in c.coach["rivals"] if r["club"] and r["club"] in c.world.club_league}
+    mine = c.coach.get("club")
+    return {r["club"]: cc.expected(r["club"])[0] for r in c.coach["rivals"]
+            if r["club"] and r["club"] in c.world.club_league and r["club"] != mine}
 
 def evolve(c):
     """Конец сезона: тренеры стареют, иногда переходят в клуб сильнее (после успеха) или теряют работу, уходят на пенсию."""
