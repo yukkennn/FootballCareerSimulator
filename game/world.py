@@ -48,6 +48,8 @@ REVERT, CHAMP_BONUS, BASE_TO_MEAN = 0.2, 0.4, 0.01
 HEG_P, HEG_YEARS, HEG_LEAD, HEG_MAX, HEG_REVERT, HEG_TEMP, HEG_COOLDOWN = 0.07, (5, 10), (5.0, 9.0), 25.0, 0.35, 8.0, 10
 # «Форма сезона»: случайная добавка к силе клуба на один сезон (удачный или провальный год), на рейтинг клуба не влияет
 FORM_SD = 3.5
+# переходы игроков меняют силу клубов (world.player_moved): 1 OVR основы = 2.5 единицы силы клуба
+MOVE_SCALE = 2.5
 # Отрыв базовой силы лидера лиги от второго клуба больше LEAD_GAP (~2.5 OVR) тает на LEAD_FADE в год: давний гегемон (ПСЖ, Бурирам)
 # остаётся фаворитом, но не навсегда. Там, где гранды рядом (Реал, Барселона, Атлетико), это не срабатывает.
 LEAD_GAP, LEAD_FADE = 6.0, 0.15
@@ -116,6 +118,20 @@ class World:
 
     def team_ovr(self, cid):
         return 48.0 + 0.40 * self.score[cid]
+
+    def player_moved(self, ovr, frm, to):
+        """Игрок перешёл из клуба frm в клуб to: сила клубов меняется. Покупатель сильнее, если игрок проходит в основу
+        (сильнее «типичного» игрока основы минус 2), на разницу / 11; продавец слабее, если терял игрока основы (вместо него
+        играет запасной уровня основы минус 3). Половина изменения уходит и в базовую силу: эффект тает за несколько сезонов."""
+        for cid, sign in ((frm, -1), (to, 1)):
+            if cid not in self.club_league or frm == to:
+                continue
+            team = self.team_ovr(cid)
+            d = (max(0.0, ovr - (team - 2.0)) if sign > 0 else -max(0.0, ovr - (team - 3.0))) / 11.0
+            if d:
+                ds = MOVE_SCALE * d
+                self.score[cid] = max(MIN_SCORE, min(100.0, self.score[cid] + ds))
+                self.base[cid] = self.base[cid] + 0.5 * ds
 
     def nat_ovr(self, code):
         return 48.0 + self.nat[code] / 2.5

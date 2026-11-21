@@ -146,7 +146,7 @@ class TransferWindow:
                 elif p["club"] == cid:                             # арендованный уходит обратно
                     gone.append(info)
                 # аренды прошлых клубов тренера тоже заканчиваются - игроки возвращаются в свои клубы
-                p["club"], p["squad"] = p["loan_from"], p["loan_from"] == cid
+                stars_mod.move(p, p["loan_from"], c.world); p["squad"] = p["loan_from"] == cid
                 for k in ("loan_from", "loan_until", "loan_min"):
                     p.pop(k, None)
         return back, gone
@@ -431,7 +431,7 @@ class TransferWindow:
         if p and p["club"] == cd["club"]:
             if cd.get("loan"):                                    # аренда на сезон
                 p["loan_from"], p["loan_until"] = p["club"], c.year + 1
-            p["club"] = cid                                       # реальный / известный игрок переходит к вам
+            stars_mod.move(p, cid, c.world)                       # реальный / известный игрок переходит к вам (его клуб слабее)
         else:
             p = stars_mod.add_other(c.stars, cd["name"], cd["nat"], cd["pos"], cd["age"], cd["ovr"], cd["pot"], cid)
         # новичок приходит здоровым и свежим (старые травмы и настроение из прошлого клуба не переносятся)
@@ -453,11 +453,11 @@ class TransferWindow:
         fee = self.sale_fee(p)
         off = win.get("offers", {}).pop(pid, None)
         if off:
-            p["club"] = off["club"]
+            stars_mod.move(p, off["club"], world)                 # покупатель становится сильнее
         else:
             buyers = [x for x in world.club_league if not c.d.clubs[x]["reserve"] and x != cid and x not in stars_mod.PROTECTED
                       and abs(world.team_ovr(x) - p["ovr"]) <= 4]
-            p["club"] = rng.choice(buyers) if buyers else rng.choice(list(world.club_league))
+            stars_mod.move(p, rng.choice(buyers) if buyers else rng.choice(list(world.club_league)), world)
         p.update(squad=False, unhappy=False, inj=0, inj_kind=None, fit=100.0)
         s["budget"] = round(s["budget"] + fee, 2); s["fin"]["income"] += fee
         squad_mod.apply_to_world(c)
@@ -476,7 +476,7 @@ class TransferWindow:
         if not club:
             return False
         before = self.rating()
-        p["club"], p["loan_from"], p["loan_until"] = club, cid, c.year + 1
+        stars_mod.move(p, club, world); p["loan_from"], p["loan_until"] = cid, c.year + 1
         p["loan_min"] = 0.85 if p["ovr"] >= world.team_ovr(club) - 1 else 0.5      # сколько будет играть в аренде
         p["unhappy"] = False
         for o in win.get("loan_offers", []):

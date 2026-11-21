@@ -119,6 +119,13 @@ def players_at(pool, cid):
 def find(pool, pid):
     return next((s for s in all_players(pool) if s["id"] == pid), None)
 
+def move(s, club, world):
+    """Переход игрока в другой клуб: сила обоих клубов в мире меняется (world.player_moved)."""
+    frm = s.get("club")
+    s["club"] = club
+    if world is not None and frm != club:
+        world.player_moved(s["ovr"], frm, club)
+
 def add_other(pool, name, nat, pos, age, ovr, pot, club, real=False):
     """Новый известный игрок (например, купленный тренером игрок с рынка): дальше живёт в мире как остальные."""
     s = {"id": f"s{pool['next']}", "name": name, "nat": nat, "pos": pos, "age": age, "ovr": float(ovr), "pot": float(pot),
@@ -172,7 +179,7 @@ def _evolve_others(pool, world, rng):
             cands = [c for c in world.club_league if not world.d.clubs[c]["reserve"] and abs(world.team_ovr(c) - s["ovr"]) <= 3
                      and c != s["club"] and c not in PROTECTED]
             if cands:
-                s["club"] = rng.choice(cands)
+                move(s, rng.choice(cands), world)
         keep.append(s)
     pool["others"] = keep
     # реальные игроки со временем уходят: список известных игроков пополняется сгенерированными (по уровню клубов)
@@ -269,7 +276,7 @@ def _grow_prospects(pool, world, rng):
             if s["club"] not in world.club_league or (s["club"] not in PROTECTED and not s.get("loan_from") and world.team_ovr(s["club"]) < 76 and rng.random() < 0.5):
                 cands = _elite_clubs(world, 78, pool)
                 if cands:
-                    s["club"] = rng.choices(cands, weights=[world.score[c] ** 2 for c in cands])[0]
+                    move(s, rng.choices(cands, weights=[world.score[c] ** 2 for c in cands])[0], world)
             pool["list"].append(s)
         elif s["age"] < PROSPECT_GIVE_UP:
             left.append(s)
@@ -294,11 +301,11 @@ def evolve(pool, world, rng):
             rich = [c for c in world.club_league if world.d.leagues[world.club_league[c]]["country"] in ("KSA", "USA")
                     and world.team_ovr(c) >= 69 and c not in PROTECTED]
             if rich:
-                s["club"] = rng.choice(rich)
+                move(s, rng.choice(rich), world)
         elif s["ovr"] >= team + 1 and r < 0.18:
             cands = [c for c in _elite_clubs(world, max(team + 1, 79), pool) if c != s["club"]]
             if cands:
-                s["club"] = rng.choices(cands, weights=[world.score[c] ** 2 for c in cands])[0]
+                move(s, rng.choices(cands, weights=[world.score[c] ** 2 for c in cands])[0], world)
         keep.append(s)
     pool["list"] = keep
     _grow_prospects(pool, world, rng)
